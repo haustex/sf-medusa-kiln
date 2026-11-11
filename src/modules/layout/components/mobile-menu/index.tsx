@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 
 import { marketPath, stripMarketPrefix } from "@lib/util/market"
 import Flag from "@modules/brand/flags"
-import { SocialIcon } from "@modules/brand/social"
+import { SocialIcon, type SocialNetwork } from "@modules/brand/social"
 import Link from "@modules/common/components/app-link"
 import { Sheet } from "@modules/ds"
 import { ICON } from "@modules/ds/icons"
@@ -16,7 +16,7 @@ export type MobileMenuProps = {
   items: { href: string; label: string }[]
   markets: MarketOption[]
   account: { href: string; label: string }
-  social: { key: string; label: string; href: string; path: string }[]
+  social: { key: SocialNetwork; label: string; href: string }[]
   labels: { open: string; close: string; menu: string; market: string }
 }
 
@@ -90,7 +90,7 @@ export default function MobileMenu({ items, markets, account, social, labels }: 
               {social.map((n) => (
                 <li key={n.key}>
                   <a href={n.href} aria-label={n.label} rel="noopener me" target="_blank" className="inline-flex size-11 items-center justify-center rounded-full outline-none hover:bg-default/60 focus-visible:ring-2 focus-visible:ring-focus">
-                    <SocialIcon path={n.path} />
+                    <SocialIcon network={n.key} />
                   </a>
                 </li>
               ))}

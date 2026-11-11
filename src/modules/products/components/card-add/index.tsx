@@ -78,7 +78,7 @@ export default function CardAdd({ product, countryCode, labels }: { product: Pro
         className={cn(
           "inline-flex size-11 items-center justify-center rounded-full outline-none transition-colors focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           "disabled:cursor-not-allowed disabled:opacity-50",
-          // bare icon over the photo (k-card-icon: colour from theme.config.ts cardIconColor, soft shadow), no background
+          // bare icon over the photo (k-card-icon: colour from theme.config.ts cardIconColor), no background or shadow
           "k-card-icon",
           state === "error" && "ring-2 ring-danger"
         )}

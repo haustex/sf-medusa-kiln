@@ -10,8 +10,8 @@ import { loadWishlist, toggleWishlist, useWishlistState } from "./store"
 /**
  * Heart toggle for a product (card corner or next to the PDP title). Renders unfilled in the static HTML, fills once
  * the shared wishlist state is loaded (modules/wishlist/store.ts). A button, never inside the card's link.
- * overlay: bare icon over the photo (k-card-icon: colour from theme.config.ts cardIconColor + a soft shadow), 44 px
- * transparent target.
+ * overlay: a solid heart over the photo, no background or shadow: cardIconColor (theme.config.ts) when not saved,
+ * the opposite tone when saved (white → ink by default); 44 px transparent target.
  */
 export default function WishlistHeart({
   productId,
@@ -54,11 +54,11 @@ export default function WishlistHeart({
       data-product-id={productId}
       className={cn(
         "inline-flex items-center justify-center rounded-full outline-none transition-colors focus-visible:ring-2 focus-visible:ring-focus",
-        variant === "overlay" ? "k-card-icon size-11" : "size-11 border border-foreground bg-surface hover:bg-default",
+        variant === "overlay" ? cn("size-11", saved ? "k-card-icon-alt" : "k-card-icon") : "size-11 border border-foreground bg-surface hover:bg-default",
         className
       )}
     >
-      <Heart {...ICON} size={22} strokeWidth={variant === "overlay" ? 2 : 1.5} fill={saved ? "currentColor" : "none"} />
+      {variant === "overlay" ? <Heart {...ICON} size={22} strokeWidth={0} fill="currentColor" /> : <Heart {...ICON} fill={saved ? "currentColor" : "none"} />}
     </button>
   )
 }

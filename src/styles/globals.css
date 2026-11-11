@@ -211,16 +211,22 @@
 }
 
 /*
- * Icon buttons over a card photo (heart, "+"): no background, the icon in --k-card-icon (theme.config.ts
- * cardIconColor) with a soft shadow in the opposite tone, so it reads on light and dark photos alike. The 44 px
- * target is transparent; keyboard focus draws a ring in the icon colour.
+ * Icon buttons over a card photo (heart, "+"): no background, no shadow; the icon in --k-card-icon (theme.config.ts
+ * cardIconColor, white by default) and, for a saved heart, the opposite tone (--k-card-icon-alt). The 44 px target
+ * is transparent; keyboard focus draws a ring in the icon colour.
  */
 @utility k-card-icon {
   color: var(--k-card-icon, #fff);
-  /* a tight halo + a soft shadow: the halo keeps the stroke readable on a near-white photo */
-  filter: drop-shadow(0 0 1px var(--k-card-icon-shadow, rgb(0 0 0 / 0.45))) drop-shadow(0 1px 3px var(--k-card-icon-shadow, rgb(0 0 0 / 0.45)));
   &:focus-visible {
     outline: 2px solid var(--k-card-icon, #fff);
+    outline-offset: -4px;
+    border-radius: 9999px;
+  }
+}
+@utility k-card-icon-alt {
+  color: var(--k-card-icon-alt, #0c0c0c);
+  &:focus-visible {
+    outline: 2px solid var(--k-card-icon-alt, #0c0c0c);
     outline-offset: -4px;
     border-radius: 9999px;
   }
