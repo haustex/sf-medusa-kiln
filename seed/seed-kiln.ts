@@ -12,6 +12,7 @@
 import {
   createApiKeysWorkflow,
   createInventoryLevelsWorkflow,
+  createCollectionsWorkflow,
   createProductCategoriesWorkflow,
   createProductsWorkflow,
   createRegionsWorkflow,
@@ -38,21 +39,28 @@ const CATEGORIES = [
   { name: "Storage", handle: "storage", image: "cat-storage" },
 ]
 
-type Demo = { handle: string; title: string; category: string; usd: number; idr: number; weight: number; options?: { title: string; values: string[]; usdStep?: number }; description: string; material: string; care: string }
+type Demo = { handle: string; title: string; category: string; maker: string; material: string; usd: number; idr: number; weight: number; options?: { title: string; values: string[]; usdStep?: number }; description: string; materials: string; care: string }
+const MAKERS = [
+  { handle: "studio-lio", title: "Studio Lio", location: "Yogyakarta, Indonesia", description: "A two-person pottery studio. Everything is thrown by hand and fired in a small gas kiln." },
+  { handle: "tjipto-workshop", title: "Tjipto Workshop", location: "Jepara, Indonesia", description: "Third-generation woodworkers. Solid timber only, finished with oil, never lacquer." },
+  { handle: "north-field", title: "North Field", location: "Bandung, Indonesia", description: "Textiles and candles made in small runs, with natural fibres and soy wax." },
+  { handle: "rumah-anyam", title: "Rumah Anyam", location: "Lombok, Indonesia", description: "A weaving collective: seagrass and rattan baskets woven the traditional way." },
+]
+
 const PRODUCTS: Demo[] = [
-  { handle: "stoneware-dinner-plate", title: "Stoneware Dinner Plate", category: "tableware", usd: 28, idr: 420000, weight: 700, options: { title: "Size", values: ["22 cm", "27 cm"], usdStep: 6 }, material: "Glazed stoneware", care: "Dishwasher and oven safe", description: "A plate with a soft matte glaze and a slightly raised rim. Fired twice, so the edge takes daily use without chipping." },
-  { handle: "ceramic-serving-bowl", title: "Ceramic Serving Bowl", category: "tableware", usd: 46, idr: 690000, weight: 1100, material: "Glazed stoneware", care: "Dishwasher safe", description: "A wide, low bowl for salads and sharing plates. Each one is thrown by hand, so the rim varies a little." },
-  { handle: "ribbed-stoneware-mug", title: "Ribbed Stoneware Mug", category: "tableware", usd: 22, idr: 330000, weight: 350, options: { title: "Colour", values: ["Ash", "Bone"] }, material: "Stoneware", care: "Dishwasher safe", description: "A 350 ml mug with fine ribs on the outside that keep it easy to hold when the coffee is hot." },
-  { handle: "oak-serving-board", title: "Oak Serving Board", category: "kitchen", usd: 54, idr: 810000, weight: 900, options: { title: "Size", values: ["Small", "Large"], usdStep: 18 }, material: "Solid European oak, food-safe oil", care: "Hand wash, re-oil monthly", description: "A thick oak board with a hanging hole. Finished with food-safe oil only, so it can be sanded and refreshed for years." },
-  { handle: "walnut-catch-all-tray", title: "Walnut Catch-all Tray", category: "kitchen", usd: 38, idr: 570000, weight: 500, material: "Solid walnut", care: "Wipe with a damp cloth", description: "A shallow tray for keys, spoons or jewellery. The raised edge is cut from the same board, so the grain runs straight through." },
-  { handle: "tapered-bud-vase", title: "Tapered Bud Vase", category: "decor", usd: 32, idr: 480000, weight: 400, material: "Stoneware", care: "Hand wash", description: "A narrow-necked vase for one or two stems. Weighted at the base so a tall branch will not tip it." },
-  { handle: "soy-candle", title: "Soy Candle", category: "decor", usd: 24, idr: 360000, weight: 450, options: { title: "Scent", values: ["Cedar", "Fig", "Unscented"] }, material: "Soy wax, cotton wick, glass", care: "Trim the wick to 5 mm before lighting", description: "A 50-hour candle in a reusable glass. Soy wax burns cool and clean; the glass goes in the dishwasher afterwards." },
-  { handle: "linen-napkin-set", title: "Linen Napkin Set", category: "textiles", usd: 36, idr: 540000, weight: 200, options: { title: "Colour", values: ["Natural", "Charcoal"] }, material: "100% washed linen", care: "Machine wash warm, tumble low", description: "Four 45 cm napkins in stonewashed linen. They soften with every wash and look best a little creased." },
-  { handle: "wool-throw", title: "Wool Throw", category: "textiles", usd: 120, idr: 1800000, weight: 1300, material: "100% lambswool", care: "Dry clean or hand wash cold", description: "A 130 × 180 cm throw woven from lambswool, with a twisted fringe. Warm without being heavy." },
-  { handle: "paper-cone-lamp", title: "Paper Cone Lamp", category: "lighting", usd: 88, idr: 1320000, weight: 1600, material: "Washi paper shade, oak base", care: "Dust with a soft brush", description: "A table lamp with a hand-folded paper shade on a turned oak base. Takes a standard E27 bulb; fitted with a fabric cord." },
-  { handle: "wall-hook-rail", title: "Wall Hook Rail", category: "storage", usd: 42, idr: 630000, weight: 700, material: "Solid oak, brass hooks", care: "Wipe clean", description: "A 45 cm oak rail with three brass hooks. Comes with screws and wall plugs; the holes are pre-drilled and countersunk." },
-  { handle: "seagrass-basket", title: "Seagrass Basket", category: "storage", usd: 34, idr: 510000, weight: 600, options: { title: "Size", values: ["Small", "Medium", "Large"], usdStep: 10 }, material: "Hand-woven seagrass", care: "Keep dry", description: "A sturdy woven basket with two handles. Holds its shape when empty and folds flat for shipping." },
-  { handle: "cedar-storage-box", title: "Cedar Storage Box", category: "storage", usd: 64, idr: 960000, weight: 1500, material: "Solid cedar", care: "Sand lightly to refresh the scent", description: "A lidded box in aromatic cedar for sweaters and linens. The scent keeps moths away without anything sprayed on." },
+  { handle: "stoneware-dinner-plate", maker: "studio-lio", material: "Stoneware", title: "Stoneware Dinner Plate", category: "tableware", usd: 28, idr: 420000, weight: 700, options: { title: "Size", values: ["22 cm", "27 cm"], usdStep: 6 }, materials: "Glazed stoneware", care: "Dishwasher and oven safe", description: "A plate with a soft matte glaze and a slightly raised rim. Fired twice, so the edge takes daily use without chipping." },
+  { handle: "ceramic-serving-bowl", maker: "studio-lio", material: "Stoneware", title: "Ceramic Serving Bowl", category: "tableware", usd: 46, idr: 690000, weight: 1100, materials: "Glazed stoneware", care: "Dishwasher safe", description: "A wide, low bowl for salads and sharing plates. Each one is thrown by hand, so the rim varies a little." },
+  { handle: "ribbed-stoneware-mug", maker: "studio-lio", material: "Stoneware", title: "Ribbed Stoneware Mug", category: "tableware", usd: 22, idr: 330000, weight: 350, options: { title: "Colour", values: ["Ash", "Bone"] }, materials: "Stoneware", care: "Dishwasher safe", description: "A 350 ml mug with fine ribs on the outside that keep it easy to hold when the coffee is hot." },
+  { handle: "oak-serving-board", maker: "tjipto-workshop", material: "Oak", title: "Oak Serving Board", category: "kitchen", usd: 54, idr: 810000, weight: 900, options: { title: "Size", values: ["Small", "Large"], usdStep: 18 }, materials: "Solid European oak, food-safe oil", care: "Hand wash, re-oil monthly", description: "A thick oak board with a hanging hole. Finished with food-safe oil only, so it can be sanded and refreshed for years." },
+  { handle: "walnut-catch-all-tray", maker: "tjipto-workshop", material: "Walnut", title: "Walnut Catch-all Tray", category: "kitchen", usd: 38, idr: 570000, weight: 500, materials: "Solid walnut", care: "Wipe with a damp cloth", description: "A shallow tray for keys, spoons or jewellery. The raised edge is cut from the same board, so the grain runs straight through." },
+  { handle: "tapered-bud-vase", maker: "studio-lio", material: "Stoneware", title: "Tapered Bud Vase", category: "decor", usd: 32, idr: 480000, weight: 400, materials: "Stoneware", care: "Hand wash", description: "A narrow-necked vase for one or two stems. Weighted at the base so a tall branch will not tip it." },
+  { handle: "soy-candle", maker: "north-field", material: "Soy wax", title: "Soy Candle", category: "decor", usd: 24, idr: 360000, weight: 450, options: { title: "Scent", values: ["Cedar", "Fig", "Unscented"] }, materials: "Soy wax, cotton wick, glass", care: "Trim the wick to 5 mm before lighting", description: "A 50-hour candle in a reusable glass. Soy wax burns cool and clean; the glass goes in the dishwasher afterwards." },
+  { handle: "linen-napkin-set", maker: "north-field", material: "Linen", title: "Linen Napkin Set", category: "textiles", usd: 36, idr: 540000, weight: 200, options: { title: "Colour", values: ["Natural", "Charcoal"] }, materials: "100% washed linen", care: "Machine wash warm, tumble low", description: "Four 45 cm napkins in stonewashed linen. They soften with every wash and look best a little creased." },
+  { handle: "wool-throw", maker: "north-field", material: "Wool", title: "Wool Throw", category: "textiles", usd: 120, idr: 1800000, weight: 1300, materials: "100% lambswool", care: "Dry clean or hand wash cold", description: "A 130 × 180 cm throw woven from lambswool, with a twisted fringe. Warm without being heavy." },
+  { handle: "paper-cone-lamp", maker: "tjipto-workshop", material: "Paper", title: "Paper Cone Lamp", category: "lighting", usd: 88, idr: 1320000, weight: 1600, materials: "Washi paper shade, oak base", care: "Dust with a soft brush", description: "A table lamp with a hand-folded paper shade on a turned oak base. Takes a standard E27 bulb; fitted with a fabric cord." },
+  { handle: "wall-hook-rail", maker: "tjipto-workshop", material: "Oak", title: "Wall Hook Rail", category: "storage", usd: 42, idr: 630000, weight: 700, materials: "Solid oak, brass hooks", care: "Wipe clean", description: "A 45 cm oak rail with three brass hooks. Comes with screws and wall plugs; the holes are pre-drilled and countersunk." },
+  { handle: "seagrass-basket", maker: "rumah-anyam", material: "Seagrass", title: "Seagrass Basket", category: "storage", usd: 34, idr: 510000, weight: 600, options: { title: "Size", values: ["Small", "Medium", "Large"], usdStep: 10 }, materials: "Hand-woven seagrass", care: "Keep dry", description: "A sturdy woven basket with two handles. Holds its shape when empty and folds flat for shipping." },
+  { handle: "cedar-storage-box", maker: "tjipto-workshop", material: "Cedar", title: "Cedar Storage Box", category: "storage", usd: 64, idr: 960000, weight: 1500, materials: "Solid cedar", care: "Sand lightly to refresh the scent", description: "A lidded box in aromatic cedar for sweaters and linens. The scent keeps moths away without anything sprayed on." },
 ]
 
 export default async function seed({ container }: ExecArgs) {
@@ -130,6 +138,12 @@ export default async function seed({ container }: ExecArgs) {
   })
   const categoryId = (handle: string) => categories.find((c) => c.handle === handle)!.id
 
+  // Makers: one collection each (the storefront's "Maker" filter and /makers pages read collections + metadata)
+  const { result: collections } = await createCollectionsWorkflow(container).run({
+    input: { collections: MAKERS.map((m) => ({ title: m.title, handle: m.handle, metadata: { location: m.location, description: m.description } })) },
+  })
+  const collectionId = (handle: string) => collections.find((c) => c.handle === handle)!.id
+
   await createProductsWorkflow(container).run({
     input: {
       products: PRODUCTS.map((p) => {
@@ -140,12 +154,13 @@ export default async function seed({ container }: ExecArgs) {
           description: p.description,
           status: ProductStatus.PUBLISHED,
           category_ids: [categoryId(p.category)],
+          collection_id: collectionId(p.maker),
           thumbnail: img(p.handle),
           images: [{ url: img(p.handle) }],
           weight: p.weight,
           shipping_profile_id: profile.id,
           sales_channels: [{ id: channel.id }],
-          metadata: { material: p.material, care: p.care },
+          metadata: { material: p.material, materials: p.materials, care: p.care },
           options: [{ title: p.options?.title ?? "Default", values }],
           variants: values.map((v, i) => ({
             title: v,

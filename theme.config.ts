@@ -138,6 +138,29 @@ const config = {
     search: "auto" as "auto" | "on" | "off",
   },
 
+  /**
+   * Product listings (/store, categories, collections). Filters are computed from the products of the listing
+   * (up to `scan` products per listing, fetched once and cached): no search engine needed. Every filter is a plain
+   * URL query (?min=20&max=150&opt=Size:Large&attr=material:Oak&maker=studio-lio&rating=4&stock=1&sort=price_asc).
+   */
+  listing: {
+    pageSize: 12,
+    /** How many products of a listing are fetched to filter, sort and count; the Store API caps a request at 100 */
+    scan: 100,
+    filters: {
+      price: true,
+      /** Product options as filters: "auto" = every option title found, or a list of titles; [] turns them off */
+      options: "auto" as "auto" | string[],
+      /** product.metadata keys shown as filters (e.g. material, wood, colour), with their labels */
+      attributes: [{ key: "material", label: { en: "Material", id: "Bahan" } }] as { key: string; label: Localized }[],
+      /** The product's collection as a filter (makers, brands, lines); false hides it */
+      collection: { en: "Maker", id: "Pembuat" } as Localized | false,
+      /** "4 & up" (needs medusa-reviews-wishlist) */
+      rating: 4 as number | false,
+      stock: true,
+    },
+  },
+
   /** Blog URL segment when medusa-blog-seo is installed */
   blogPath: "/blog",
 

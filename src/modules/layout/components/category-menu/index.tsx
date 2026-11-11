@@ -1,14 +1,18 @@
 "use client"
 
 import { cn } from "@heroui/styles"
+import { stripMarketPrefix } from "@lib/util/market"
 import Link from "@modules/common/components/app-link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef } from "react"
 
 export type MenuItem = { href: string; label: string }
 
-/** `/id/...` (internal rewrite) and `/...` are the same Indonesian page. */
-const normalize = (path: string) => (path.replace(/^\/id(?=\/|$)/, "") || "/").replace(/\/$/, "") || "/"
+/**
+ * The server renders the rewritten path (`/us/store`), the browser shows the public one (`/store`): compare both
+ * without the market prefix, or hydration would flag aria-current.
+ */
+const normalize = (path: string) => stripMarketPrefix(path).replace(/\/$/, "") || "/"
 
 const isActive = (pathname: string, href: string) => {
   const p = normalize(pathname)
