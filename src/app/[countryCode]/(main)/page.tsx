@@ -4,9 +4,10 @@ import config from "@theme"
 import { listCategories } from "@lib/data/categories"
 import { listProducts } from "@lib/data/products"
 import { getDictionary } from "@lib/i18n/dictionaries"
+import { tx } from "@lib/i18n/localized"
 import { organizationSchema, websiteSchema } from "@lib/seo/organization"
 import { JsonLd } from "@lib/seo/jsonld"
-import { marketAlternates, marketPath } from "@lib/util/market"
+import { getMarket, marketAlternates, marketPath } from "@lib/util/market"
 import { getSiteOrigin } from "@lib/util/site"
 import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
 import { CategoryTile, Page, ProductGrid, Section } from "@modules/ds"
@@ -20,9 +21,10 @@ export const revalidate = 60
 export async function generateMetadata(props: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
   const { countryCode } = await props.params
   const origin = await getSiteOrigin()
+  const lang = getMarket(countryCode).dictionary
   return {
-    title: { absolute: `${config.brand.name} · ${config.brand.tagline}` },
-    description: `${config.brand.tagline} ${config.brand.footerText}`,
+    title: { absolute: `${config.brand.name} · ${tx(config.brand.tagline, lang)}` },
+    description: `${tx(config.brand.tagline, lang)} ${tx(config.brand.footerText, lang)}`,
     alternates: { canonical: `${origin}${marketPath(countryCode)}`, languages: marketAlternates(origin) },
   }
 }

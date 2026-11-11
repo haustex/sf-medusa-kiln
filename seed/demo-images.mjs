@@ -10,8 +10,8 @@ import sharp from "sharp"
 const out = join(dirname(fileURLToPath(import.meta.url)), "images")
 mkdirSync(out, { recursive: true })
 
-const BG = ["#F3F0EA", "#EEEBE6", "#F5F2EC", "#ECE9E3"]
-const INK = ["#2A2724", "#4A443E", "#6B645C", "#8A8178", "#B5ADA3"]
+const BG = ["#F3F0EA", "#EEEBE6", "#F5F2EC", "#ECE9E3", "#2A2724", "#3A3632"]
+const INK = ["#2A2724", "#4A443E", "#6B645C", "#8A8178", "#B5ADA3", "#D9D2C7", "#EFEAE2"]
 const shapes = {
   plate: (c) => `<circle cx="600" cy="600" r="330" fill="${c}"/><circle cx="600" cy="600" r="230" fill="none" stroke="#F3F0EA" stroke-opacity=".35" stroke-width="6"/>`,
   bowl: (c) => `<path d="M270 540 h660 a330 330 0 0 1 -660 0z" fill="${c}"/><ellipse cx="600" cy="540" rx="330" ry="70" fill="${c}" opacity=".85"/>`,
@@ -35,11 +35,13 @@ export const DEMO_IMAGES = [
   ["seagrass-basket", "basket", 1, 2], ["cedar-storage-box", "box", 2, 1], ["walnut-catch-all-tray", "tray", 3, 0],
   ["wall-hook-rail", "hook", 1, 4], ["cat-tableware", "plate", 0, 1], ["cat-kitchen", "board", 1, 0], ["cat-decor", "vase", 2, 2],
   ["cat-textiles", "throw", 3, 3], ["cat-lighting", "lamp", 0, 0], ["cat-storage", "basket", 1, 1],
+  // dark backdrops (used by the /design page to check the card icons on dark photos)
+  ["dark-plate", "plate", 4, 5], ["dark-lamp", "lamp", 5, 6],
 ]
 
 for (const [name, shape, bg, ink] of DEMO_IMAGES) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200"><rect width="1200" height="1200" fill="${BG[bg]}"/>
-    <ellipse cx="600" cy="900" rx="330" ry="40" fill="#000" opacity=".05"/>${shapes[shape](INK[ink])}</svg>`
+    <ellipse cx="600" cy="900" rx="330" ry="40" fill="${bg >= 4 ? "#fff" : "#000"}" opacity=".05"/>${shapes[shape](INK[ink])}</svg>`
   const jpg = await sharp(Buffer.from(svg)).jpeg({ quality: 84, mozjpeg: true, progressive: true }).toBuffer()
   writeFileSync(join(out, `${name}.jpg`), jpg)
 }

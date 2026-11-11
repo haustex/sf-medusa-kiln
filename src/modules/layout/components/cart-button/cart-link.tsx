@@ -2,7 +2,9 @@
 
 import { CART_UPDATED_EVENT } from "@lib/util/cart-events"
 import { marketPath } from "@lib/util/market"
+import { ShoppingBag } from "lucide-react"
 import Link from "@modules/common/components/app-link"
+import { ICON } from "@modules/ds/icons"
 import CountBadge from "@modules/layout/components/count-badge"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -37,10 +39,7 @@ export default function CartLink({ initialCount, label }: { initialCount: number
       aria-label={count > 0 ? `${label} (${count})` : label}
       data-testid="nav-cart-link"
     >
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-6">
-        <path d="M5 8h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9L5 8Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-        <path d="M9 10V7a3 3 0 0 1 6 0v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
+      <ShoppingBag {...ICON} />
       <CountBadge count={count} />
     </Link>
   )

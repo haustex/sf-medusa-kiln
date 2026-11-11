@@ -4,6 +4,9 @@
  * markets drive routing (src/lib/util/market.ts, src/proxy.ts); the rest is read by the components that need it.
  * Keep this file free of secrets: it is imported by client components too.
  */
+/** One string for every language, or one per dictionary code: { en: "Help", id: "Bantuan" } */
+export type Localized = string | Record<string, string>
+
 export type MarketConfig = {
   /** Medusa region country code (lower case), e.g. "us" */
   countryCode: string
@@ -26,22 +29,39 @@ const config = {
     name: "Tilde Goods",
     /** Title suffix: "{page} | Tilde Goods" */
     titleSuffix: "Tilde Goods",
-    tagline: "Small-batch objects for the home, made by independent makers.",
+    tagline: { en: "Small-batch objects for the home, made by independent makers.", id: "Benda rumah dalam jumlah kecil, dari pembuat independen." } as Localized,
     /** Short line under the logo in the footer; the demo content is fictional */
-    footerText: "Every piece ships from the workshop that made it.",
+    footerText: { en: "Every piece ships from the workshop that made it.", id: "Setiap barang dikirim dari bengkel yang membuatnya." } as Localized,
     location: "Jepara, Indonesia",
     /** Logo: "text" renders the name in the site font with a small mark; "svg" uses `svgPath` (one path, fill currentColor) */
     logo: { type: "text" as "text" | "svg", svgPath: "", svgViewBox: "0 0 100 20" },
     /** Links in the header's category row, after the categories */
     navLinks: [
-      { label: "Makers", href: "/makers" },
-      { label: "Journal", href: "/blog" },
+      { label: { en: "Makers", id: "Pembuat" } as Localized, href: "/makers" },
+      { label: { en: "Journal", id: "Jurnal" } as Localized, href: "/blog" },
     ],
     /** Footer columns (the "Shop" column lists categories automatically) */
     footerColumns: [
-      { title: "Help", links: [{ label: "Shipping", href: "/shipping" }, { label: "Track an order", href: "/track" }, { label: "Returns", href: "/returns" }, { label: "Contact", href: "/contact" }] },
-      { title: "Studio", links: [{ label: "About", href: "/about" }, { label: "Makers", href: "/makers" }, { label: "Journal", href: "/blog" }, { label: "Privacy", href: "/privacy" }, { label: "Terms", href: "/terms" }] },
-    ],
+      {
+        title: { en: "Help", id: "Bantuan" },
+        links: [
+          { label: { en: "Shipping", id: "Pengiriman" }, href: "/shipping" },
+          { label: { en: "Track an order", id: "Lacak pesanan" }, href: "/track" },
+          { label: { en: "Returns", id: "Pengembalian" }, href: "/returns" },
+          { label: { en: "Contact", id: "Kontak" }, href: "/contact" },
+        ],
+      },
+      {
+        title: { en: "Studio", id: "Studio" },
+        links: [
+          { label: { en: "About", id: "Tentang" }, href: "/about" },
+          { label: { en: "Makers", id: "Pembuat" }, href: "/makers" },
+          { label: { en: "Journal", id: "Jurnal" }, href: "/blog" },
+          { label: { en: "Privacy", id: "Privasi" }, href: "/privacy" },
+          { label: { en: "Terms", id: "Syarat" }, href: "/terms" },
+        ],
+      },
+    ] as { title: Localized; links: { label: Localized; href: string }[] }[],
     /** "Theme Kiln by Haus Kayu" after the copyright line in the footer. Set to false to hide it. */
     credit: true,
   },
@@ -84,6 +104,9 @@ const config = {
     soft: "#f5f5f5",
     softHover: "#ebebeb",
   },
+
+  /** Heart and "+" over a card photo: "light" = white icons with a soft dark shadow, "dark" = ink icons with a light one */
+  cardIconColor: "light" as "light" | "dark",
 
   radius: {
     /** buttons, inputs, chips */

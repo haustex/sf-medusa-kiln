@@ -1,7 +1,9 @@
+import { Search, User } from "lucide-react"
 import { Suspense } from "react"
 
 import { listCategories } from "@lib/data/categories"
 import { getDictionary } from "@lib/i18n/dictionaries"
+import { tx } from "@lib/i18n/localized"
 import { getMarket, marketPath } from "@lib/util/market"
 import config from "@theme"
 import Logo from "@modules/brand/logo"
@@ -16,6 +18,7 @@ import { marketOptions } from "@modules/layout/components/market-select/options"
 import MobileMenu from "@modules/layout/components/mobile-menu"
 import WishlistLink from "@modules/layout/components/wishlist-link"
 import Link from "@modules/common/components/app-link"
+import { ICON } from "@modules/ds/icons"
 
 /**
  * Header: logo left, search centred on the page (middle column of a 1fr/640px/1fr grid), market switch + wishlist +
@@ -43,7 +46,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
   const menuItems = [
     { href: href("/store"), label: t.nav.allProducts },
     ...topLevel.map((c) => ({ href: href(`/categories/${c.handle}`), label: c.name })),
-    ...config.brand.navLinks.map((l) => ({ href: href(l.href), label: l.label })),
+    ...config.brand.navLinks.map((l) => ({ href: href(l.href), label: tx(l.label, market.dictionary) })),
   ]
 
   const search = <HeaderSearch action={href("/search")} placeholder={t.nav.search} label={t.nav.searchLabel} formLabel={t.nav.searchRegion} />
@@ -85,10 +88,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
             data-search-toggle
             className="inline-flex size-11 items-center justify-center rounded-full hover:bg-default/60 md:hidden"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-6">
-              <circle cx="11" cy="11" r="6.75" stroke="currentColor" strokeWidth="1.5" />
-              <path d="m20 20-4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <Search {...ICON} />
           </Link>
           <MarketSelect options={markets} label={t.nav.market} className="hidden md:block" />
           <WishlistLink href={href("/wishlist")} label={t.nav.wishlist} />
@@ -98,10 +98,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
             className="inline-flex size-11 items-center justify-center rounded-full hover:bg-default/60"
             data-testid="nav-account-link"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-6">
-              <circle cx="12" cy="8.5" r="3.75" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M4.75 20c.9-3.6 3.8-5.5 7.25-5.5s6.35 1.9 7.25 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <User {...ICON} />
           </Link>
           <Suspense fallback={<CartLink initialCount={null} label={t.nav.cart} />}>
             <CartButton label={t.nav.cart} />

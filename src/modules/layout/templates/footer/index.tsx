@@ -1,6 +1,8 @@
 import config from "@theme"
 import { listCategories } from "@lib/data/categories"
 import { getDictionary } from "@lib/i18n/dictionaries"
+import { tx } from "@lib/i18n/localized"
+import { getMarket } from "@lib/util/market"
 import Logo from "@modules/brand/logo"
 import SocialLinks from "@modules/brand/social"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -11,6 +13,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
  */
 export default async function Footer({ countryCode }: { countryCode: string }) {
   const t = getDictionary(countryCode)
+  const lang = getMarket(countryCode).dictionary
   const categories = await listCategories({ fields: "id,name,handle,parent_category_id", limit: 20 }, countryCode).catch(() => [])
   const topLevel = categories.filter((c) => !c.parent_category_id).slice(0, 6)
 
@@ -22,7 +25,7 @@ export default async function Footer({ countryCode }: { countryCode: string }) {
             <Logo size="md" decorative />
           </LocalizedClientLink>
           <p className="max-w-sm text-sm text-muted">
-            {config.brand.tagline} {config.brand.footerText}
+            {tx(config.brand.tagline, lang)} {tx(config.brand.footerText, lang)}
           </p>
         </div>
 
@@ -45,13 +48,13 @@ export default async function Footer({ countryCode }: { countryCode: string }) {
         </div>
 
         {config.brand.footerColumns.map((col) => (
-          <div key={col.title} className="flex flex-col gap-stack-md text-sm">
-            <span className="type-eyebrow">{col.title}</span>
+          <div key={tx(col.title, "en")} className="flex flex-col gap-stack-md text-sm">
+            <span className="type-eyebrow">{tx(col.title, lang)}</span>
             <ul className="flex flex-col gap-stack-sm">
               {col.links.map((l) => (
                 <li key={l.href}>
                   <LocalizedClientLink prefetch={false} href={l.href} className="hover:underline underline-offset-4">
-                    {l.label}
+                    {tx(l.label, lang)}
                   </LocalizedClientLink>
                 </li>
               ))}

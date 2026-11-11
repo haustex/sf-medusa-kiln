@@ -1,14 +1,19 @@
-import { cn } from "@heroui/styles"
+import { ArrowRight as LucideArrowRight } from "lucide-react"
+import type { LucideProps } from "lucide-react"
 
 /*
- * Inline SVG icons. Don't use text arrows ("→", "›"): they fall outside the latin
- * subset of the site font (Inter) and fall back to a system font with different metrics.
+ * UI icons come from lucide-react (one named import per icon: tree-shaken, Next optimises the package). Use ICON
+ * for the shared size/stroke so every icon reads the same: 20 px, stroke 1.5. Brand marks (social, flags, the logo)
+ * stay hand-drawn SVG in modules/brand. Don't use text arrows ("→", "›"): they fall outside the Latin subset of
+ * Inter and fall back to a system font.
  */
+export const ICON = { size: 20, strokeWidth: 1.5, "aria-hidden": true, focusable: false } as const satisfies LucideProps & { focusable: boolean }
 
+/** Inline arrow that follows the text size (section "See all" links, eyebrow links) */
 export function ArrowRight({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className={cn("inline-block size-[1em] shrink-0", className)}>
-      <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
+  return <LucideArrowRight aria-hidden="true" focusable={false} size="1em" strokeWidth={1.75} className={cn("inline-block shrink-0", className)} />
+}
+
+function cn(...parts: (string | undefined)[]) {
+  return parts.filter(Boolean).join(" ")
 }

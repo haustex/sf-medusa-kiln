@@ -1,4 +1,5 @@
 import { breadcrumbsVariants, cn } from "@heroui/styles"
+import { ChevronRight } from "lucide-react"
 import Link from "@modules/common/components/app-link"
 
 export type Crumb = { label: string; href?: string }
@@ -23,9 +24,7 @@ export default function Breadcrumb({ items, label = "Breadcrumb", className }: {
                 </span>
               )}
               {!last && (
-                <svg aria-hidden="true" viewBox="0 0 16 16" className={s.separator()} fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="m6 3.5 4.5 4.5L6 12.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <ChevronRight aria-hidden="true" focusable={false} size={16} strokeWidth={1.5} className={s.separator()} />
               )}
             </li>
           )

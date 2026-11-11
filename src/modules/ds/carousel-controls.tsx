@@ -1,6 +1,7 @@
 "use client"
 
 import { buttonVariants, cn } from "@heroui/styles"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useState } from "react"
 
 /**
@@ -59,8 +60,6 @@ export default function CarouselControls({
 
 function Chevron({ dir }: { dir: "left" | "right" }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.75">
-      <path d={dir === "left" ? "M10 3.5 5.5 8l4.5 4.5" : "m6 3.5 4.5 4.5L6 12.5"} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    dir === "left" ? <ChevronLeft aria-hidden="true" focusable={false} size={16} strokeWidth={1.75} /> : <ChevronRight aria-hidden="true" focusable={false} size={16} strokeWidth={1.75} />
   )
 }

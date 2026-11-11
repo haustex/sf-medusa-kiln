@@ -1,7 +1,10 @@
 "use client"
 
 import { cn } from "@heroui/styles"
+import { X } from "lucide-react"
 import { useEffect, useRef } from "react"
+
+import { ICON } from "./icons"
 
 /**
  * Floating sheet on a native <dialog> (focus trap, Escape, backdrop and inert page for free; no overlay library).
@@ -73,9 +76,7 @@ export default function Sheet({
           aria-label={closeLabel}
           className="-mr-2 inline-flex size-11 items-center justify-center rounded-full outline-none hover:bg-default/60 focus-visible:ring-2 focus-visible:ring-focus"
         >
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-6">
-            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
+          <X {...ICON} />
         </button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-stack-lg py-stack-md">{children}</div>

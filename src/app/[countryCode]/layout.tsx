@@ -45,6 +45,8 @@ const themeVars = {
   "--k-radius-media": config.radius.media,
   "--k-radius-sheet": config.radius.sheet,
   "--k-frost-alpha": String(config.frost.alpha),
+  "--k-card-icon": config.cardIconColor === "dark" ? config.colors.ink : config.colors.background,
+  "--k-card-icon-shadow": config.cardIconColor === "dark" ? "rgb(255 255 255 / 0.8)" : "rgb(0 0 0 / 0.55)",
   "--k-frost-blur": config.frost.blur,
 } as React.CSSProperties
 

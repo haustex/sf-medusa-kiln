@@ -2,10 +2,12 @@
 
 import { cn } from "@heroui/styles"
 import { useParams, usePathname } from "next/navigation"
+import { Check, ChevronDown } from "lucide-react"
 import { useEffect, useId, useRef, useState } from "react"
 
 import { marketPath, stripMarketPrefix } from "@lib/util/market"
 import Flag from "@modules/brand/flags"
+import { ICON } from "@modules/ds/icons"
 
 export type MarketOption = {
   code: string
@@ -83,9 +85,7 @@ export default function MarketSelect({ options: given, label, className }: { opt
         data-testid="market-select"
       >
         <Flag code={current.code} />
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className={cn("size-4 transition-transform motion-reduce:transition-none", open && "rotate-180")}>
-          <path d="m7 10 5 5 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <ChevronDown {...ICON} size={16} className={cn("transition-transform motion-reduce:transition-none", open && "rotate-180")} />
       </button>
       {open && (
         <ul
@@ -112,9 +112,7 @@ export default function MarketSelect({ options: given, label, className }: { opt
                 <span className="flex-1">{o.country}</span>
                 <span className="type-price text-muted">{o.currency.toUpperCase()}</span>
                 {o.current && (
-                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-4">
-                    <path d="m5 12 4.5 4.5L19 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+                  <Check {...ICON} size={16} />
                 )}
               </a>
             </li>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useParams, usePathname } from "next/navigation"
+import { Menu, User } from "lucide-react"
 import { useEffect, useState } from "react"
 
 import { marketPath, stripMarketPrefix } from "@lib/util/market"
@@ -8,6 +9,7 @@ import Flag from "@modules/brand/flags"
 import { SocialIcon } from "@modules/brand/social"
 import Link from "@modules/common/components/app-link"
 import { Sheet } from "@modules/ds"
+import { ICON } from "@modules/ds/icons"
 import type { MarketOption } from "../market-select"
 
 export type MobileMenuProps = {
@@ -43,9 +45,7 @@ export default function MobileMenu({ items, markets, account, social, labels }: 
         className="-ml-2 inline-flex size-11 items-center justify-center rounded-full outline-none hover:bg-default/60 focus-visible:ring-2 focus-visible:ring-focus md:hidden"
         data-testid="nav-menu-button"
       >
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-6">
-          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        </svg>
+        <Menu {...ICON} />
       </button>
       <Sheet open={open} onClose={() => setOpen(false)} side="left" label={labels.menu} closeLabel={labels.close}>
         <nav aria-label={labels.menu} className="flex flex-col gap-stack-lg">
@@ -80,10 +80,7 @@ export default function MobileMenu({ items, markets, account, social, labels }: 
           <ul className="-mx-2 flex flex-col border-t border-separator pt-stack-sm">
             <li>
               <Link href={account.href} prefetch={false} className={`${row} gap-stack-sm`}>
-                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-5">
-                  <circle cx="12" cy="8.5" r="3.75" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M4.75 20c.9-3.6 3.8-5.5 7.25-5.5s6.35 1.9 7.25 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
+                <User {...ICON} />
                 {account.label}
               </Link>
             </li>

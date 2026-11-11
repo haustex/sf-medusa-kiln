@@ -1,4 +1,6 @@
 import config from "@theme"
+import { tx } from "@lib/i18n/localized"
+import { getMarket } from "@lib/util/market"
 
 /**
  * Facts about the business for structured data, llms.txt and feeds. Everything comes from theme.config.ts
@@ -23,7 +25,7 @@ export function organizationSchema(origin: string, countryCode: string) {
     url: origin,
     logo: `${origin}/brand/logo.png`,
     ...(ORG.email ? { email: ORG.email } : {}),
-    description: config.brand.tagline,
+    description: tx(config.brand.tagline, getMarket(countryCode).dictionary),
     ...(ORG.location ? { foundingLocation: { "@type": "Place", name: ORG.location } } : {}),
     sameAs: [],
   }

@@ -4,7 +4,8 @@ export type BadgeTone = "neutral" | "new" | "sale" | "stock" | "low"
 
 /**
  * Small label on cards and PDPs ("Handmade", "Custom", "Baru", "-20%", "Sisa 2"). Palette only (docs/keputusan.md
- * "Palet v3"): Soft / Ink / White + Control border. `overPhoto`: solid white 90% chip (no blur), for labels over a photo.
+ * "Palet v3"): Soft / Ink / White + Control border. `overPhoto`: solid white 90% rectangle (4px radius, no blur) for
+ * labels over a photo; the other tones are pills.
  */
 const tones: Record<BadgeTone, string> = {
   neutral: "bg-default text-foreground",
@@ -31,7 +32,8 @@ export default function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full font-medium leading-none whitespace-nowrap",
+        "inline-flex items-center font-medium leading-none whitespace-nowrap",
+        overPhoto ? "rounded-[4px]" : "rounded-full",
         size === "sm" ? "h-6 px-2.5 text-xs" : "h-7 px-3 text-sm",
         overPhoto ? "chip-over-photo" : tones[tone],
         className

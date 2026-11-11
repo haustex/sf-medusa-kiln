@@ -1,4 +1,5 @@
 import { buttonVariants, cn } from "@heroui/styles"
+import { ChevronRight } from "lucide-react"
 import Link from "@modules/common/components/app-link"
 import { ArrowRight } from "./icons"
 
@@ -43,9 +44,7 @@ export default function SectionHeader({
           {titleHref ? (
             <Link href={titleHref} className="group inline-flex items-center gap-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-focus">
               {title}
-              <svg aria-hidden="true" viewBox="0 0 16 16" className="size-[0.8em] transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="m6 3.5 4.5 4.5L6 12.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <ChevronRight aria-hidden="true" focusable={false} size="0.8em" strokeWidth={2} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
           ) : (
             title
