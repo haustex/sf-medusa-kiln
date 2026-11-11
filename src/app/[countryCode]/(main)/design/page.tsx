@@ -3,6 +3,14 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import config from "@theme"
+import Flag from "@modules/brand/flags"
+import SocialLinks from "@modules/brand/social"
+import { ProductGrid, type ProductCardData } from "@modules/ds"
+import CountBadge from "@modules/layout/components/count-badge"
+import MarketSelect from "@modules/layout/components/market-select"
+import { marketOptions } from "@modules/layout/components/market-select/options"
+import CatalogCard from "@modules/products/components/catalog-card"
+import SheetDemo from "./sheet-demo"
 
 export const metadata: Metadata = { title: "Design tokens", robots: { index: false, follow: false } }
 
@@ -30,8 +38,17 @@ const TYPE = [
  * /design: the theme's tokens on one page (colours, type scale, radii, buttons, fields, frost surfaces). Shown in
  * development only; set KILN_DESIGN_PAGE=1 to keep it in production.
  */
-export default function DesignPage() {
+const DEMO_CARDS: ProductCardData[] = [
+  { id: "demo_1", href: "/products/demo-plate", title: "Stoneware Dinner Plate", subtitle: "Tableware", price: { amount: 28, currency: "usd", from: "From" }, options: [{ id: "o1", title: "Size", values: ["22 cm", "27 cm"] }], variants: [{ id: "v1", title: "22 cm", options: { Size: "22 cm" }, price: { amount: 28, currency: "usd" }, inStock: true }, { id: "v2", title: "27 cm", options: { Size: "27 cm" }, price: { amount: 34, currency: "usd" }, inStock: true }] },
+  { id: "demo_2", href: "/products/demo-bowl", title: "Ceramic Serving Bowl", subtitle: "Tableware", price: { amount: 46, currency: "usd" }, options: [{ id: "o2", title: "Default", values: ["Default"] }], variants: [{ id: "v3", title: "Default", options: { Default: "Default" }, price: { amount: 46, currency: "usd" }, inStock: true }] },
+  { id: "demo_3", href: "/products/demo-throw", title: "Wool Throw", subtitle: "Textiles", price: { amount: 120, currency: "usd", original: 150 }, options: [{ id: "o3", title: "Default", values: ["Default"] }], variants: [{ id: "v4", title: "Default", options: { Default: "Default" }, price: { amount: 120, currency: "usd", original: 150 }, inStock: true }] },
+  { id: "demo_4", href: "/products/demo-lamp", title: "Paper Cone Lamp", subtitle: "Lighting", price: { amount: 88, currency: "usd" }, soldOut: "Sold out", options: [{ id: "o4", title: "Default", values: ["Default"] }], variants: [{ id: "v5", title: "Default", options: { Default: "Default" }, price: { amount: 88, currency: "usd" }, inStock: false }] },
+]
+
+export default async function DesignPage(props: { params: Promise<{ countryCode: string }> }) {
   if (process.env.NODE_ENV === "production" && process.env.KILN_DESIGN_PAGE !== "1") notFound()
+  const { countryCode } = await props.params
+  const markets = await marketOptions("en-US")
   return (
     <div className="content-container flex flex-col gap-section py-section">
       <header className="flex flex-col gap-stack-sm">
@@ -97,6 +114,53 @@ export default function DesignPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="flex flex-col gap-stack-md" aria-labelledby="d-card">
+        <h2 id="d-card" className="type-h2">Product card</h2>
+        <p className="type-body max-w-2xl text-muted">Category chip top-left, wishlist heart top-right, "+" bottom-right: one variant adds to the cart (tick for 1.6 s), several open the quick view, sold out disables it. All three sit outside the link; 44 px targets.</p>
+        <ProductGrid>
+          {DEMO_CARDS.map((c) => (
+            <CatalogCard key={c.id} product={c} countryCode={countryCode} />
+          ))}
+        </ProductGrid>
+      </section>
+
+      <section className="flex flex-col gap-stack-md" aria-labelledby="d-header">
+        <h2 id="d-header" className="type-h2">Header parts</h2>
+        <div className="flex flex-wrap items-center gap-stack-lg">
+          <div className="flex flex-col gap-stack-xs">
+            <span className="type-label text-muted">Market select</span>
+            <MarketSelect options={markets} label="Country and currency" className="w-fit" />
+          </div>
+          <div className="flex flex-col gap-stack-xs">
+            <span className="type-label text-muted">Count badge (space reserved at 0)</span>
+            <div className="flex gap-stack-sm">
+              {[0, 3, 120].map((n) => (
+                <span key={n} className="relative inline-flex size-11 items-center justify-center rounded-full bg-default">
+                  <span className="text-xs text-muted">{n}</span>
+                  <CountBadge count={n} />
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-stack-xs">
+            <span className="type-label text-muted">Flags (SVG)</span>
+            <div className="flex flex-wrap gap-stack-xs">
+              {["us", "id", "gb", "de", "fr", "it", "nl", "jp", "sg", "au", "ca", "br"].map((c) => (
+                <Flag key={c} code={c} className="h-[18px] w-6" />
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-stack-xs">
+            <span className="type-label text-muted">Social (theme.config.ts)</span>
+            <SocialLinks className="-mx-2" />
+          </div>
+        </div>
+        <div className="flex flex-col gap-stack-xs">
+          <span className="type-label text-muted">Sheets (ds/sheet.tsx)</span>
+          <SheetDemo />
+        </div>
       </section>
 
       <section className="flex flex-col gap-stack-md" aria-labelledby="d-frost">

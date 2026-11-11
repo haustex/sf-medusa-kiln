@@ -42,8 +42,18 @@ const config = {
       { title: "Help", links: [{ label: "Shipping", href: "/shipping" }, { label: "Track an order", href: "/track" }, { label: "Returns", href: "/returns" }, { label: "Contact", href: "/contact" }] },
       { title: "Studio", links: [{ label: "About", href: "/about" }, { label: "Makers", href: "/makers" }, { label: "Journal", href: "/blog" }, { label: "Privacy", href: "/privacy" }, { label: "Terms", href: "/terms" }] },
     ],
-    /** "Built with Kiln by Haus Kayu" in the footer. Set to false to hide it. */
+    /** "Theme Kiln by Haus Kayu" after the copyright line in the footer. Set to false to hide it. */
     credit: true,
+  },
+
+  /** Social profiles: icons in the footer and the phone menu. Leave a URL empty to hide that network. */
+  social: {
+    facebook: "https://www.facebook.com/",
+    instagram: "https://www.instagram.com/",
+    x: "https://x.com/",
+    pinterest: "https://www.pinterest.com/",
+    tiktok: "",
+    youtube: "",
   },
 
   markets: {

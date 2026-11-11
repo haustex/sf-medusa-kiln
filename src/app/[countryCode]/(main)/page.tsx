@@ -9,7 +9,8 @@ import { JsonLd } from "@lib/seo/jsonld"
 import { marketAlternates, marketPath } from "@lib/util/market"
 import { getSiteOrigin } from "@lib/util/site"
 import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
-import { CategoryTile, Page, ProductCard, ProductGrid, Section } from "@modules/ds"
+import { CategoryTile, Page, ProductGrid, Section } from "@modules/ds"
+import CatalogCard from "@modules/products/components/catalog-card"
 import Hero from "@modules/home/components/hero"
 import ValueProps from "@modules/home/components/value-props"
 
@@ -62,7 +63,7 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
         <Section id="featured" title={t.home.featuredTitle} titleHref={href("/store")} description={t.home.featuredDescription}>
           <ProductGrid>
             {products.map((p, i) => (
-              <ProductCard key={p.href} product={p} priority={i < 4} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />
+              <CatalogCard key={p.href} product={p} countryCode={countryCode} priority={i < 4} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />
             ))}
           </ProductGrid>
         </Section>

@@ -3,6 +3,7 @@
 import { CART_UPDATED_EVENT } from "@lib/util/cart-events"
 import { marketPath } from "@lib/util/market"
 import Link from "@modules/common/components/app-link"
+import CountBadge from "@modules/layout/components/count-badge"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -32,19 +33,15 @@ export default function CartLink({ initialCount, label }: { initialCount: number
   return (
     <Link
       href={marketPath(countryCode as string, "/cart")}
-      className="relative inline-flex size-11 items-center justify-center rounded-full hover:bg-default"
-      aria-label={`${label} (${count})`}
+      className="relative inline-flex size-11 items-center justify-center rounded-full outline-none hover:bg-default/60 focus-visible:ring-2 focus-visible:ring-focus"
+      aria-label={count > 0 ? `${label} (${count})` : label}
       data-testid="nav-cart-link"
     >
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="size-6">
         <path d="M5 8h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9L5 8Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
         <path d="M9 10V7a3 3 0 0 1 6 0v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
-      {count > 0 && (
-        <span className="absolute right-0.5 top-0.5 flex min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[11px] font-medium leading-5 text-accent-foreground tabular-nums">
-          {count}
-        </span>
-      )}
+      <CountBadge count={count} />
     </Link>
   )
 }

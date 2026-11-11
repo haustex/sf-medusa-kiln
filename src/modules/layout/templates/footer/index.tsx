@@ -1,19 +1,18 @@
-import Link from "@modules/common/components/app-link"
-
 import config from "@theme"
 import { listCategories } from "@lib/data/categories"
 import { getDictionary } from "@lib/i18n/dictionaries"
-import { MARKETS, MARKET_CODES, getMarket, marketPath } from "@lib/util/market"
 import Logo from "@modules/brand/logo"
+import SocialLinks from "@modules/brand/social"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
-/** Footer: logo + tagline, "Shop" (categories), the columns from theme.config.ts, market switch, optional credit. */
+/**
+ * Footer: logo + tagline, "Shop" (categories), the columns from theme.config.ts; bottom row = "© {year} {brand} ·
+ * Theme Kiln by Haus Kayu" (credit optional) and the social icons from theme.config.ts (empty URLs hidden).
+ */
 export default async function Footer({ countryCode }: { countryCode: string }) {
   const t = getDictionary(countryCode)
-  const market = getMarket(countryCode)
   const categories = await listCategories({ fields: "id,name,handle,parent_category_id", limit: 20 }, countryCode).catch(() => [])
   const topLevel = categories.filter((c) => !c.parent_category_id).slice(0, 6)
-  const otherMarkets = MARKET_CODES.filter((c) => c !== market.countryCode)
 
   return (
     <footer className="mt-section border-t border-separator bg-surface">
@@ -63,29 +62,20 @@ export default async function Footer({ countryCode }: { countryCode: string }) {
 
       <div className="border-t border-separator">
         <div className="content-container flex flex-col gap-stack-sm py-stack-lg text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-          <span>
+          <p>
             © {new Date().getFullYear()} {config.brand.name}
-            {config.brand.location ? ` · ${config.brand.location}` : ""}
             {config.brand.credit && (
               <>
                 {" · "}
-                <a href="https://github.com/haustex/sf-medusa-kiln" className="hover:underline underline-offset-4" rel="noopener">
-                  Built with Kiln by Haus Kayu
-                </a>
+                {t.footer.theme}{" "}
+                <a href="https://github.com/haustex/sf-medusa-kiln" className="text-foreground underline-offset-4 hover:underline" rel="noopener">
+                  Kiln
+                </a>{" "}
+                {t.footer.by} Haus Kayu
               </>
             )}
-          </span>
-          <span className="flex flex-wrap items-center gap-stack-sm">
-            <span className="text-foreground">{market.label}</span>
-            {otherMarkets.map((code) => (
-              <span key={code} className="flex items-center gap-stack-sm">
-                <span aria-hidden="true">·</span>
-                <Link prefetch={false} href={marketPath(code)} hrefLang={MARKETS[code].hreflang} className="hover:underline underline-offset-4">
-                  {MARKETS[code].label}
-                </Link>
-              </span>
-            ))}
-          </span>
+          </p>
+          <SocialLinks className="-mx-2 -my-2" />
         </div>
       </div>
     </footer>

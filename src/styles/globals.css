@@ -14,6 +14,7 @@
   --color-control: var(--k-control);
   /* lg radius for photos, cards, tiles, hero (buttons/inputs stay md = --radius) */
   --radius-media: var(--k-radius-media);
+  --radius-sheet: var(--k-radius-sheet);
   --shadow-soft: var(--k-shadow-soft);
   --shadow-lift: var(--k-shadow-lift);
 
@@ -387,13 +388,13 @@ input[type="radio"] {
   transition: opacity 200ms ease-out;
 }
 @media (hover: hover) {
-  .hk-card:hover .card-media,
-  .hk-card:focus-visible .card-media {
+  .k-card:hover .card-media,
+  .k-card:focus-visible .card-media {
     transform: translateY(-3px);
     box-shadow: var(--k-shadow-lift);
   }
-  .hk-card:hover .card-media-alt,
-  .hk-card:focus-visible .card-media-alt {
+  .k-card:hover .card-media-alt,
+  .k-card:focus-visible .card-media-alt {
     opacity: 1;
   }
 }
@@ -402,8 +403,28 @@ input[type="radio"] {
   .card-media-alt {
     transition: none;
   }
-  .hk-card:hover .card-media,
-  .hk-card:focus-visible .card-media {
+  .k-card:hover .card-media,
+  .k-card:focus-visible .card-media {
     transform: none;
+  }
+}
+
+/* Sheets (ds/sheet.tsx): slide/fade in, 200ms; nothing moves with reduced motion. */
+.k-sheet[open] {
+  animation: k-sheet-in 200ms ease-out;
+}
+@keyframes k-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .k-sheet[open] {
+    animation: none;
   }
 }

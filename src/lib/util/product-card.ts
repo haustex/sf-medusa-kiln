@@ -3,11 +3,11 @@ import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { isVariantInStock } from "@lib/util/inventory"
 import { marketPath } from "@lib/util/market"
 import { productImageName } from "@lib/util/image-name"
-import type { ProductCardData } from "@modules/ds"
+import type { CardVariant, ProductCardData } from "@modules/ds"
 
 /** Store API fields needed by {@link toProductCard} (and the PDP). */
 export const PRODUCT_CARD_FIELDS =
-  "*variants.calculated_price,+variants.inventory_quantity,*variants.options,+metadata,*categories"
+  "*variants.calculated_price,+variants.inventory_quantity,*variants.options,*options.values,+metadata,*categories"
 
 /** Cheapest priced variant, plus whether variant prices differ ("from" price). */
 export function cheapestPrice(product: HttpTypes.StoreProduct) {
@@ -36,6 +36,18 @@ export function toProductCard(product: HttpTypes.StoreProduct, countryCode: stri
   const price = cheapestPrice(product)
   const soldOut = !(product.variants ?? []).some(isVariantInStock)
   const image2 = product.images?.find((i) => i.url && i.url !== product.thumbnail)?.url ?? null
+  const options = (product.options ?? []).map((o) => ({ id: o.id, title: o.title, values: (o.values ?? []).map((v) => v.value) }))
+  const optionTitle = new Map(options.map((o) => [o.id, o.title]))
+  const variants: CardVariant[] = (product.variants ?? []).map((v) => ({
+    id: v.id,
+    title: v.title ?? "",
+    options: Object.fromEntries((v.options ?? []).map((o) => [o.option?.title ?? optionTitle.get(o.option_id ?? "") ?? "", o.value])),
+    price:
+      typeof v.calculated_price?.calculated_amount === "number"
+        ? { amount: v.calculated_price.calculated_amount, currency: v.calculated_price.currency_code ?? "", original: v.calculated_price.original_amount ?? null }
+        : null,
+    inStock: isVariantInStock(v),
+  }))
   return {
     id: product.id,
     href: marketPath(countryCode, `/products/${product.handle}`),
@@ -51,9 +63,9 @@ export function toProductCard(product: HttpTypes.StoreProduct, countryCode: stri
       original: price.original,
       from: price.varies ? t.from : undefined,
     },
-    // Made-to-order pieces: "Custom" chip over the photo
-    badges: product.categories?.some((c) => c.handle === "furniture-custom") ? [{ label: "Custom" }] : undefined,
     soldOut: soldOut ? t.soldOut : null,
+    options,
+    variants,
     ...(rating && rating.count > 0
       ? {
           rating,
