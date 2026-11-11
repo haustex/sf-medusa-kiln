@@ -161,6 +161,14 @@ const config = {
     },
   },
 
+  /** Product page: short promises under the add-to-cart button (shipping, returns, custom work); [] hides the list */
+  product: {
+    notes: [
+      { en: "Free shipping over $120 · 30-day returns", id: "Gratis ongkir di atas Rp1.500.000 · retur 30 hari" },
+      { en: "Custom sizes available on request", id: "Ukuran custom bisa dipesan" },
+    ] as Localized[],
+  },
+
   /** Blog URL segment when medusa-blog-seo is installed */
   blogPath: "/blog",
 
