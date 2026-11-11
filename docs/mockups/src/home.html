@@ -1,0 +1,93 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kiln mockup · Home</title><link rel="stylesheet" href="mockup.css">
+<style>
+.hero { display: grid; gap: 28px; align-items: center; padding-top: 32px; }
+@media (min-width: 1024px) { .hero { grid-template-columns: 1fr 1.15fr; gap: 56px; padding-top: 48px; } }
+.hero .copy { display: grid; gap: 20px; max-width: 40rem; }
+.hero .copy p { max-width: 34rem; font-size: 1.0625rem; margin: 0; }
+.hero .ph { order: -1; } @media (min-width: 1024px) { .hero .ph { order: 0; } }
+.story { display: grid; gap: 24px; align-items: center; } @media (min-width: 1024px) { .story { grid-template-columns: 1.1fr 1fr; gap: 64px; } }
+.story .copy { display: grid; gap: 16px; max-width: 32rem; }
+.carousel { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 3 * var(--gutter)) / 4); gap: var(--gutter); overflow: hidden; }
+@media (max-width: 1023px) { .carousel { grid-auto-columns: 46%; } }
+.values { display: grid; gap: 20px; grid-template-columns: repeat(4, 1fr); padding: 28px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+@media (max-width: 1023px) { .values { grid-template-columns: repeat(2, 1fr); } }
+.values div { display: grid; gap: 4px; font-size: .9375rem; } .values b { font-weight: 500; } .values span { color: var(--muted); font-size: .875rem; }
+.post { display: grid; gap: 10px; } .post .cat { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 500; color: var(--muted); }
+.post h3 { margin: 0; font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
+.news { background: var(--soft); border-radius: var(--radius-media); padding: 40px; display: grid; gap: 16px; align-items: center; }
+@media (min-width: 1024px) { .news { grid-template-columns: 1fr auto; padding: 48px 56px; } }
+.news .field { background: #fff; width: 320px; max-width: 100%; }
+</style></head><body>
+<div data-part="header:All"></div>
+<main class="container">
+  <section class="hero">
+    <div class="copy">
+      <span class="t-label muted">Independent makers · Small batches</span>
+      <h1 class="t-display">Objects made slowly, by hand.</h1>
+      <p>Cutting boards, trays and bowls from workshops that still sign their work. Pick the size, wood and finish; we ship from the bench it was made on.</p>
+      <div class="row" style="flex-wrap:wrap"><a class="btn btn-primary btn-lg" href="#">Shop all</a><a class="btn btn-secondary btn-lg" href="#">Meet the makers</a></div>
+    </div>
+    <div class="ph hero"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2 class="t-h2">Shop by category</h2><a href="#">All products →</a></div>
+    <div class="grid cols-6" id="cats"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2 class="t-h2">Featured this month</h2><a href="#">See all →</a></div>
+    <div class="grid cols-4" id="featured"></div>
+  </section>
+
+  <section class="section story">
+    <div class="ph land dark"></div>
+    <div class="copy">
+      <span class="t-label muted">Meet the maker</span>
+      <h2 class="t-h2">Tjipto's workshop, three generations in.</h2>
+      <p class="muted" style="margin:0">Teak offcuts from the furniture shop next door become end-grain boards. Each one is oiled twice and rests a week before it leaves Jepara.</p>
+      <a href="#" class="row" style="font-weight:500;gap:6px">Read the story <span id="arr1"></span></a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2 class="t-h2">New this week</h2><div class="row" style="gap:8px"><button class="btn btn-outline btn-icon" aria-label="Previous">‹</button><button class="btn btn-outline btn-icon" aria-label="Next">›</button></div></div>
+    <div class="carousel" id="new"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2 class="t-h2">From the journal</h2><a href="#">All articles →</a></div>
+    <div class="grid cols-3" id="posts"></div>
+  </section>
+
+  <section class="section"><div class="values">
+    <div><b>Made to order</b><span>Most pieces ship in 3–5 days</span></div>
+    <div><b>Worldwide shipping</b><span>Tracked, duties shown at checkout</span></div>
+    <div><b>30-day returns</b><span>Unused, in original packaging</span></div>
+    <div><b>Secure payment</b><span>Cards, QRIS and bank transfer</span></div>
+  </div></section>
+
+  <section class="section"><div class="news">
+    <div><h2 class="t-h3" style="margin:0 0 6px">New makers, once a month.</h2><p class="muted t-small" style="margin:0">One e-mail. No discount spam.</p></div>
+    <div class="row"><div class="field">you@example.com</div><a class="btn btn-primary" href="#">Subscribe</a></div>
+  </div></section>
+</main>
+<div data-part="footer"></div>
+<script src="parts.js"></script>
+<script>
+const P = [
+  { maker: "Tjipto Workshop", title: "End-grain teak cutting board, large", price: "$84", rating: "4.9", count: 32, badge: "Bestseller" },
+  { maker: "Studio Lio", title: "Walnut serving tray with handles", price: "$62", rating: "4.8", count: 18 },
+  { maker: "Rumah Bambu", title: "Hand-turned mango bowl, 24 cm", price: "$38", rating: "4.7", count: 41 },
+  { maker: "Hana Ceramics", title: "Stoneware pour-over set", price: "$96", rating: "5.0", count: 9, badge: "New" },
+  { maker: "Tjipto Workshop", title: "Mini board for bread and cheese", price: "$32", rating: "4.9", count: 57 },
+  { maker: "Loom & Line", title: "Linen table runner, undyed", price: "$44", rating: "4.6", count: 12 },
+  { maker: "Studio Lio", title: "Oak side table, oiled", price: "$290", rating: "4.8", count: 7 },
+  { maker: "Hana Ceramics", title: "Matte white mugs, set of two", price: "$48", rating: "4.9", count: 23 },
+];
+document.getElementById("featured").innerHTML = P.map(K.card).join("");
+document.getElementById("new").innerHTML = P.slice(2, 8).map((p, i) => K.card(p, i + 1)).join("");
+document.getElementById("cats").innerHTML = ["Cutting boards", "Trays", "Bowls", "Ceramics", "Textiles", "Furniture"].map((c, i) => `<a class="tile" href="#"><span class="ph sq ${["", "v2", "v3", "v4", "", "v2"][i]}"></span><span class="name">${c}</span></a>`).join("");
+document.getElementById("posts").innerHTML = [["Care", "How to oil a cutting board (and how often)"], ["Makers", "A day at Hana Ceramics' kiln"], ["Wood", "Teak, mango, walnut: which board for what"]].map(([c, t], i) => `<article class="post"><span class="ph land ${["v2", "", "v3"][i]}"></span><span class="cat">${c}</span><h3>${t}</h3><span class="muted t-small">6 min read · Nov 2026</span></article>`).join("");
+document.getElementById("arr1").outerHTML = K.I.arrow;
+</script></body></html>

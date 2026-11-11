@@ -1,0 +1,96 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kiln mockup · Product</title><link rel="stylesheet" href="mockup.css">
+<style>
+.crumbs { padding-top: 20px; font-size: .875rem; color: var(--muted); display: flex; gap: 8px; }
+.pdp { display: grid; gap: 28px; margin-top: 16px; } @media (min-width: 1024px) { .pdp { grid-template-columns: 1.15fr 1fr; gap: 64px; align-items: start; } .info { position: sticky; top: 124px; } }
+.gallery { display: grid; gap: var(--gutter); } .thumbs { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--gutter); } .thumbs .ph { border-radius: 8px; } .thumbs .ph.on { outline: 2px solid var(--ink); outline-offset: 2px; }
+@media (max-width: 1023px) { .thumbs { display: none; } .gallery { margin: 0 calc(-1 * var(--px)); } .gallery .ph { border-radius: 0; } }
+.info { display: grid; gap: 20px; }
+.info h1 { margin: 0; }
+.price { font-size: 1.5rem; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.price s { color: var(--muted); font-weight: 400; font-size: 1rem; margin-left: 8px; }
+.opts { display: grid; gap: 8px; } .opts .lab { display: flex; justify-content: space-between; font-size: .875rem; } .opts .lab b { font-weight: 500; } .opts .lab span { color: var(--muted); }
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; } .sw { height: 40px; padding: 0 14px; border: 1px solid var(--control); border-radius: var(--radius); display: inline-flex; align-items: center; font-size: .9375rem; font-weight: 500; } .sw.on { border-color: var(--ink); background: var(--ink); color: #fff; } .sw.off { color: var(--muted); border-style: dashed; }
+.buy { display: flex; gap: 8px; } .qty { height: 48px; border: 1px solid var(--control); border-radius: var(--radius); display: inline-flex; align-items: center; } .qty span { width: 40px; text-align: center; font-weight: 500; } .qty b { width: 36px; text-align: center; font-weight: 400; color: var(--muted); }
+.buy .btn-primary { flex: 1; }
+.notes { display: grid; gap: 6px; font-size: .875rem; color: var(--muted); } .notes div { display: flex; gap: 8px; align-items: center; } .notes i { width: 6px; height: 6px; border-radius: 999px; background: var(--ink); }
+.acc { border-top: 1px solid var(--border); } .acc div { display: flex; justify-content: space-between; align-items: center; height: 52px; border-bottom: 1px solid var(--border); font-weight: 500; font-size: .9375rem; }
+.acc p { margin: 0 0 16px; font-size: .9375rem; color: var(--muted); }
+.specs { display: grid; grid-template-columns: 1fr; gap: 0; border-top: 1px solid var(--border); font-size: .9375rem; } .specs div { display: grid; grid-template-columns: 180px 1fr; padding: 12px 0; border-bottom: 1px solid var(--border); } .specs b { font-weight: 500; }
+.reviews { display: grid; gap: 24px; } @media (min-width: 1024px) { .reviews { grid-template-columns: 280px 1fr; gap: 64px; } }
+.rsum { display: grid; gap: 12px; align-content: start; } .rsum .big { font-size: 3rem; font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variation-settings: "opsz" 32; }
+.bars { display: grid; gap: 6px; font-size: .8125rem; } .bars div { display: grid; grid-template-columns: 14px 1fr 28px; align-items: center; gap: 10px; } .bars i { height: 6px; border-radius: 999px; background: var(--soft-2); display: block; overflow: hidden; } .bars i::after { content: ""; display: block; height: 100%; background: var(--ink); width: var(--w); }
+.rev { display: grid; gap: 8px; padding: 20px 0; border-top: 1px solid var(--border); } .rev .who { display: flex; justify-content: space-between; font-size: .875rem; } .rev .who b { font-weight: 500; } .rev p { margin: 0; font-size: .9375rem; }
+.sticky-atc { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; padding: 10px var(--px) calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); display: none; align-items: center; gap: 12px; background: var(--bg); }
+@supports (backdrop-filter: blur(1px)) { .sticky-atc { background: var(--frost-strong); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); } }
+@media (prefers-reduced-transparency: reduce) { .sticky-atc { background: var(--bg); backdrop-filter: none; } }
+@media (max-width: 1023px) { .sticky-atc { display: flex; } body { padding-bottom: 76px; } }
+.sticky-atc .btn { flex: 1; }
+</style></head><body>
+<div data-part="header:Cutting boards"></div>
+<main class="container">
+  <nav class="crumbs desktop-only" aria-label="Breadcrumb"><a href="#">Shop</a><span>/</span><a href="#">Cutting boards</a></nav>
+  <div class="pdp">
+    <div class="gallery">
+      <div class="ph sq"></div>
+      <div class="dots mobile-only" style="margin-top:4px"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+      <div class="thumbs"><span class="ph sq on"></span><span class="ph sq v2"></span><span class="ph sq v3"></span><span class="ph sq v4"></span><span class="ph sq dark"></span></div>
+    </div>
+    <div class="info">
+      <div style="display:grid;gap:10px">
+        <a href="#" class="t-label muted">Tjipto Workshop · Jepara</a>
+        <h1 class="t-h1">End-grain teak cutting board, large</h1>
+        <a href="#" class="stars" style="font-size:.9375rem"><span id="st"></span><b>4.9</b><span>· 32 reviews</span></a>
+      </div>
+      <div class="price">$84 <s>$96</s></div>
+      <p class="muted" style="margin:0">40 × 30 × 3.5 cm. Plantation teak offcuts, end grain up, finished with food-safe oil and beeswax. Each board is unique in pattern.</p>
+      <div class="opts">
+        <div class="lab"><b>Size</b><span>Large · 40 × 30 cm</span></div>
+        <div class="swatches"><span class="sw">Small</span><span class="sw">Medium</span><span class="sw on">Large</span><span class="sw off">XL · sold out</span></div>
+      </div>
+      <div class="opts">
+        <div class="lab"><b>Finish</b><span>Natural oil</span></div>
+        <div class="swatches"><span class="sw on">Natural oil</span><span class="sw">Dark wax</span></div>
+      </div>
+      <div class="buy"><div class="qty"><b>−</b><span>1</span><b>+</b></div><a class="btn btn-primary btn-lg" href="#">Add to cart · $84</a><a class="btn btn-outline btn-lg btn-icon" href="#" aria-label="Save" style="width:48px"><span id="h1"></span></a></div>
+      <div class="notes"><div><i></i>In stock · ships in 3–5 days from Jepara</div><div><i></i>Free shipping over $120 · 30-day returns</div><div><i></i>Custom sizes available on request</div></div>
+      <div class="acc">
+        <div>Details <span id="c1"></span></div>
+        <p>End-grain construction is gentler on knives and self-heals light cuts. Rubber feet included; the board is reversible without them.</p>
+        <div>Materials &amp; care <span id="c2"></span></div>
+        <div>Shipping &amp; returns <span id="c3"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="section">
+    <h2 class="t-h2" style="margin:0 0 16px">Specifications</h2>
+    <div class="specs"><div><b>Dimensions</b><span>40 × 30 × 3.5 cm</span></div><div><b>Wood</b><span>Plantation teak (Tectona grandis), end grain</span></div><div><b>Finish</b><span>Food-safe mineral oil + beeswax</span></div><div><b>Weight</b><span>2.4 kg</span></div><div><b>Made in</b><span>Jepara, Indonesia</span></div></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2 class="t-h2">Reviews</h2><a class="btn btn-secondary" href="#">Write a review</a></div>
+    <div class="reviews">
+      <div class="rsum"><div class="big">4.9</div><div class="stars" style="font-size:.9375rem"><span id="st2"></span><span>32 reviews</span></div>
+        <div class="bars"><div>5<i style="--w:88%"></i><span>28</span></div><div>4<i style="--w:9%"></i><span>3</span></div><div>3<i style="--w:3%"></i><span>1</span></div><div>2<i style="--w:0%"></i><span>0</span></div><div>1<i style="--w:0%"></i><span>0</span></div></div></div>
+      <div>
+        <article class="rev"><div class="who"><b>Maya R. · Verified buyer</b><span class="muted">2 weeks ago</span></div><div class="stars"><span id="st3"></span><b>5</b></div><p>Heavier than I expected, in a good way. The grain pattern is lovely and it hasn't warped after a month of daily use.</p></article>
+        <article class="rev"><div class="who"><b>Daniel K. · Verified buyer</b><span class="muted">Oct 2026</span></div><div class="stars"><span id="st4"></span><b>5</b></div><p>Arrived well packed with a small card from the workshop. Oiled it once on arrival as instructed.</p></article>
+        <a href="#" class="btn btn-outline" style="margin-top:8px">Show all 32 reviews</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2 class="t-h2">More from Tjipto Workshop</h2><a href="#">See all →</a></div>
+    <div class="grid cols-4" id="rel"></div>
+  </section>
+</main>
+<div data-part="footer"></div>
+<div class="sticky-atc"><div><div class="t-small muted">Large · Natural oil</div><div class="price" style="font-size:1.125rem">$84</div></div><a class="btn btn-primary" href="#">Add to cart</a></div>
+<script src="parts.js"></script>
+<script>
+for (const id of ["st", "st2", "st3", "st4"]) document.getElementById(id).outerHTML = K.I.star;
+for (const id of ["c1", "c2", "c3"]) document.getElementById(id).outerHTML = K.I.chev;
+document.getElementById("h1").outerHTML = K.I.heart;
+document.getElementById("rel").innerHTML = [["Tjipto Workshop", "Mini board for bread and cheese", "$32", "4.9", 57], ["Tjipto Workshop", "End-grain teak board, medium", "$64", "4.9", 44], ["Tjipto Workshop", "Butcher block, 5 cm thick", "$140", "5.0", 6], ["Tjipto Workshop", "Board oil & wax, 120 ml", "$14", "4.8", 88]].map(([maker, title, price, rating, count], i) => K.card({ maker, title, price, rating, count }, i + 1)).join("");
+</script></body></html>

@@ -1,0 +1,77 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kiln mockup · Category</title><link rel="stylesheet" href="mockup.css">
+<style>
+.page-head { padding-top: 28px; display: grid; gap: 8px; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; }
+.layout { display: grid; gap: 40px; margin-top: 24px; } @media (min-width: 1024px) { .layout { grid-template-columns: 240px 1fr; } }
+.filters { display: grid; gap: 28px; align-content: start; font-size: .9375rem; }
+.filters h3 { margin: 0 0 10px; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 500; color: var(--muted); }
+.filters ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.cb { display: flex; align-items: center; gap: 10px; } .cb i { width: 18px; height: 18px; border: 1px solid var(--control); border-radius: 4px; display: inline-block; } .cb i.on { background: var(--ink); border-color: var(--ink); }
+.cb .n { color: var(--muted); margin-left: auto; font-size: .8125rem; }
+.range { display: flex; gap: 8px; } .range .field { flex: 1; height: 40px; }
+.active { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; } .active .chip { height: 32px; gap: 8px; }
+.pager { display: flex; justify-content: center; gap: 6px; margin-top: 40px; } .pager a { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius); font-weight: 500; } .pager a.on { background: var(--ink); color: #fff; }
+.select { height: 40px; border: 1px solid var(--control); border-radius: var(--radius); display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; font-size: .9375rem; font-weight: 500; }
+/* mobile filter sheet */
+.sheet { position: fixed; inset: 0; z-index: 60; display: none; } .sheet.open { display: block; }
+.sheet .scrim { position: absolute; inset: 0; background: rgb(12 12 12 / .35); }
+.sheet .panel { position: absolute; left: 0; right: 0; bottom: 0; max-height: 84vh; border-radius: 16px 16px 0 0; padding: 12px 20px 20px; display: grid; gap: 24px; box-shadow: var(--shadow-lift); background: var(--bg); overflow: auto; }
+@supports (backdrop-filter: blur(1px)) { .sheet .panel { background: var(--frost-strong); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); } }
+@media (prefers-reduced-transparency: reduce) { .sheet .panel { background: var(--bg); backdrop-filter: none; } }
+.sheet .grab { width: 40px; height: 4px; border-radius: 999px; background: var(--border); margin: 0 auto; }
+.sheet .foot { display: flex; gap: 8px; position: sticky; bottom: 0; } .sheet .foot .btn { flex: 1; }
+</style></head><body>
+<div data-part="header:Cutting boards"></div>
+<main class="container">
+  <div class="page-head">
+    <span class="t-label muted">Shop · Kitchen</span>
+    <h1 class="t-h1">Cutting boards</h1>
+    <p class="muted" style="margin:0;max-width:52ch">End-grain and edge-grain boards in teak, walnut and mango, from eight workshops. Oiled, ready to use.</p>
+  </div>
+  <div class="toolbar">
+    <span class="muted t-small">48 products</span>
+    <div class="row desktop-only" style="gap:8px"><span class="select">Sort: Featured <span id="chev1"></span></span></div>
+    <div class="row mobile-only" style="gap:8px"><a class="btn btn-outline" href="?sheet=1" style="height:40px">Filter · 2</a><span class="select">Sort <span id="chev2"></span></span></div>
+  </div>
+  <div class="layout">
+    <aside class="filters desktop-only" aria-label="Filters">
+      <div><h3>Category</h3><ul><li class="cb"><i class="on"></i>Cutting boards<span class="n">48</span></li><li class="cb"><i></i>Trays<span class="n">21</span></li><li class="cb"><i></i>Bowls<span class="n">33</span></li><li class="cb"><i></i>Serving sets<span class="n">9</span></li></ul></div>
+      <div><h3>Price</h3><div class="range"><div class="field">$ 20</div><div class="field">$ 150</div></div></div>
+      <div><h3>Wood</h3><ul><li class="cb"><i class="on"></i>Teak<span class="n">26</span></li><li class="cb"><i></i>Walnut<span class="n">11</span></li><li class="cb"><i></i>Mango<span class="n">8</span></li><li class="cb"><i></i>Oak<span class="n">3</span></li></ul></div>
+      <div><h3>Maker</h3><ul><li class="cb"><i></i>Tjipto Workshop</li><li class="cb"><i></i>Studio Lio</li><li class="cb"><i></i>Rumah Bambu</li></ul></div>
+      <div><h3>Rating</h3><ul><li class="cb"><i></i><span class="stars"><b>4</b> & up</span></li></ul></div>
+      <div><h3>Availability</h3><ul><li class="cb"><i class="on"></i>In stock</li></ul></div>
+    </aside>
+    <div>
+      <div class="active"><span class="chip">Teak ×</span><span class="chip">In stock ×</span><a href="#" class="t-small" style="align-self:center;font-weight:500;margin-left:4px">Clear all</a></div>
+      <div class="grid cols-3" id="grid"></div>
+      <nav class="pager" aria-label="Pages"><a class="on" href="#">1</a><a href="#">2</a><a href="#">3</a><a href="#">4</a><a href="#">›</a></nav>
+    </div>
+  </div>
+</main>
+<div data-part="footer"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="Filters">
+  <div class="scrim"></div>
+  <div class="panel">
+    <div class="grab"></div>
+    <div class="row" style="justify-content:space-between"><h2 class="t-h3" style="margin:0">Filters</h2><span class="muted t-small">48 products</span></div>
+    <div class="filters">
+      <div><h3>Price</h3><div class="range"><div class="field">$ 20</div><div class="field">$ 150</div></div></div>
+      <div><h3>Wood</h3><ul><li class="cb"><i class="on"></i>Teak<span class="n">26</span></li><li class="cb"><i></i>Walnut<span class="n">11</span></li><li class="cb"><i></i>Mango<span class="n">8</span></li><li class="cb"><i></i>Oak<span class="n">3</span></li></ul></div>
+      <div><h3>Maker</h3><ul><li class="cb"><i></i>Tjipto Workshop</li><li class="cb"><i></i>Studio Lio</li><li class="cb"><i></i>Rumah Bambu</li></ul></div>
+      <div><h3>Availability</h3><ul><li class="cb"><i class="on"></i>In stock</li></ul></div>
+    </div>
+    <div class="foot"><a class="btn btn-secondary" href="#">Clear</a><a class="btn btn-primary" href="#">Show 26 products</a></div>
+  </div>
+</div>
+<script src="parts.js"></script>
+<script>
+const P = [
+  ["Tjipto Workshop", "End-grain teak cutting board, large", "$84", "4.9", 32, "Bestseller"], ["Tjipto Workshop", "Mini board for bread and cheese", "$32", "4.9", 57], ["Studio Lio", "Walnut edge-grain board with juice groove", "$78", "4.8", 14],
+  ["Rumah Bambu", "Mango wood round board, 30 cm", "$36", "4.7", 21], ["Tjipto Workshop", "End-grain teak board, medium", "$64", "4.9", 44], ["Studio Lio", "Walnut paddle board", "$54", "4.8", 9, "New"],
+  ["Tjipto Workshop", "Butcher block, 5 cm thick", "$140", "5.0", 6], ["Rumah Bambu", "Set of three mango boards", "$72", "4.6", 17], ["Studio Lio", "Oak bread board with handle", "$46", "4.7", 11],
+].map(([maker, title, price, rating, count, badge]) => ({ maker, title, price, rating, count, badge }));
+document.getElementById("grid").innerHTML = P.map(K.card).join("");
+document.getElementById("chev1").outerHTML = K.I.chev; document.getElementById("chev2").outerHTML = K.I.chev;
+if (location.search.includes("sheet=1")) document.getElementById("sheet").classList.add("open");
+</script></body></html>
