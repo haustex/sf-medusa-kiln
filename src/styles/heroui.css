@@ -1,0 +1,51 @@
+/*
+ * HeroUI v3 styles, selective. Same structure as @heroui/styles/dist/index.css,
+ * but only the component styles the storefront uses: the full set is ~450 KB of
+ * CSS on every page (render-blocking, hurts LCP/TBT on phones).
+ *
+ * Need another HeroUI component? Add its CSS below, keeping the order of
+ * @heroui/styles/dist/components/index.css (shared primitives first).
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss";
+
+@import "@heroui/styles/base/base.css" layer(base);
+@import "@heroui/styles/base/scrollbar.css" layer(base);
+
+/* Shared primitives */
+@import "@heroui/styles/components/close-button.css" layer(components);
+@import "@heroui/styles/components/description.css" layer(components);
+@import "@heroui/styles/components/error-message.css" layer(components);
+@import "@heroui/styles/components/field-error.css" layer(components);
+@import "@heroui/styles/components/label.css" layer(components);
+/* Navigation */
+@import "@heroui/styles/components/breadcrumbs.css" layer(components);
+@import "@heroui/styles/components/link.css" layer(components);
+/* Buttons */
+@import "@heroui/styles/components/button.css" layer(components);
+/* Data display / feedback */
+@import "@heroui/styles/components/badge.css" layer(components);
+@import "@heroui/styles/components/chip.css" layer(components);
+@import "@heroui/styles/components/alert.css" layer(components);
+@import "@heroui/styles/components/skeleton.css" layer(components);
+@import "@heroui/styles/components/spinner.css" layer(components);
+/* Forms */
+@import "@heroui/styles/components/checkbox.css" layer(components);
+@import "@heroui/styles/components/input.css" layer(components);
+@import "@heroui/styles/components/radio-group.css" layer(components);
+@import "@heroui/styles/components/radio.css" layer(components);
+@import "@heroui/styles/components/textfield.css" layer(components);
+@import "@heroui/styles/components/search-field.css" layer(components);
+@import "@heroui/styles/components/textarea.css" layer(components);
+/* Layout */
+@import "@heroui/styles/components/card.css" layer(components);
+@import "@heroui/styles/components/separator.css" layer(components);
+@import "@heroui/styles/components/surface.css" layer(components);
+
+/* Default theme: variables (Uber overrides in theme.css) */
+@import "@heroui/styles/themes/shared/theme.css";
+@import "@heroui/styles/themes/default/variables.css" layer(theme);
+
+@import "@heroui/styles/utilities";
+@import "@heroui/styles/variants";

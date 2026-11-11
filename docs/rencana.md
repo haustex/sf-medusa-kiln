@@ -9,10 +9,17 @@ Cek 11 Nov 2026: `haustex/kiln` kosong, tidak ada repo Medusa bernama "kiln" di 
 lain (tidak masalah: tema ini bukan paket npm, tapi **template repo**). Cadangan kalau tidak suka: **Linen**, **Slate**
 (keduanya juga kosong di `haustex/`).
 
-- Repo: `haustex/kiln` (GitHub *template repository*, MIT). Mengikuti pola nama repo plugin kita tidak wajib
-  (`pg-`, `fs-`, dst. itu untuk paket npm); kalau mau konsisten: `haustex/sf-medusa-kiln`.
-- Demo brand: **Nord Atelier** (fiktif, netral; produk contoh: talenan, tray, mangkuk, keramik, tekstil, furnitur
-  kecil dari "pembuat" fiktif). Demo live = hauskayu.com (tema yang sama dengan brand asli).
+- **Keputusan Anto (11 Nov 2026):** nama **Kiln**, repo **`haustex/sf-medusa-kiln`** (GitHub *template repository*,
+  MIT), topics: `medusa`, `medusajs`, `nextjs`, `storefront`, `ecommerce-theme` (diset Anto saat bikin repo).
+- Demo brand: **Tilde Goods** (fiktif; "Tilde Goods" dibatalkan karena nama itu dipakai usaha lain). Cek 11 Nov 2026:
+  tidak ada toko/brand "Tilde Goods" di hasil pencarian. Katalog demo: peralatan makan, dapur, dekor, tekstil, lampu,
+  penyimpanan (13 produk, 6 kategori) dari "pembuat" fiktif. Demo live = hauskayu.com (tema yang sama dengan brand asli).
+- **Foto demo:** hanya milik sendiri, CC0, atau hasil generate. Saat ini semua gambar demo dibuat oleh
+  `seed/demo-images.mjs` (ilustrasi datar, sharp, CC0). Sumber dan lisensi dicatat di `seed/README.md`.
+- **Pembayaran:** Stripe default + slot provider (`payment/providers/<id>.tsx`); doit dan manual-transfer jadi contoh
+  snippet config di README, bukan kode tema.
+- **Routing:** market utama tanpa prefix (default). Opsi `markets.routing: "always-prefix"` untuk yang mau sama dengan
+  starter resmi (`/us/…` untuk semua market).
 - Kredit: README "Built by Haus Kayu" + satu baris di footer default (`theme.config.ts` → `credit: false` mematikan).
 
 ## 2. Arah desain (ringkasan keputusan)
@@ -64,7 +71,7 @@ kiln/
   src/ds/                    design system (lihat §4)
   src/modules/               home, layout, products, store, cart, checkout, account, blog, reviews, wishlist, search
   src/lib/                   data (SDK), i18n, seo, util, features.ts (deteksi plugin)
-  demo/                      seed Nord Atelier (produk, kategori, pembuat, artikel), gambar placeholder
+  demo/                      seed Tilde Goods (produk, kategori, pembuat, artikel), gambar placeholder
   docs/                      rencana, mockups, screenshots, kustomisasi (EN+ID)
 ```
 
@@ -114,7 +121,7 @@ Override manual lewat env (`KILN_FEATURE_REVIEWS=off`), supaya deteksi bisa dima
 
 Mega menu kategori (desktop, blur), cart drawer (blur, ganti dropdown), quick view (blur), filter sheet HP (blur),
 bar add-to-cart sticky HP (blur, sudah ada versi solid di HK), blok cerita pembuat, halaman pembuat (koleksi/metadata),
-newsletter slot, halaman 404 bergaya, seed demo Nord Atelier (produk, kategori, pembuat, 6 artikel, gambar
+newsletter slot, halaman 404 bergaya, seed demo Tilde Goods (produk, kategori, pembuat, 6 artikel, gambar
 placeholder netral tanpa teks), `theme.config.ts` + `docs/customize.md`, screenshot README.
 
 ## 7. Tahapan setelah OK

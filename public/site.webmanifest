@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "HAUS KAYU",
+  "short_name": "HAUS KAYU",
+  "description": "HAUS KAYU menyediakan furniture custom dan kerajinan dari Jepara. Jelajahi koleksi desain original atau buat furniture sesuai kebutuhan Anda.",
+  "lang": "id-ID",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF",
+  "icons": [
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

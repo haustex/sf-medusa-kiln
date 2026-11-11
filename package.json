@@ -1,0 +1,51 @@
+{
+  "name": "kiln",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Kiln: an open-source Medusa storefront theme (Next.js 16, Tailwind v4, HeroUI v3)",
+  "packageManager": "pnpm@10.11.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev -p 9720 -H localhost",
+    "build": "next build",
+    "start": "next start -p 9720 -H localhost",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.0",
+    "@heroui/react": "3.2.7",
+    "@heroui/styles": "3.2.7",
+    "@medusajs/icons": "2.22.2",
+    "@medusajs/js-sdk": "2.22.2",
+    "@medusajs/ui-preset": "2.22.2",
+    "@radix-ui/react-accordion": "^1.2.3",
+    "@radix-ui/react-slider": "^1.4.7",
+    "clsx": "^2.1.1",
+    "lodash": "^4.17.21",
+    "medusa-reviews-wishlist": "0.1.1",
+    "next": "16.3.8",
+    "react": "19.0.5",
+    "react-country-flag": "^3.1.0",
+    "react-dom": "19.0.5",
+    "server-only": "^0.0.1",
+    "sharp": "0.35.5"
+  },
+  "devDependencies": {
+    "@medusajs/types": "2.22.2",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "17.0.21",
+    "@types/react": "19.0.5",
+    "@types/react-dom": "19.0.5",
+    "eslint": "^9.13.0",
+    "eslint-config-next": "16.3.8",
+    "postcss": "^8.4.8",
+    "prettier": "^2.8.8",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.3.2"
+  }
+}

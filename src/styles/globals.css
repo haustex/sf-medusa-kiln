@@ -1,0 +1,409 @@
+/* Tailwind CSS v4 + HeroUI v3 (imports tailwindcss itself) */
+@import "./heroui.css";
+@import "./theme.css";
+
+/*
+ * Legacy starter config (Medusa UI preset tokens, screens, keyframes). Kept so the
+ * starter components still render until they are replaced with HeroUI in Tahap 2.
+ */
+@config "../../tailwind.config.js";
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Palette helpers (values in theme.css): border-control = borders of inputs/selects/checkboxes (>= 3:1) */
+  --color-control: var(--k-control);
+  /* lg radius for photos, cards, tiles, hero (buttons/inputs stay md = --radius) */
+  --radius-media: var(--k-radius-media);
+  --shadow-soft: var(--k-shadow-soft);
+  --shadow-lift: var(--k-shadow-lift);
+
+  /*
+   * Spacing tokens (docs/keputusan.md, "Spacing"). Use as Tailwind spacing:
+   * gap-section, pt-stack-md, gap-gutter, px-container-x ... Values switch per
+   * breakpoint inside the variables, so markup never needs sm:/lg: spacing.
+   */
+  --spacing-section: var(--space-section);
+  --spacing-section-head: var(--space-section-head);
+  --spacing-stack-xs: var(--space-stack-xs);
+  --spacing-stack-sm: var(--space-stack-sm);
+  --spacing-stack-md: var(--space-stack-md);
+  --spacing-stack-lg: var(--space-stack-lg);
+  --spacing-gutter: var(--space-gutter);
+  --spacing-container-x: var(--space-container-x);
+  --spacing-inset-banner: var(--space-inset-banner);
+}
+
+/* Spacing scale: multiples of 4px. Same group = tight, different group = clearly apart. */
+:root {
+  --space-section: 2.5rem; /* 40: between sections (shop.com 40) */
+  --space-section-head: 1rem; /* 16: section header -> its content (shop.com 16) */
+  --space-stack-xs: 0.25rem; /* 4: title -> subtitle, lines inside a card */
+  --space-stack-sm: 0.5rem; /* 8: photo -> card text (shop.com 8), label -> control */
+  --space-stack-md: 1rem; /* 16: header -> first block, blocks inside a group */
+  --space-stack-lg: 1.5rem; /* 24: sub-groups inside one section (copy -> buttons) */
+  --space-gutter: 0.75rem; /* 12: grid gap between cards/tiles (shop.com 8) */
+  --space-container-x: 1rem; /* 16: page side padding (shop.com 16) */
+  --space-inset-banner: 1.25rem; /* 20: padding inside hero/editorial banners */
+}
+@media (min-width: 640px) {
+  :root {
+    --space-container-x: 1.5rem; /* 24 */
+    --space-inset-banner: 2rem; /* 32 */
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --space-section: 3rem; /* 48 */
+    --space-gutter: 1rem; /* 16 */
+    --space-container-x: 2rem; /* 32 */
+    --space-inset-banner: 3rem; /* 48 */
+  }
+}
+
+/*
+ * Fallback faces for Inter (docs/keputusan.md "Font dan wordmark"). Shown until the web font arrives (display: swap);
+ * tuned so lines wrap the same before and after the swap (CLS). Next's automatic fallback (one Arial face at 107.9%)
+ * was 2.6% too wide for body text and 9–13% too wide for headings, because large headings use Inter's narrower
+ * display cut (opsz). Measured on the real pages (Inter width / system font width): body 400–500 and headings 600–700
+ * get their own size-adjust. Roboto first (Android has no Arial), then Arial (Windows, macOS, iOS; Liberation Sans /
+ * Arimo are metric-compatible). ascent/descent = Inter's (0.96875 / 0.24124) divided by size-adjust.
+ */
+@font-face {
+  font-family: InterFallbackRoboto;
+  src: local("Roboto"), local("Roboto-Regular");
+  font-weight: 400 500;
+  size-adjust: 106.1%;
+  ascent-override: 91.31%;
+  descent-override: 22.74%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: InterFallbackRoboto;
+  src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto");
+  font-weight: 600 700;
+  size-adjust: 102.5%;
+  ascent-override: 94.51%;
+  descent-override: 23.54%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: InterFallbackArial;
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Arimo");
+  font-weight: 400 500;
+  size-adjust: 105.2%;
+  ascent-override: 92.09%;
+  descent-override: 22.93%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: InterFallbackArial;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Arimo Bold");
+  font-weight: 600 700;
+  size-adjust: 96.5%;
+  ascent-override: 100.39%;
+  descent-override: 25.00%;
+  line-gap-override: 0%;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+}
+
+/* Layout: content max 1280px (max-w-7xl) with responsive side padding. */
+@utility content-container {
+  @apply mx-auto w-full max-w-7xl px-container-x;
+}
+
+/*
+ * Type scale (Inter, optical sizes on). Weights: headings 600, UI 500, body 400. Big headings carry negative tracking.
+ *   type-display  56–72 fluid, 600, -0.03em   hero / editorial opener
+ *   type-h1       40, 600, -0.02em            page titles, PDP title
+ *   type-h2       28, 600, -0.02em            section titles
+ *   type-h3       20, 600, -0.01em            card groups, drawer titles
+ *   type-body     16 / 1.6                    running text
+ *   type-label    12, 500, uppercase, +0.08em eyebrows, form labels, chips
+ *   type-price    tabular figures             prices, quantities, totals
+ * Older aliases (type-hero / type-section / type-title / type-heading / type-eyebrow / type-caption) map onto these.
+ */
+@utility type-display {
+  font-size: clamp(3.5rem, 2.5rem + 2.8vw, 4.5rem);
+  @apply leading-[1.02] font-semibold tracking-[-0.03em] text-balance;
+}
+@utility type-h1 {
+  @apply text-[2.5rem] leading-[1.08] font-semibold tracking-[-0.02em] text-balance;
+}
+@utility type-h2 {
+  @apply text-[1.75rem] leading-[1.15] font-semibold tracking-[-0.02em];
+}
+@utility type-h3 {
+  @apply text-[1.25rem] leading-[1.3] font-semibold tracking-[-0.01em];
+}
+@utility type-body {
+  @apply text-base leading-[1.6];
+}
+@utility type-label {
+  @apply text-xs font-medium uppercase tracking-[0.08em];
+}
+@utility type-price {
+  font-variant-numeric: tabular-nums;
+}
+@utility type-caption {
+  @apply text-xs leading-5 text-muted sm:text-sm;
+}
+/* aliases used by the extracted components */
+@utility type-hero {
+  font-size: clamp(2.5rem, 1.6rem + 3vw, 4.5rem);
+  @apply leading-[1.02] font-semibold tracking-[-0.03em] text-balance;
+}
+@utility type-section {
+  @apply text-[1.75rem] leading-[1.15] font-semibold tracking-[-0.02em];
+}
+@utility type-title {
+  @apply text-[1.75rem] leading-[1.15] font-semibold tracking-[-0.02em];
+}
+@utility type-heading {
+  @apply text-[1.25rem] leading-[1.3] font-semibold tracking-[-0.01em];
+}
+@utility type-eyebrow {
+  @apply text-xs font-medium uppercase tracking-[0.08em] text-muted;
+}
+
+/*
+ * Frost: the translucent surface used ONLY by floating layers (sticky header, mega menu, cart drawer, quick view,
+ * mobile filter sheet, mobile sticky add-to-cart). Opacity and blur come from theme.config.ts (--k-frost-alpha,
+ * --k-frost-blur). Solid background where backdrop-filter is unsupported and when the visitor asks for reduced
+ * transparency. Text on it: Ink only.
+ */
+@utility frost {
+  background: var(--background);
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background: color-mix(in srgb, var(--background) calc(var(--k-frost-alpha, 0.8) * 100%), transparent);
+    -webkit-backdrop-filter: blur(var(--k-frost-blur, 14px)) saturate(1.4);
+    backdrop-filter: blur(var(--k-frost-blur, 14px)) saturate(1.4);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background: var(--background);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@utility frost-header {
+  background: var(--background);
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background: color-mix(in srgb, var(--background) calc(var(--k-frost-alpha, 0.8) * 100%), transparent);
+    -webkit-backdrop-filter: blur(var(--k-frost-blur, 14px)) saturate(1.4);
+    backdrop-filter: blur(var(--k-frost-blur, 14px)) saturate(1.4);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background: var(--background);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+/* Chips/badges over a photo: solid white 90%, no blur; a hairline shadow keeps the shape on a light photo. Ink only. */
+@utility chip-over-photo {
+  color: var(--foreground);
+  background: var(--k-over-photo);
+  box-shadow: var(--k-shadow-soft);
+}
+
+/* Photo stand-in: flat Soft (a small "//" sits on top, see ds/placeholder) */
+@utility photo-placeholder {
+  background: var(--k-soft);
+}
+
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  input:focus ~ label,
+  input:not(:placeholder-shown) ~ label {
+    @apply -translate-y-2 text-xsmall-regular;
+  }
+
+  input:focus ~ label {
+    @apply left-0;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    border: 1px solid #212121;
+    -webkit-text-fill-color: #212121;
+    -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-results-button,
+  input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+  }
+}
+
+@utility contrast-btn {
+  @apply px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition-colors duration-200 ease-in;
+}
+
+@utility text-xsmall-regular {
+  @apply text-[10px] leading-4 font-normal;
+}
+
+@utility text-small-regular {
+  @apply text-xs leading-5 font-normal;
+}
+
+@utility text-small-semi {
+  @apply text-xs leading-5 font-semibold;
+}
+
+@utility text-base-regular {
+  @apply text-sm leading-6 font-normal;
+}
+
+@utility text-base-semi {
+  @apply text-sm leading-6 font-semibold;
+}
+
+@utility text-large-regular {
+  @apply text-base leading-6 font-normal;
+}
+
+@utility text-large-semi {
+  @apply text-base leading-6 font-semibold;
+}
+
+@utility text-xl-regular {
+  @apply text-2xl leading-[36px] font-normal;
+}
+
+@utility text-xl-semi {
+  @apply text-2xl leading-[36px] font-semibold;
+}
+
+@utility text-2xl-regular {
+  @apply text-[30px] leading-[48px] font-normal;
+}
+
+@utility text-2xl-semi {
+  @apply text-[30px] leading-[48px] font-semibold;
+}
+
+@utility text-3xl-regular {
+  @apply text-[32px] leading-[44px] font-normal;
+}
+
+@utility text-3xl-semi {
+  @apply text-[32px] leading-[44px] font-semibold;
+}
+
+/*
+ * The Medusa UI preset sets its own font stack on its typography utilities (txt-*,
+ * h1-* … h4-*). Starter markup still uses them; keep the site font (our self-hosted Inter) instead.
+ * Unlayered, so it wins over the preset's utility layer. Remove with @config.
+ */
+:is([class*="txt-"], [class*="h1-"], [class*="h2-"], [class*="h3-"], [class*="h4-"]) {
+  font-family: var(--font-sans);
+}
+
+/* Native checkboxes/radios in starter forms: Uber black instead of browser blue. */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--foreground);
+}
+
+/* Buttons: radius md everywhere (HeroUI's base is rounded-3xl). docs/keputusan.md "Bentuk". */
+.button {
+  border-radius: var(--radius);
+}
+
+/*
+ * Sticky header "shrinks" on scroll without layout shift: it sticks at a negative top, so its extra top padding
+ * scrolls away (--header-tuck). Only a paint-only shadow follows the scroll (scroll-timeline, CSS only).
+ */
+:root {
+  --header-tuck: 0.75rem;
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+    .site-header {
+      animation: site-header-shadow linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 96px;
+    }
+  }
+}
+/* Phones: the search + category rows slide behind the top row while collapsed (HeaderScroll) */
+@media (max-width: 767.98px) {
+  .header-secondary {
+    transition: transform 200ms ease-out;
+  }
+  .site-header[data-collapsed] .header-secondary {
+    transform: translateY(-100%);
+  }
+  .site-header[data-collapsed] .header-top {
+    border-bottom-color: var(--separator);
+  }
+}
+@media (max-width: 767.98px) and (prefers-reduced-motion: reduce) {
+  .header-secondary {
+    transition: none;
+  }
+}
+@keyframes site-header-shadow {
+  to {
+    box-shadow: var(--k-shadow-soft);
+  }
+}
+
+/* Product card: gentle lift + soft neutral shadow + second photo, 200ms; nothing moves with reduced motion */
+.card-media {
+  transition:
+    transform 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+.card-media-alt {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+@media (hover: hover) {
+  .hk-card:hover .card-media,
+  .hk-card:focus-visible .card-media {
+    transform: translateY(-3px);
+    box-shadow: var(--k-shadow-lift);
+  }
+  .hk-card:hover .card-media-alt,
+  .hk-card:focus-visible .card-media-alt {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-media,
+  .card-media-alt {
+    transition: none;
+  }
+  .hk-card:hover .card-media,
+  .hk-card:focus-visible .card-media {
+    transform: none;
+  }
+}

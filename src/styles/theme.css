@@ -1,0 +1,124 @@
+/*
+ * HeroUI v3 theme for Kiln (light mode). The colour values are set on <html> from theme.config.ts (--k-*); this
+ * file maps them onto HeroUI's variables.
+ *   Ink     text and primary buttons (#0C0C0C on white: 19.6:1)
+ *   Muted   secondary text (#6B6B6B: 5.3:1 on white)
+ *   Border  decorative hairlines only (never the border of a control)
+ *   Control borders that must be seen: inputs, selects, checkboxes (3:1+)
+ *   Soft    secondary background: chips, secondary buttons, photo placeholders
+ * Blur only on floating surfaces (see the frost utility in globals.css). Status colours for form errors and
+ * system states only, never decoration. Started from the HeroUI "Uber" preset (structure, radius md 0.5rem).
+ */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --k-white: #ffffff;
+  --k-ink: #0c0c0c;
+  --k-muted: #6b6b6b;
+  --k-border: #e5e5e5;
+  --k-control: #8a8a8a;
+  --k-soft: #f5f5f5;
+  --k-soft-hover: #ebebeb; /* Soft pressed/hover: Ink on it 16.4:1 (no Muted text on it) */
+  --k-ink-hover: #2b2b2b; /* Ink hover: white on it 14.2:1 */
+
+  --background: var(--k-white);
+  --border: var(--k-border);
+  --default: var(--k-soft); /* chips, secondary buttons, photo placeholders */
+  --default-hover: var(--k-soft-hover);
+  --default-foreground: var(--k-ink);
+  --field-background: var(--k-white);
+  --field-border: var(--k-control);
+  --field-foreground: var(--k-ink);
+  --field-placeholder: var(--k-muted);
+  --foreground: var(--k-ink);
+  --link: var(--k-ink);
+  --muted: var(--k-muted);
+  --overlay: var(--k-white);
+  --overlay-foreground: var(--k-ink);
+  --scrollbar: var(--k-border);
+  --segment: var(--k-white);
+  --segment-foreground: var(--k-ink);
+  --separator: var(--k-border);
+  --surface: var(--k-white);
+  --surface-foreground: var(--k-ink);
+  --surface-secondary: var(--k-soft);
+  --surface-secondary-foreground: var(--k-ink);
+  --surface-tertiary: var(--k-soft);
+  --surface-tertiary-foreground: var(--k-ink);
+  --accent: var(--k-ink);
+  --accent-hover: var(--k-ink-hover);
+  --accent-foreground: var(--k-white);
+  --focus: var(--k-ink);
+  --success: oklch(0.6277 0.1604 153.06);
+  --success-foreground: oklch(99.11% 0 0);
+  --warning: oklch(0.8446 0.1525 80.6);
+  --warning-foreground: oklch(15% 0.0457 80.6);
+  --danger: oklch(0.52 0.19 25); /* errors only */
+  --danger-foreground: var(--k-white);
+  --radius: 0.5rem; /* md: buttons, inputs */
+  --field-radius: 0.5rem;
+  --k-radius-media: 0.75rem; /* lg: photos, cards, tiles, hero */
+
+  /* Soft neutral shadows */
+  --k-shadow-soft: 0 1px 2px rgb(0 0 0 / 0.05);
+  --k-shadow-lift: 0 2px 6px rgb(0 0 0 / 0.04), 0 14px 32px -12px rgb(0 0 0 / 0.16);
+
+  /* Solid chips over photos */
+  --k-over-photo: rgb(255 255 255 / 0.9);
+
+  --chart-1: oklch(from var(--accent) calc(l - 0.24) c h);
+  --chart-2: oklch(from var(--accent) calc(l - 0.12) c h);
+  --chart-3: var(--accent);
+  --chart-4: oklch(from var(--accent) calc(l + 0.12) c h);
+  --chart-5: oklch(from var(--accent) calc(l + 0.24) c h);
+}
+
+/*
+ * Bridge: Medusa UI preset tokens (used by the remaining starter components:
+ * text-ui-fg-*, bg-ui-bg-*, border-ui-border-*, shadow-borders-*) mapped onto the
+ * HeroUI/Uber theme, so starter pages read black/white/grey like the rest of the
+ * site (no Medusa blue). Unlayered, so it wins over the preset's base-layer :root.
+ * Remove together with @config in globals.css once no starter markup is left.
+ */
+:root {
+  --fg-base: var(--foreground);
+  --fg-subtle: var(--muted);
+  --fg-muted: var(--muted);
+  --fg-disabled: var(--k-muted);
+  --fg-interactive: var(--foreground);
+  --fg-interactive-hover: var(--muted);
+  --fg-error: var(--danger);
+  --fg-on-color: var(--accent-foreground);
+  --fg-on-inverted: var(--accent-foreground);
+  --bg-base: var(--surface);
+  --bg-base-hover: var(--default);
+  --bg-base-pressed: var(--surface-tertiary);
+  --bg-subtle: var(--background);
+  --bg-subtle-hover: var(--default);
+  --bg-subtle-pressed: var(--surface-tertiary);
+  --bg-component: var(--surface-secondary);
+  --bg-component-hover: var(--default);
+  --bg-field: var(--field-background);
+  --bg-field-hover: var(--surface-secondary);
+  --bg-field-component: var(--field-background);
+  --bg-interactive: var(--accent);
+  --bg-highlight: var(--surface-secondary);
+  --bg-highlight-hover: var(--default);
+  --bg-disabled: var(--default);
+  --bg-overlay: rgb(12 12 12 / 0.4);
+  /* Starter inputs/selects/checkboxes use these: Control (3:1), not the decorative Border */
+  --border-base: var(--k-control);
+  --border-strong: var(--k-control);
+  --border-interactive: var(--foreground);
+  --border-danger: var(--danger);
+  --border-error: var(--danger);
+  --button-inverted: var(--accent);
+  --button-inverted-hover: var(--accent-hover);
+  --button-neutral: var(--surface);
+  --button-neutral-hover: var(--default);
+  --borders-base: 0 0 0 1px var(--k-control);
+  --borders-interactive-with-active: 0 0 0 1px var(--foreground), 0 0 0 3px rgb(12 12 12 / 0.12);
+  --borders-interactive-with-focus: 0 0 0 1px var(--foreground), 0 0 0 3px rgb(12 12 12 / 0.12);
+  --borders-focus: 0 0 0 1px var(--foreground), 0 0 0 3px rgb(12 12 12 / 0.2);
+  --borders-error: 0 0 0 1px var(--danger), 0 0 0 3px oklch(from var(--danger) l c h / 0.2);
+}

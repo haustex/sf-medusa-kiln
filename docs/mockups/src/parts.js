@@ -14,7 +14,7 @@ const header = (active = "") => `
 <header class="header frost">
   <div class="container">
     <div class="header-row desktop-only">
-      <a class="wordmark" href="#"><i></i>Nord Atelier</a>
+      <a class="wordmark" href="#"><i></i>Tilde Goods</a>
       <div class="header-search"><div class="field">${I.search}<span>Search boards, bowls, makers…</span></div></div>
       <div class="header-actions">
         <a href="#">${I.user}Sign in</a>
@@ -28,7 +28,7 @@ const header = (active = "") => `
     </nav>
     <div class="header-row mobile-only">
       <button class="btn btn-icon" style="background:none;border:0" aria-label="Menu">${I.menu}</button>
-      <a class="wordmark" href="#"><i></i>Nord Atelier</a>
+      <a class="wordmark" href="#"><i></i>Tilde Goods</a>
       <div class="header-actions"><a href="#" aria-label="Account">${I.user}</a><a href="#">${I.bag}<span class="count">2</span></a></div>
     </div>
     <div class="m-search mobile-only"><div class="field" style="flex:1">${I.search}<span>Search boards, bowls, makers…</span></div></div>
@@ -39,12 +39,12 @@ const footer = `
 <footer class="footer">
   <div class="container">
     <div class="footer-grid">
-      <div><a class="wordmark" href="#"><i></i>Nord Atelier</a><p class="muted t-small" style="max-width:34ch;margin:12px 0 0">Small-batch objects for the home, made by independent makers. Every piece ships from the workshop that made it.</p></div>
+      <div><a class="wordmark" href="#"><i></i>Tilde Goods</a><p class="muted t-small" style="max-width:34ch;margin:12px 0 0">Small-batch objects for the home, made by independent makers. Every piece ships from the workshop that made it.</p></div>
       <div><h4>Shop</h4><ul><li>Cutting boards</li><li>Trays</li><li>Bowls</li><li>Ceramics</li><li>Textiles</li><li>Furniture</li></ul></div>
       <div><h4>Help</h4><ul><li>Shipping</li><li>Track an order</li><li>Returns</li><li>Contact</li><li>Custom orders</li></ul></div>
       <div><h4>Studio</h4><ul><li>About</li><li>Makers</li><li>Journal</li><li>Privacy</li><li>Terms</li></ul></div>
     </div>
-    <div class="footer-bottom"><span>© 2026 Nord Atelier · Ships worldwide from Jepara, Indonesia</span><span>Built by Haus Kayu · Kiln theme for Medusa</span></div>
+    <div class="footer-bottom"><span>© 2026 Tilde Goods · Ships worldwide from Jepara, Indonesia</span><span>Built by Haus Kayu · Kiln theme for Medusa</span></div>
   </div>
 </footer>`;
 const stars = (avg, n) => `<span class="stars">${I.star}<b>${avg}</b><span>(${n})</span></span>`;
