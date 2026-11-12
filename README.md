@@ -134,6 +134,15 @@ backend as they are) and a Google Merchant feed. The journal and the account's r
 test the storefront with the optional integrations switched off, and the checks before a commit
 (`pnpm typecheck`, `pnpm lint`).
 
+## Docker
+
+`Dockerfile` builds the standalone server (port 8000). The static pages are rendered during the build, so the
+backend must be reachable then: `docker build --network host --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_… 
+--build-arg NEXT_PUBLIC_MEDUSA_BACKEND_URL=https://api.example.com --build-arg NEXT_PUBLIC_BASE_URL=https://shop.example.com 
+--build-arg MEDUSA_BACKEND_URL_INTERNAL=http://127.0.0.1:9000 --build-arg SITE_LIVE=true -t kiln .`
+Run it with the same `MEDUSA_BACKEND_URL_INTERNAL` (and `REVALIDATE_SECRET`, `NEXT_PUBLIC_STRIPE_KEY` when used).
+`KILN_DEMO_NOTICE=true` shows a one-line "demo store" notice above the header.
+
 ## Licence
 
 MIT. Fonts, icons and the Medusa starter this theme grew from are credited in

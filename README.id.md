@@ -135,6 +135,15 @@ oleh backend), dan feed Google Merchant. Jurnal dan tab ulasan di akun butuh plu
 menguji storefront dengan integrasi opsional dimatikan, dan pemeriksaan sebelum commit (`pnpm typecheck`,
 `pnpm lint`).
 
+## Docker
+
+`Dockerfile` membangun server standalone (port 8000). Halaman statis dirender saat build, jadi backend harus bisa
+diakses saat itu: `docker build --network host --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_… 
+--build-arg NEXT_PUBLIC_MEDUSA_BACKEND_URL=https://api.contoh.com --build-arg NEXT_PUBLIC_BASE_URL=https://toko.contoh.com 
+--build-arg MEDUSA_BACKEND_URL_INTERNAL=http://127.0.0.1:9000 --build-arg SITE_LIVE=true -t kiln .`
+Jalankan dengan `MEDUSA_BACKEND_URL_INTERNAL` yang sama (plus `REVALIDATE_SECRET`, `NEXT_PUBLIC_STRIPE_KEY` bila
+dipakai). `KILN_DEMO_NOTICE=true` menampilkan satu baris pemberitahuan "toko demo" di atas header.
+
 ## Lisensi
 
 MIT. Font, ikon, dan starter Medusa yang jadi asal tema ini dicatat di
