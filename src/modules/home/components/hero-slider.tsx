@@ -18,6 +18,8 @@ const SETTLE_MS = 700
 const DRAG_THRESHOLD = 50
 /** Mouse moved this far during a press: the release is a drag, not a click on the CTA */
 const CLICK_SLOP = 6
+/** Slides 2+ load when the browser is idle, at the latest after this */
+const IDLE_TIMEOUT_MS = 2500
 
 const REDUCED = "(prefers-reduced-motion: reduce)"
 const noop = () => {}
@@ -40,7 +42,7 @@ const useTabHidden = () => useSyncExternalStore(typeof document === "undefined" 
  * by mouse drag (pointer events, 50px threshold, grab cursor; a drag never fires the CTA link, a plain click does), by the dots and by
  * the arrow keys when the rail has focus. The rail is a native scroll-snap list, so swiping works before JS and
  * the layout never shifts (fixed 4:5 / 12:5 boxes). Slide 1 is the LCP image: eager, high priority, preloaded for
- * the viewport that will show it; the others load lazily.
+ * the viewport that will show it; the others wait for an idle moment (or the first interaction).
  *
  * Autoplay (ms, from theme.config.ts) only with JS, never with prefers-reduced-motion; it pauses while the pointer
  * is over the slider, while anything inside has focus, while dragging and while the tab is hidden, and resumes
@@ -60,6 +62,19 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
   const reduced = useReducedMotion()
   const hidden = useTabHidden()
   const playing = many && !!autoplay && !reduced
+  // Photos of slides 2+ are requested only once the browser is idle (or on the first interaction), so slide 1
+  // (the LCP image) and the page's scripts never share bandwidth with them
+  const [rest, setRest] = useState(false)
+  useEffect(() => {
+    if (!many || rest) return
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void }
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(() => setRest(true), { timeout: IDLE_TIMEOUT_MS })
+      return () => w.cancelIdleCallback?.(id)
+    }
+    const id = window.setTimeout(() => setRest(true), IDLE_TIMEOUT_MS)
+    return () => window.clearTimeout(id)
+  }, [many, rest])
 
   // Active slide follows the rail (swipe / scroll)
   useEffect(() => {
@@ -67,6 +82,7 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
     if (!rail || !many) return
     let raf = 0
     const onScroll = () => {
+      setRest(true)
       if (Date.now() < settleUntil.current || drag.current) return
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(() => {
@@ -85,6 +101,7 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
     const rail = railRef.current
     if (!rail) return
     const next = ((i % count) + count) % count
+    setRest(true)
     settleUntil.current = Date.now() + SETTLE_MS
     rail.scrollTo({ left: next * rail.clientWidth, behavior: reduced ? "auto" : "smooth" })
     setActive(next)
@@ -112,6 +129,7 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
   // Mouse drag (touch keeps the native swipe). While pressed the rail follows the pointer with snapping off
   // (data-dragging, globals.css); on release it goes to the next/previous slide past the threshold, else back.
   const onPointerDown = (e: React.PointerEvent<HTMLUListElement>) => {
+    setRest(true)
     if (!many || e.pointerType !== "mouse" || e.button !== 0) return
     drag.current = { id: e.pointerId, x: e.clientX, left: e.currentTarget.scrollLeft, moved: false }
     setDragging(true)
@@ -199,7 +217,7 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
                   aria-label={many ? fill(labels.slideOf, { n: i + 1, total: count }) : undefined}
                   className="relative aspect-[4/5] overflow-hidden md:aspect-[12/5]"
                 >
-                  <SlideImage slide={s} first={first} />
+                  <SlideImage slide={s} first={first} load={first || rest} />
                   {/* scrim: white copy stays AA on any photo */}
                   <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
                   <div className="absolute inset-0 flex flex-col justify-end gap-stack-md p-6 pb-14 text-white sm:p-8 sm:pb-14 md:p-12 md:pb-16 lg:p-16 lg:pb-20">
@@ -247,31 +265,36 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
 /**
  * The two photos of a slide (next/image URLs computed in lib/hero.ts: AVIF / WebP, responsive): the tall one on
  * phones, the wide one from md. Slide 1 is the LCP image: eager, high priority, one preload per viewport with the
- * exact srcset the browser will pick (ds/image-preload.tsx).
+ * exact srcset the browser will pick (ds/image-preload.tsx). The other slides render their <picture> only when
+ * `load` is true (browser idle or first interaction); until then the slide shows its background. Without JS the
+ * <noscript> copy loads them lazily, so the rail still works.
  */
-function SlideImage({ slide: s, first }: { slide: HeroSlide; first: boolean }) {
+function SlideImage({ slide: s, first, load }: { slide: HeroSlide; first: boolean; load: boolean }) {
   const { desktop, mobile } = s.picture
+  const picture = (
+    <picture>
+      <source media={DESKTOP} srcSet={desktop.srcSet} sizes="100vw" />
+      {/* next/image's own srcset, computed in lib/hero.ts */}
+      <img
+        src={mobile.src}
+        srcSet={mobile.srcSet}
+        sizes="100vw"
+        alt={s.alt}
+        width={840}
+        height={1050}
+        loading={first ? "eager" : "lazy"}
+        fetchPriority={first ? "high" : undefined}
+        decoding="async"
+        draggable={false}
+        className="pointer-events-none absolute inset-0 size-full object-cover"
+      />
+    </picture>
+  )
   return (
     <>
       {first && mobile.srcSet && <ImagePreload href={mobile.src} srcSet={mobile.srcSet} sizes="100vw" media={PHONE} type={null} />}
       {first && desktop.srcSet && <ImagePreload href={desktop.src} srcSet={desktop.srcSet} sizes="100vw" media={DESKTOP} type={null} />}
-      <picture>
-        <source media={DESKTOP} srcSet={desktop.srcSet} sizes="100vw" />
-        {/* eslint-disable-next-line @next/next/no-img-element -- next/image's own srcset */}
-        <img
-          src={mobile.src}
-          srcSet={mobile.srcSet}
-          sizes="100vw"
-          alt={s.alt}
-          width={840}
-          height={1050}
-          loading={first ? "eager" : "lazy"}
-          fetchPriority={first ? "high" : undefined}
-          decoding="async"
-          draggable={false}
-          className="pointer-events-none absolute inset-0 size-full object-cover"
-        />
-      </picture>
+      {load ? picture : <noscript>{picture}</noscript>}
     </>
   )
 }
