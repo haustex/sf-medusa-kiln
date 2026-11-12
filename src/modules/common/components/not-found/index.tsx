@@ -7,7 +7,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { useParams } from "next/navigation"
 
 /**
- * HAUS KAYU 404 inside a market (ID / EN from the URL): title, one sentence, product search, buttons to the home page and
+ * 404 inside a market (ID / EN from the URL): title, one sentence, product search, buttons to the home page and
  * all products. The status stays 404 and the page is noindex (metadata of the not-found files).
  */
 export default function NotFoundContent() {

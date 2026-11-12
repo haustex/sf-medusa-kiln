@@ -32,7 +32,7 @@ export const Text = forwardRef<HTMLParagraphElement, TextProps>(
 )
 Text.displayName = "Text"
 
-// Heading Component: mapped onto the Haus Kayu type scale (globals.css)
+// Heading Component: mapped onto the Kiln type scale (globals.css)
 type HeadingProps = HTMLAttributes<HTMLHeadingElement> & {
   level?: "h1" | "h2" | "h3"
 }

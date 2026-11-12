@@ -1,7 +1,7 @@
 import { getLocaleHeader } from "@lib/util/get-locale-header"
 import Medusa, { FetchArgs, FetchInput } from "@medusajs/js-sdk"
 
-// Browser: public URL (NEXT_PUBLIC_MEDUSA_BACKEND_URL, e.g. https://api.hauskayu.com).
+// Browser: public URL (NEXT_PUBLIC_MEDUSA_BACKEND_URL, e.g. https://api.example.com).
 // Server: MEDUSA_BACKEND_URL_INTERNAL when set, so SSR skips the public round trip.
 const MEDUSA_BACKEND_URL =
   (typeof window === "undefined" && process.env.MEDUSA_BACKEND_URL_INTERNAL) ||

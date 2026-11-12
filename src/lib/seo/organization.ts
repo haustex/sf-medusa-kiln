@@ -23,11 +23,11 @@ export function organizationSchema(origin: string, countryCode: string) {
     "@id": `${origin}/#organization`,
     name: ORG.name,
     url: origin,
-    logo: `${origin}/brand/logo.png`,
+    logo: `${origin}/android-chrome-512x512.png`,
     ...(ORG.email ? { email: ORG.email } : {}),
     description: tx(config.brand.tagline, getMarket(countryCode).dictionary),
     ...(ORG.location ? { foundingLocation: { "@type": "Place", name: ORG.location } } : {}),
-    sameAs: [],
+    sameAs: Object.values(config.social).filter(Boolean),
   }
 }
 

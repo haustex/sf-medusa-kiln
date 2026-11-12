@@ -1,10 +1,9 @@
 /**
  * Products that exist in Medusa only for internal use and must never reach a public surface (lists, PDP, search,
- * sitemap, llms, feeds, JSON-LD, UCP). "Furniture custom" carries the lines of custom quotes (draft orders,
- * docs/desain-dp-custom.md nomor 4). It is in no sales channel already; this is the second lock in case someone
- * adds it to one in the Admin. Keep in sync with PLACEHOLDER_HANDLE in apps/backend/src/lib/custom-dp/quote.ts.
+ * sitemap, feeds, JSON-LD): list their handles here. Sales channels are the first lock; this is the second one in
+ * case someone adds such a product to a channel in the Admin.
  */
-export const HIDDEN_PRODUCT_HANDLES: ReadonlySet<string> = new Set(["hk-custom-quote-item"])
+export const HIDDEN_PRODUCT_HANDLES: ReadonlySet<string> = new Set<string>([])
 
 export const isHiddenProduct = (p: { handle?: string | null } | null | undefined) =>
   !!p?.handle && HIDDEN_PRODUCT_HANDLES.has(p.handle)
@@ -15,6 +14,6 @@ export function withoutHidden<T extends { handle?: string | null }>(products: T[
   return { products: visible, count: Math.max(count - (products.length - visible.length), 0) }
 }
 
-/** Secret test product: published, reachable only by its link (lists drop it in the backend). Never indexed. */
+/** Product reachable only by its link (metadata `secret: true`): never indexed, never in a list */
 export const isSecretProduct = (p: { metadata?: Record<string, unknown> | null } | null | undefined) =>
-  p?.metadata?.hk_secret === true || p?.metadata?.hk_secret === "true"
+  p?.metadata?.secret === true || p?.metadata?.secret === "true"

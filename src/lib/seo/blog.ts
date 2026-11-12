@@ -57,7 +57,7 @@ export function blogPosting(origin: string, countryCode: string, post: BlogArtic
         },
     publisher: {
       ...orgRef(origin),
-      logo: { "@type": "ImageObject", url: `${origin}/brand/logo.png` },
+      logo: { "@type": "ImageObject", url: `${origin}/android-chrome-512x512.png` },
     },
     inLanguage: getMarket(countryCode).locale,
     ...(post.category ? { articleSection: post.category.name } : {}),

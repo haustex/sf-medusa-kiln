@@ -1,5 +1,5 @@
 /**
- * Haus Kayu design system: custom components on top of HeroUI v3 styles.
+ * Kiln design system: custom components on top of HeroUI v3 styles.
  * Server components unless noted; preview at /_design.
  */
 export { default as Badge, type BadgeTone } from "./badge"

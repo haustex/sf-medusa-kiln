@@ -15,7 +15,7 @@ export default function FeaturedPost({ post, cta, label }: { post: PostCardData;
   return (
     <Link
       href={post.href}
-      className="hk-card group grid items-center gap-stack-md rounded-media outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-4 focus-visible:ring-offset-background lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-inset-banner"
+      className="k-card group grid items-center gap-stack-md rounded-media outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-4 focus-visible:ring-offset-background lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-inset-banner"
     >
       {/* First screen on /blog: the LCP image */}
       <PostCover slug={post.href.split("/").pop() ?? ""} src={post.cover} alt="" shape="feature" priority sizes="(min-width: 1024px) 60vw, 100vw" className="card-media" />

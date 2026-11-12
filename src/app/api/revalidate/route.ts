@@ -29,7 +29,7 @@ function authorized(req: NextRequest) {
   return a.length === b.length && timingSafeEqual(a, b)
 }
 
-const PUBLIC_ORIGIN = (process.env.NEXT_PUBLIC_BASE_URL || "https://hauskayu.com").replace(/\/$/, "")
+const PUBLIC_ORIGIN = (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9720").replace(/\/$/, "")
 
 /** AVIF/WebP variants referenced by the pages, fetched through Cloudflare so the edge and the disk cache hold them. */
 async function warmImages(paths: string[]) {
@@ -39,7 +39,7 @@ async function warmImages(paths: string[]) {
     for (const u of html.match(/\/img\/(?:avif|webp)\/\d+\/[^\s",]+/g) ?? []) urls.add(u)
   }
   for (const u of Array.from(urls).slice(0, 300)) {
-    await fetch(PUBLIC_ORIGIN + u, { headers: { "user-agent": "hauskayu-revalidate" } }).then((r) => r.arrayBuffer()).catch(() => null)
+    await fetch(PUBLIC_ORIGIN + u, { headers: { "user-agent": "kiln-revalidate" } }).then((r) => r.arrayBuffer()).catch(() => null)
   }
 }
 
@@ -49,7 +49,7 @@ async function warm(paths: string[]) {
   for (let round = 0; round < 2; round++) {
     await Promise.all(
       paths.map((p) =>
-        fetch(ORIGIN + p, { headers: { "user-agent": "hauskayu-revalidate" }, cache: "no-store" })
+        fetch(ORIGIN + p, { headers: { "user-agent": "kiln-revalidate" }, cache: "no-store" })
           .then((r) => r.arrayBuffer())
           .catch(() => null)
       )

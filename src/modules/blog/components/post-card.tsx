@@ -29,7 +29,7 @@ export function PostMeta({ post, author, className }: { post: PostCardData; auth
 /**
  * Blog card: 1:1 cover (radius lg), category, title, date + reading time; variant "journal" (home page): 4:3 cover,
  * category, title, a two-line excerpt and the date. Same hover as the product card
- * (.hk-card in globals.css: lifts 3px with a soft shadow, nothing with reduced motion). The whole card is one link,
+ * (.k-card in globals.css: lifts 3px with a soft shadow, nothing with reduced motion). The whole card is one link,
  * so the category is text here; the category chips above the grid are the links.
  */
 export default function PostCard({
@@ -52,7 +52,7 @@ export default function PostCard({
     <Link
       href={post.href}
       className={cn(
-        "hk-card group flex flex-col gap-stack-sm rounded-media outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "k-card group flex flex-col gap-stack-sm rounded-media outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className
       )}
     >
