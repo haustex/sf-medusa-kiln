@@ -1,3 +1,4 @@
+import { feature } from "@lib/features"
 import { addToWishlist, getWishlist, removeFromWishlist } from "@lib/data/wishlist"
 
 /**
@@ -10,6 +11,8 @@ import { addToWishlist, getWishlist, removeFromWishlist } from "@lib/data/wishli
  */
 export const dynamic = "force-dynamic"
 
+const OFF = () => Response.json({ message: "Not found" }, { status: 404 })
+
 const NO_STORE = { "Cache-Control": "private, no-store", "Cloudflare-CDN-Cache-Control": "no-store", Vary: "Cookie" }
 const ID = /^[A-Za-z0-9_-]{1,64}$/
 
@@ -17,10 +20,12 @@ const json = (view: Awaited<ReturnType<typeof getWishlist>>, status = 200) =>
   Response.json({ ids: view.productIds, count: view.productIds.length, customer: view.customer }, { status, headers: NO_STORE })
 
 export async function GET() {
+  if (!(await feature("wishlist"))) return OFF()
   return json(await getWishlist())
 }
 
 export async function POST(req: Request) {
+  if (!(await feature("wishlist"))) return OFF()
   const body = (await req.json().catch(() => null)) as { product_id?: unknown; variant_id?: unknown; action?: unknown } | null
   const productId = typeof body?.product_id === "string" && ID.test(body.product_id) ? body.product_id : null
   const variantId = typeof body?.variant_id === "string" && ID.test(body.variant_id) ? body.variant_id : null

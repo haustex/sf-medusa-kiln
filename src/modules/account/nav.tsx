@@ -9,14 +9,14 @@ import { marketPath, stripMarketPrefix } from "@lib/util/market"
 import Link from "@modules/common/components/app-link"
 
 /** Account navigation: a scrolling pill row on phones, a sidebar list from lg. The current page has aria-current. */
-export default function AccountNav({ email }: { email: string }) {
+export default function AccountNav({ email, reviews }: { email: string; /** medusa-reviews-wishlist installed: the "Reviews" item */ reviews: boolean }) {
   const t = useDictionary().account
   const { countryCode } = useParams() as { countryCode: string }
   const route = stripMarketPrefix(usePathname() ?? "")
   const items = [
     { href: "/account", label: t.overview, testId: "overview-link" },
     { href: "/account/orders", label: t.orders, testId: "orders-link" },
-    { href: "/account/reviews", label: t.reviews, testId: "reviews-link" },
+    ...(reviews ? [{ href: "/account/reviews", label: t.reviews, testId: "reviews-link" }] : []),
     { href: "/account/addresses", label: t.addresses, testId: "addresses-link" },
     { href: "/account/profile", label: t.profile, testId: "profile-link" },
   ]

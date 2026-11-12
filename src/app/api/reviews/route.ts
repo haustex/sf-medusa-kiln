@@ -1,3 +1,4 @@
+import { feature } from "@lib/features"
 import { getAuthHeaders } from "@lib/data/cookies"
 import { listProductReviews } from "@lib/data/reviews"
 
@@ -8,12 +9,15 @@ import { listProductReviews } from "@lib/data/reviews"
  */
 export const dynamic = "force-dynamic"
 
+const OFF = () => Response.json({ message: "Not found" }, { status: 404 })
+
 const NO_STORE = { "Cache-Control": "private, no-store", "Cloudflare-CDN-Cache-Control": "no-store" }
 const PUBLIC = { "Cache-Control": "public, max-age=60", "Cloudflare-CDN-Cache-Control": "max-age=60" }
 const BACKEND = (process.env.MEDUSA_BACKEND_URL_INTERNAL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000").replace(/\/$/, "")
 const ID = /^[A-Za-z0-9_-]{1,64}$/
 
 export async function GET(req: Request) {
+  if (!(await feature("reviews"))) return OFF()
   const url = new URL(req.url)
   const productId = url.searchParams.get("product_id") ?? ""
   if (!ID.test(productId)) return Response.json({ message: "product_id required" }, { status: 400, headers: NO_STORE })
@@ -24,6 +28,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  if (!(await feature("reviews"))) return OFF()
   const raw = await req.text()
   if (raw.length > 64 * 1024) return Response.json({ message: "too large" }, { status: 413, headers: NO_STORE })
   let parsed: Record<string, unknown>

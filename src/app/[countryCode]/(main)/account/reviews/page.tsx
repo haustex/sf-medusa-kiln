@@ -1,8 +1,10 @@
 import { Metadata } from "next"
+import { notFound } from "next/navigation"
 
 import { retrieveCustomer } from "@lib/data/customer"
 import { listOrders } from "@lib/data/orders"
 import { listMyReviews, reviewEligibility, type EligibilityItem } from "@lib/data/reviews"
+import { feature } from "@lib/features"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { getMarket, marketPath } from "@lib/util/market"
 import config from "@theme"
@@ -18,6 +20,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 /** Account → Reviews: items of shipped orders that can be reviewed (one form each) and the reviews written */
 export default async function ReviewsPage(props: Props) {
+  if (!(await feature("reviews"))) notFound()
   const { countryCode } = await props.params
   const customer = await retrieveCustomer().catch(() => null)
   if (!customer) return null

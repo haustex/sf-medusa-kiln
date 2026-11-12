@@ -105,7 +105,7 @@ export default async function ArticleTemplate({
           )}
           <header className="blog-column flex flex-col gap-stack-md">
             <h1 className="blog-title">{post.title}</h1>
-            {/* "[Care] · 12 November 2026 | Published by Nadia Tjipto" — the author part drops to its own line on phones */}
+            {/* "[Care] · 12 November 2026 · 1 min read | Published by Nadia Tjipto" — the author part drops to its own line on phones */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-stack-xs text-sm text-muted" data-testid="post-meta">
               {post.category && categoryHref && (
                 <>
@@ -116,6 +116,8 @@ export default async function ArticleTemplate({
                 </>
               )}
               <time dateTime={post.published_at}>{card.dateLabel}</time>
+              <span aria-hidden="true">·</span>
+              <span>{card.readingTime}</span>
               <span aria-hidden="true" className="text-separator max-sm:hidden">
                 |
               </span>

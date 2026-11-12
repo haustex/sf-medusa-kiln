@@ -1,4 +1,5 @@
 import { listJournalPicks, toPostCard } from "@lib/data/blog"
+import { feature } from "@lib/features"
 import type { Dictionary } from "@lib/i18n/dictionaries"
 import { Section } from "@modules/ds"
 import PostCard from "@modules/blog/components/post-card"
@@ -9,6 +10,7 @@ import PostCard from "@modules/blog/components/post-card"
  * is down or there is no public article yet.
  */
 export default async function Journal({ countryCode, t, href }: { countryCode: string; t: Dictionary["home"]; href: string }) {
+  if (!(await feature("blog"))) return null
   const posts = await listJournalPicks(countryCode, 3)
   if (!posts.length) return null
   return (

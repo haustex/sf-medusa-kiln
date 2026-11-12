@@ -3,6 +3,7 @@
 import { HttpTypes } from "@medusajs/types"
 
 import { sdk } from "@lib/config"
+import { feature } from "@lib/features"
 import { withoutHidden } from "@lib/util/hidden-products"
 import { getMarket } from "@lib/util/market"
 import { getAuthHeaders } from "./cookies"
@@ -44,6 +45,7 @@ export const searchProducts = async ({
   if (!region) return { response: { products: [], count: 0 }, engine: "meilisearch" }
 
   try {
+    if (!(await feature("search"))) throw new Error("Meilisearch route not installed (feature off)")
     const res = await sdk.client.fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
       "/store/meilisearch/products",
       {

@@ -7,6 +7,7 @@ import { tx } from "@lib/i18n/localized"
 import { getMarket, marketPath } from "@lib/util/market"
 import config from "@theme"
 import Logo from "@modules/brand/logo"
+import { features, linkEnabled } from "@lib/features"
 import { socialLinks } from "@modules/brand/social"
 import CartLink from "@modules/layout/components/cart-button/cart-link"
 import CartButton from "@modules/layout/components/cart-button"
@@ -39,15 +40,16 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
   const t = getDictionary(countryCode)
   const market = getMarket(countryCode)
   const href = (p: string) => marketPath(countryCode, p)
-  const [categories, markets] = await Promise.all([
+  const [categories, markets, f] = await Promise.all([
     listCategories({ fields: "id,name,handle,parent_category_id,rank", limit: 20 }, countryCode).catch(() => []),
     marketOptions(market.locale),
+    features(),
   ])
   const topLevel = categories.filter((c) => !c.parent_category_id).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
   const menuItems = [
     { href: href("/store"), label: t.nav.allProducts },
     ...topLevel.map((c) => ({ href: href(`/categories/${c.handle}`), label: c.name })),
-    ...config.brand.navLinks.map((l) => ({ href: href(l.href), label: tx(l.label, market.dictionary) })),
+    ...config.brand.navLinks.filter((l) => linkEnabled(l.href, f)).map((l) => ({ href: href(l.href), label: tx(l.label, market.dictionary) })),
   ]
 
   const search = <HeaderSearch action={href("/search")} placeholder={t.nav.search} label={t.nav.searchLabel} formLabel={t.nav.searchRegion} />
@@ -92,7 +94,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
             <Search {...ICON} />
           </Link>
           <MarketSelect options={markets} label={t.nav.market} className="hidden md:block" />
-          <WishlistLink href={href("/wishlist")} label={t.nav.wishlist} />
+          {f.wishlist && <WishlistLink href={href("/wishlist")} label={t.nav.wishlist} />}
           <Link
             href={href("/account")}
             aria-label={t.nav.account}

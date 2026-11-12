@@ -1,5 +1,6 @@
 import config from "@theme"
 import { listCategories } from "@lib/data/categories"
+import { features, linkEnabled } from "@lib/features"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
 import { getMarket } from "@lib/util/market"
@@ -14,6 +15,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 export default async function Footer({ countryCode }: { countryCode: string }) {
   const t = getDictionary(countryCode)
   const lang = getMarket(countryCode).dictionary
+  const f = await features()
   const categories = await listCategories({ fields: "id,name,handle,parent_category_id", limit: 20 }, countryCode).catch(() => [])
   const topLevel = categories.filter((c) => !c.parent_category_id).slice(0, 6)
 
@@ -51,7 +53,7 @@ export default async function Footer({ countryCode }: { countryCode: string }) {
           <div key={tx(col.title, "en")} className="flex flex-col gap-stack-md text-sm">
             <span className="type-eyebrow">{tx(col.title, lang)}</span>
             <ul className="flex flex-col gap-stack-sm">
-              {col.links.map((l) => (
+              {col.links.filter((l) => linkEnabled(l.href, f)).map((l) => (
                 <li key={l.href}>
                   <LocalizedClientLink prefetch={false} href={l.href} className="hover:underline underline-offset-4">
                     {tx(l.label, lang)}

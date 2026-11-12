@@ -1,3 +1,4 @@
+import { feature } from "@lib/features"
 import { blogFeed } from "@lib/seo/blog-feed"
 import { isMarketCode } from "@lib/util/market"
 import { getRequestOrigin } from "@lib/util/site"
@@ -12,7 +13,7 @@ export const dynamic = "force-dynamic"
 
 export async function GET(request: Request, { params }: { params: Promise<{ countryCode: string }> }) {
   const { countryCode } = await params
-  if (!SITE_LIVE || !isMarketCode(countryCode)) return new Response("Not found", { status: 404 })
+  if (!SITE_LIVE || !isMarketCode(countryCode) || !(await feature("blog"))) return new Response("Not found", { status: 404 })
   return new Response(await blogFeed(countryCode.toLowerCase(), getRequestOrigin(request)), {
     headers: {
       "Content-Type": "application/rss+xml; charset=utf-8",

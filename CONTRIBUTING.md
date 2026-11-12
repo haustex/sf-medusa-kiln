@@ -91,6 +91,25 @@ the order is created). Stripe is wired in and switches on with keys:
 Checkout then shows "Card" with Stripe's Payment Element (card, wallets and any redirect method enabled in the
 Stripe dashboard); redirect methods come back through `/api/payment-return`. Test card: 4242 4242 4242 4242.
 
+## Optional integrations off
+
+Reviews, wishlist, blog and Meilisearch search are optional: the theme probes one store route of each
+(`src/lib/features.ts`) and a 404 switches the feature off — no nav/footer link, no hearts, no reviews block,
+`/blog` and `/wishlist` 404, `/api/reviews` and `/api/wishlist` 404, search falls back to Medusa's own. Two ways
+to test that mode:
+
+1. Force it in the storefront: `KILN_FEATURE_REVIEWS=off KILN_FEATURE_WISHLIST=off KILN_FEATURE_BLOG=off
+   KILN_FEATURE_SEARCH=off pnpm dev` (the same variables with `on` force the opposite; `theme.config.ts`
+   `features` has the defaults, `auto`).
+2. The real thing: start the dev backend with `KILN_PLUGINS=none` (medusa-config.ts then loads no plugin) and the
+   storefront with a clean fetch cache (above). The probes are cached per server process, so restart the storefront
+   after switching the backend.
+
+Expected in both: home without the journal band, header/footer without "Journal" and the wishlist icon, product
+cards without hearts, PDP without rating/reviews, account nav without "Reviews" (`/account/reviews` 404 when
+signed in), `/blog`, `/blog/<slug>`, `/blog/feed.xml`, `/wishlist` 404, `/search?q=` still answering, no
+console errors.
+
 ## Checks before a commit
 
 ```bash

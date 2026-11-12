@@ -1,6 +1,7 @@
 import { marketAlternates, marketPath } from "@lib/util/market"
 import { sdk } from "@lib/config"
 import { categoryPath, listPostIndex, postPath } from "@lib/data/blog"
+import { feature } from "@lib/features"
 import { listRegions } from "@lib/data/regions"
 import { getSiteOrigin, listCountryCodes } from "@lib/util/site"
 import { SITE_LIVE } from "@lib/util/site-live"
@@ -68,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .then((res) => ({ items: res.collections, count: res.count }))
     ),
     // Blog: public articles (same slug in both markets); a failing blog API must not empty the sitemap
-    listPostIndex().catch(() => []),
+    feature("blog").then((on) => (on ? listPostIndex() : [])).catch(() => []),
   ])
 
   // One entry per market URL, each listing all language versions (hreflang)

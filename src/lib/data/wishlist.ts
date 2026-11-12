@@ -1,6 +1,7 @@
 import "server-only"
 import { cookies as nextCookies } from "next/headers"
 import { sdk } from "@lib/config"
+import { feature } from "@lib/features"
 import { wishlistStore, type Wishlist } from "medusa-reviews-wishlist/sdk"
 import { getAuthHeaders } from "./cookies"
 
@@ -47,6 +48,7 @@ const view = (wishlist: Wishlist | null, customer: boolean): WishlistView => ({
 /** The visitor's wishlist; a logged-in customer with a leftover guest token gets the two merged first. */
 export async function getWishlist(opts: { merge?: boolean } = {}): Promise<WishlistView> {
   const a = await auth()
+  if (!(await feature("wishlist"))) return view(null, a.customer)
   try {
     if (a.customer && opts.merge !== false) {
       const guest = await getGuestToken()

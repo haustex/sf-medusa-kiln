@@ -5,6 +5,7 @@ import { productReviews } from "medusa-reviews-wishlist/jsonld"
 import config from "@theme"
 import { listProducts } from "@lib/data/products"
 import { cardRating, getProductRating, getProductRatings, listProductReviews, PDP_REVIEWS } from "@lib/data/reviews"
+import { feature } from "@lib/features"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
 import { breadcrumbList, faqPage, JsonLd } from "@lib/seo/jsonld"
@@ -59,7 +60,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
   const variants = (product.variants ?? []).map(toBuyBoxVariant)
   const options = (product.variants?.length ?? 0) > 1 ? optionValues(product) : []
 
-  const [related, rating, reviewPage, origin] = await Promise.all([
+  const [related, rating, reviewPage, origin, wish] = await Promise.all([
     listProducts({
       countryCode,
       queryParams: { limit: 9, fields: PRODUCT_CARD_FIELDS, ...(maker ? { collection_id: [maker.id] } : category ? { category_id: [category.id] } : {}) },
@@ -69,6 +70,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
     getProductRating(product.id),
     listProductReviews(product.id, { limit: PDP_REVIEWS }),
     getSiteOrigin(),
+    feature("wishlist"),
   ])
   const relatedRatings = await getProductRatings(related.map((p) => p.id))
   const hasReviews = !!rating && rating.count > 0
@@ -159,7 +161,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
               actionUrl={href("/cart/add")}
               cartUrl={href("/cart")}
               notes={config.product.notes.map((n) => tx(n, lang))}
-              heart={<WishlistHeart productId={product.id} variant="inline" labels={{ add: dict.wishlist.add, remove: dict.wishlist.remove }} className="size-12 shrink-0 rounded-control" />}
+              heart={wish ? <WishlistHeart productId={product.id} variant="inline" labels={{ add: dict.wishlist.add, remove: dict.wishlist.remove }} className="size-12 shrink-0 rounded-control" /> : undefined}
               labels={{
                 quantity: t.quantity,
                 decrease: t.decrease,

@@ -1,8 +1,10 @@
 import { Metadata } from "next"
+import { notFound } from "next/navigation"
 
 import { listProducts } from "@lib/data/products"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
 import { getWishlist } from "@lib/data/wishlist"
+import { feature } from "@lib/features"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { isHiddenProduct } from "@lib/util/hidden-products"
 import { marketPath } from "@lib/util/market"
@@ -22,6 +24,7 @@ export async function generateMetadata(props: { params: Promise<{ countryCode: s
 
 export default async function WishlistPage(props: { params: Promise<{ countryCode: string }> }) {
   const { countryCode } = await props.params
+  if (!(await feature("wishlist"))) notFound()
   const t = getDictionary(countryCode).wishlist
   const view = await getWishlist()
   const ids = view.productIds
