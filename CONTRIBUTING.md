@@ -91,6 +91,20 @@ the order is created). Stripe is wired in and switches on with keys:
 Checkout then shows "Card" with Stripe's Payment Element (card, wallets and any redirect method enabled in the
 Stripe dashboard); redirect methods come back through `/api/payment-return`. Test card: 4242 4242 4242 4242.
 
+End to end, scripted (`scripts/e2e/checkout-stripe.mjs`, header has every option): adds a product, fills the
+address, picks a delivery option, fills the test card in the Payment Element, places the order, then reads the
+order's payment from the Admin API. With `--provider dev` it runs the same flow on "Pay later" (no keys needed).
+
+```bash
+export PATH=~/.local/lib/node/bin:$PATH
+cd ~/themes/kiln && MEDUSA_ADMIN_EMAIL=admin@kiln.test MEDUSA_ADMIN_PASSWORD=kiln-dev-password \
+  PUPPETEER_DIR=<folder with puppeteer in node_modules> node scripts/e2e/checkout-stripe.mjs            # Stripe
+cd ~/themes/kiln && MEDUSA_ADMIN_EMAIL=admin@kiln.test MEDUSA_ADMIN_PASSWORD=kiln-dev-password \
+  PUPPETEER_DIR=<folder with puppeteer in node_modules> node scripts/e2e/checkout-stripe.mjs --provider dev
+```
+
+With the admin credentials the script enables the provider on the region itself when it is missing.
+
 ## Optional integrations off
 
 Reviews, wishlist, blog and Meilisearch search are optional: the theme probes one store route of each
