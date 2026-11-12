@@ -13,7 +13,6 @@ import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
 import { Page, ProductGrid, Section } from "@modules/ds"
 import CatalogCard from "@modules/products/components/catalog-card"
 import CategoryCard from "@modules/home/components/category-card"
-import Faq from "@modules/home/components/faq"
 import Hero from "@modules/home/components/hero"
 import Journal from "@modules/home/components/journal"
 import ValueProps from "@modules/home/components/value-props"
@@ -99,8 +98,6 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
       <ValueProps t={t.home} />
 
       <Journal countryCode={countryCode} t={t.home} href={href(config.blogPath)} />
-
-      <Faq lang={getMarket(countryCode).dictionary} t={t.home} contactHref={href("/contact")} url={`${origin}${marketPath(countryCode)}`} />
     </Page>
   )
 }

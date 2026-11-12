@@ -479,31 +479,6 @@ input[type="radio"] {
   }
 }
 
-/*
- * <details> accordions (FAQ, product page): the body slides open where the browser animates ::details-content
- * (Chrome 131+, Safari 18.4+); elsewhere it just opens. Nothing moves with reduced motion.
- */
-.k-details::details-content {
-  block-size: 0;
-  overflow-y: clip;
-  transition:
-    block-size 250ms ease-out,
-    content-visibility 250ms allow-discrete;
-}
-.k-details[open]::details-content {
-  block-size: auto;
-}
-@supports (interpolate-size: allow-keywords) {
-  .k-details {
-    interpolate-size: allow-keywords;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .k-details::details-content {
-    transition: none;
-  }
-}
-
 /* Product card: gentle lift + soft neutral shadow + second photo, 200ms; nothing moves with reduced motion */
 .card-media {
   transition:

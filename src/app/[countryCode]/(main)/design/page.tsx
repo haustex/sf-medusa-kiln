@@ -10,7 +10,6 @@ import CountBadge from "@modules/layout/components/count-badge"
 import MarketSelect from "@modules/layout/components/market-select"
 import { marketOptions } from "@modules/layout/components/market-select/options"
 import CatalogCard from "@modules/products/components/catalog-card"
-import { FaqList, faqItems } from "@modules/home/components/faq"
 import ValueProps from "@modules/home/components/value-props"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import SheetDemo from "./sheet-demo"
@@ -97,12 +96,6 @@ export default async function DesignPage(props: { params: Promise<{ countryCode:
           <SectionHeader title="This week's picks" description="The pieces people come back for." action={{ label: "View all", href: "#" }} />
           <SectionHeader eyebrow="Journal" title="From the Journal" action={{ label: "View all", href: "#" }} />
         </div>
-      </section>
-
-      <section className="flex flex-col gap-stack-md" aria-labelledby="d-faq">
-        <h2 id="d-faq" className="type-h2">FAQ accordion</h2>
-        <p className="max-w-2xl text-sm text-muted">Native details/summary (no JS), Plus → Minus when open, body slides open (none with reduced motion), hairlines between items only. Content: theme.config.ts faq.items.</p>
-        <FaqList items={faqItems("en").slice(0, 3)} className="max-w-2xl" />
       </section>
 
       <section className="flex flex-col gap-stack-md" aria-labelledby="d-band">
