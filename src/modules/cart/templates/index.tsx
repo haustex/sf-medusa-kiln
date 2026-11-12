@@ -8,7 +8,7 @@ import { toCartLine } from "@modules/cart/components/cart-line/data"
 import RemovedNotice from "@modules/cart/components/removed-notice"
 import { ButtonLink, Page, Section, Stack } from "@modules/ds"
 
-import Summary, { checkoutStep } from "./summary"
+import Summary from "./summary"
 
 /** Cart page: lines on the left, sticky summary card on the right (desktop); one column on phones. */
 export default function CartTemplate({ cart, customer, countryCode }: { cart: HttpTypes.StoreCart | null; customer: HttpTypes.StoreCustomer | null; countryCode: string }) {
@@ -52,7 +52,7 @@ export default function CartTemplate({ cart, customer, countryCode }: { cart: Ht
             </Section>
 
             <aside className="lg:sticky lg:top-36">
-              <Summary cart={cart} title={t.summary} checkoutLabel={t.checkout} continueLabel={t.continue} checkoutHref={href(`/checkout?step=${checkoutStep(cart)}`)} storeHref={href("/store")} />
+              <Summary cart={cart} title={t.summary} checkoutLabel={t.checkout} continueLabel={t.continue} checkoutHref={href("/checkout")} storeHref={href("/store")} />
             </aside>
           </div>
         ) : (

@@ -78,6 +78,19 @@ node seed/seed-blog.mjs    # 4 demo articles into medusa-blog-seo via the Admin 
 `seed-blog.mjs` reads `MEDUSA_BACKEND_URL`, `MEDUSA_ADMIN_EMAIL`, `MEDUSA_ADMIN_PASSWORD` (defaults: the dev backend above)
 and skips articles that already exist.
 
+## Payments
+
+The dev backend has only Medusa's `pp_system_default` provider ("Pay later (test)" at checkout: no payment,
+the order is created). Stripe is wired in and switches on with keys:
+
+1. Backend: put `STRIPE_API_KEY=sk_test_…` (and `STRIPE_WEBHOOK_SECRET` once a webhook points at
+   `/hooks/payment/stripe_stripe`) in `~/themes/kiln-backend/.env`, restart it, then enable the provider on the
+   region in Admin → Settings → Regions (start the backend with `KILN_ADMIN=1` for the UI).
+2. Storefront: `NEXT_PUBLIC_STRIPE_KEY=pk_test_…` in `.env`, restart.
+
+Checkout then shows "Card" with Stripe's Payment Element (card, wallets and any redirect method enabled in the
+Stripe dashboard); redirect methods come back through `/api/payment-return`. Test card: 4242 4242 4242 4242.
+
 ## Checks before a commit
 
 ```bash

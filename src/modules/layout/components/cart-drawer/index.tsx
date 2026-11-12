@@ -97,7 +97,7 @@ export default function CartDrawer({ labels: t }: { labels: CartDrawerLabels }) 
               <p className="text-muted">{t.shippingLater}</p>
             </dl>
             <div className="flex flex-col gap-stack-sm">
-              <Link href={href("/checkout?step=address")} className={cn(buttonVariants({ variant: "primary", size: "lg", fullWidth: true }), "h-12")} data-testid="cart-drawer-checkout">
+              <Link href={href("/checkout")} className={cn(buttonVariants({ variant: "primary", size: "lg", fullWidth: true }), "h-12")} data-testid="cart-drawer-checkout">
                 {t.checkout}
               </Link>
               <Link href={href("/cart")} className={cn(buttonVariants({ variant: "secondary", size: "lg", fullWidth: true }), "h-12")} data-testid="cart-drawer-view">
