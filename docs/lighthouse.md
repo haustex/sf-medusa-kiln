@@ -7,7 +7,7 @@ noisy here**: it moved by up to 30 points between runs of the same page. The num
 
 | Page | Perf | A11y | Best practices | SEO | LCP | TBT | CLS |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Home `/` | 83 (best 88) | 100 | 100 | 100 | 2.2 s | 672 ms | 0 |
+| Home `/` | 87 (best 91) | 100 | 100 | 100 | 2.1 s | 560 ms | 0 |
 | Listing `/store` | 86 | 100 | 100 | 100 | 2.1 s | 506 ms | 0 |
 | Product | 84 (best 90) | 100 | 100 | 100 | 2.1 s | 608 ms | 0 |
 | Journal `/blog` | 88 (best 91) | 100 | 100 | 100 | 2.1 s | 444 ms | 0 |
@@ -61,3 +61,5 @@ CLS, LCP, TBT and FCP per run; the JSON reports land in `.trash/lighthouse`.
   and by the 404 page's client component. `fill` has its own module and the 404 content is a server component.
 - The legacy Medusa UI Tailwind preset (`@config`) is gone, with the last classes that used it.
 - The hero slides had `role="group"` on the `<li>`, which fails axe's `list` rule (home A11y 97 → 100).
+- Hero slides 2+ load only once the browser is idle (or on the first swipe/dot), so their photos no longer
+  compete with slide 1 and the scripts during load (home median 83 → 87, measured 12 Nov 2026).
