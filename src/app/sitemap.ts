@@ -10,15 +10,7 @@ import { isHiddenProduct } from "@lib/util/hidden-products"
 import { productImageName } from "@lib/util/image-name"
 import { imageJpeg, imageRef } from "@lib/util/image-url"
 
-const STATIC_PATHS = [
-  "",
-  "/store",
-  "/shipping",
-  "/returns",
-  "/terms",
-  "/privacy",
-  "/contact",
-]
+const STATIC_PATHS = ["", "/store", "/makers", "/shipping", "/returns", "/terms", "/privacy", "/contact", "/about"]
 const PAGE_SIZE = 200
 
 type Page<T> = { items: T[]; count: number }
@@ -116,6 +108,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...toEntries("products", products, productImages),
     ...toEntries("categories", categories),
     ...toEntries("collections", collections),
+    ...toEntries("makers", collections),
     ...blog,
   ]
 }

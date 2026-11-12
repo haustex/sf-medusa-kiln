@@ -70,6 +70,16 @@ const id = {
     market: "Indonesia (IDR)",
     switchMarket: "United States (USD)",
   },
+  makers: {
+    title: "Pembuat",
+    intro: "Setiap barang dikirim dari bengkel yang membuatnya. Kenali orang-orang di balik koleksi ini.",
+    count: "{n} produk",
+    countOne: "1 produk",
+    products: "Produk {name}",
+    seeAll: "Lihat semua {n} produk",
+    website: "Situs web",
+    empty: "Belum ada pembuat.",
+  },
   notFound: {
     title: "Halaman tidak ditemukan",
     body: "Halaman yang Anda cari tidak ada atau sudah dipindahkan. Coba cari produknya, atau kembali ke beranda.",
@@ -858,6 +868,16 @@ const en: Dictionary = {
     close: "Close cart",
     viewCart: "View cart",
     loading: "Loading your cart…",
+  },
+  makers: {
+    title: "Makers",
+    intro: "Every piece ships from the workshop that made it. Meet the people behind the collection.",
+    count: "{n} products",
+    countOne: "1 product",
+    products: "Products by {name}",
+    seeAll: "See all {n} products",
+    website: "Website",
+    empty: "No makers yet.",
   },
   notFound: {
     title: "Page not found",

@@ -41,10 +41,34 @@ const CATEGORIES = [
 
 type Demo = { handle: string; title: string; category: string; maker: string; material: string; usd: number; idr: number; weight: number; options?: { title: string; values: string[]; usdStep?: number }; description: string; materials: string; care: string }
 const MAKERS = [
-  { handle: "studio-lio", title: "Studio Lio", location: "Yogyakarta, Indonesia", description: "A two-person pottery studio. Everything is thrown by hand and fired in a small gas kiln." },
-  { handle: "tjipto-workshop", title: "Tjipto Workshop", location: "Jepara, Indonesia", description: "Third-generation woodworkers. Solid timber only, finished with oil, never lacquer." },
-  { handle: "north-field", title: "North Field", location: "Bandung, Indonesia", description: "Textiles and candles made in small runs, with natural fibres and soy wax." },
-  { handle: "rumah-anyam", title: "Rumah Anyam", location: "Lombok, Indonesia", description: "A weaving collective: seagrass and rattan baskets woven the traditional way." },
+  {
+    handle: "studio-lio",
+    title: "Studio Lio",
+    location: "Yogyakarta, Indonesia",
+    description: "A two-person pottery studio. Everything is thrown by hand and fired in a small gas kiln.",
+    story: "Lio and Sari started the studio in 2016 in a rented garage, with one wheel and a kiln they built themselves. Ten years on there are two wheels, a bigger kiln and still just the two of them.\n\nThe clay comes from a quarry two hours away and every glaze is mixed in the studio. Plates and bowls are thrown in batches of thirty, dried for a week and fired twice, so the rims take daily use without chipping.",
+  },
+  {
+    handle: "tjipto-workshop",
+    title: "Tjipto Workshop",
+    location: "Jepara, Indonesia",
+    description: "Third-generation woodworkers. Solid timber only, finished with oil, never lacquer.",
+    story: "The workshop was opened by Tjipto's grandfather in 1961 and still stands on the same street, which has been the carpenters' street of Jepara for longer than anyone remembers.\n\nThey work in solid oak, walnut and cedar, joined without screws where the piece allows it. Every board is finished with food-safe oil only, so it can be sanded and refreshed for years instead of thrown away.",
+  },
+  {
+    handle: "north-field",
+    title: "North Field",
+    location: "Bandung, Indonesia",
+    description: "Textiles and candles made in small runs, with natural fibres and soy wax.",
+    story: "North Field is a weaving studio in the hills above Bandung, where the mornings are cool enough for wool. Four looms, six people, and a candle bench by the window.\n\nLinen is bought as yarn and woven, washed and cut in the studio; the throws are lambswool from a small spinner. Candles are poured in batches of forty, in glasses that go in the dishwasher afterwards.",
+  },
+  {
+    handle: "rumah-anyam",
+    title: "Rumah Anyam",
+    location: "Lombok, Indonesia",
+    description: "A weaving collective: seagrass and rattan baskets woven the traditional way.",
+    story: "Rumah Anyam is a collective of twenty-two weavers in three villages on Lombok. Each basket is woven by one person from start to finish and carries her initials on the base.\n\nThe seagrass is harvested after the rains, dried in the sun for two weeks and woven without dye. Baskets are shipped folded flat and spring back into shape in a day.",
+  },
 ]
 
 const PRODUCTS: Demo[] = [
@@ -140,7 +164,7 @@ export default async function seed({ container }: ExecArgs) {
 
   // Makers: one collection each (the storefront's "Maker" filter and /makers pages read collections + metadata)
   const { result: collections } = await createCollectionsWorkflow(container).run({
-    input: { collections: MAKERS.map((m) => ({ title: m.title, handle: m.handle, metadata: { location: m.location, description: m.description } })) },
+    input: { collections: MAKERS.map((m) => ({ title: m.title, handle: m.handle, metadata: { location: m.location, description: m.description, story: m.story } })) },
   })
   const collectionId = (handle: string) => collections.find((c) => c.handle === handle)!.id
 

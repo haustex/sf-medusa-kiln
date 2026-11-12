@@ -62,7 +62,6 @@ const config = {
         title: { en: "Help", id: "Bantuan" },
         links: [
           { label: { en: "Shipping", id: "Pengiriman" }, href: "/shipping" },
-          { label: { en: "Track an order", id: "Lacak pesanan" }, href: "/track" },
           { label: { en: "Returns", id: "Pengembalian" }, href: "/returns" },
           { label: { en: "Contact", id: "Kontak" }, href: "/contact" },
         ],

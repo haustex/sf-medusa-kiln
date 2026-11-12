@@ -21,6 +21,8 @@ Bahasa Indonesia: [README.id.md](README.id.md).
   reviews), wishlist for guests and customers.
 - **Content**: a journal with categories, pagination, table of contents, FAQ blocks, "from the shop" product
   cards, share row, author box, RSS feed and secret previews, through [medusa-blog-seo](https://www.npmjs.com/package/medusa-blog-seo).
+  Information pages (shipping, returns, contact, privacy, terms, about) as markdown files per language, and
+  maker pages (list + profile with story and products) built from Medusa collections.
 - **Markets**: several Medusa regions as markets with their own language, currency and URL prefix. The default
   market can live at `/` (the others at `/id/…`), or every market can keep its prefix like the official starter.
   Product content comes translated from Medusa's Translation Module; the UI strings ship in English and Indonesian.
@@ -122,9 +124,8 @@ docs                   customize.md, lighthouse.md, plan, mockups, screenshots
 
 ## Status
 
-Kiln is young. Not in the theme yet: the information pages the demo footer points at (shipping, returns, contact,
-privacy, terms, about, makers), `llms.txt`, a product image resizer (images are served by the backend as they
-are) and a Google Merchant feed. The journal and the account's review tab need their plugins.
+Kiln is young. Not in the theme yet: an order-tracking page, a product image resizer (images are served by the
+backend as they are) and a Google Merchant feed. The journal and the account's review tab need their plugins.
 
 ## Development
 

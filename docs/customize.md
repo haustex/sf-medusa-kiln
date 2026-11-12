@@ -207,6 +207,24 @@ comes translated from Medusa). To change a wording, edit it there. To add a lang
 same shape, add its code to `MarketConfig["dictionary"]` in `theme.config.ts` and reference it from a market.
 Server components read strings with `getDictionary(countryCode)`, client components with `useDictionary()`.
 
+### Information pages
+
+Shipping, returns, contact, privacy, terms and about are markdown files in `content/pages/{language}/{slug}.md`
+(`src/lib/content/pages.ts`), served at `/{slug}` in every market. The language is the market's dictionary; a page
+missing in one language falls back to `en`. The front matter holds `title` and `description`; the text may use
+`{{brand}}`, `{{email}}`, `{{whatsapp}}`, `{{location}}` (from `theme.config.ts`), `{{country}}` (the market's
+country), `{{year}}` and `{{date}}`. Links that start with `/` get the market prefix. Add a file to add a page;
+link it from `brand.footerColumns`. The demo texts are placeholders: replace the policies with your own before
+going live. An order-tracking page (`/track`) is not part of the theme yet.
+
+### Makers
+
+`/makers` and `/makers/{handle}` are built from Medusa collections (one collection per workshop, brand or line;
+the same collection drives the product page's "by …" line and the listing's maker filter). Everything beyond the
+title is optional collection metadata (Admin → Products → Collections → Metadata): `location`, `description`
+(one or two sentences), `story` (the profile text; markdown), `image` (a wide cover photo, 12:5) and `website`.
+A collection without products is not listed. `src/lib/data/makers.ts` is the only place that reads them.
+
 ### Journal URL segments
 
 Category and preview segments inside the journal are `kategori` and `pratinjau` (folders under

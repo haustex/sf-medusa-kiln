@@ -21,6 +21,8 @@ English: [README.md](README.md).
   profil, ulasan), wishlist untuk tamu dan pelanggan.
 - **Konten**: jurnal dengan kategori, paginasi, daftar isi, blok FAQ, kartu produk "Dari toko", baris bagikan,
   kotak penulis, RSS, dan pratinjau rahasia, lewat [medusa-blog-seo](https://www.npmjs.com/package/medusa-blog-seo).
+  Halaman informasi (pengiriman, pengembalian, kontak, privasi, syarat, tentang) berupa file markdown per bahasa,
+  dan halaman pembuat (daftar + profil dengan cerita dan produk) dari koleksi Medusa.
 - **Market**: beberapa region Medusa sebagai market dengan bahasa, mata uang, dan prefix URL masing-masing. Market
   utama bisa di `/` (yang lain di `/id/…`), atau semua market pakai prefix seperti starter resmi. Konten produk
   datang sudah diterjemahkan dari Translation Module Medusa; teks UI tersedia dalam bahasa Inggris dan Indonesia.
@@ -123,9 +125,8 @@ docs                   customize.md, lighthouse.md, rencana, mockup, screenshot
 
 ## Status
 
-Kiln masih muda. Belum ada di tema: halaman informasi yang dirujuk footer demo (pengiriman, pengembalian, kontak,
-privasi, syarat, tentang, pembuat), `llms.txt`, resizer gambar produk (gambar disajikan apa adanya oleh backend),
-dan feed Google Merchant. Jurnal dan tab ulasan di akun butuh plugin masing-masing.
+Kiln masih muda. Belum ada di tema: halaman lacak pesanan, resizer gambar produk (gambar disajikan apa adanya
+oleh backend), dan feed Google Merchant. Jurnal dan tab ulasan di akun butuh plugin masing-masing.
 
 ## Pengembangan
 
