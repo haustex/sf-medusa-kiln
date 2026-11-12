@@ -9,7 +9,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "next dev -p 9720 -H localhost",
+    "dev": "next dev -p 9720 -H 127.0.0.1",
     "build": "next build",
     "start": "next start -p 9720 -H localhost",
     "lint": "eslint .",
