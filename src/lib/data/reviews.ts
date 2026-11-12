@@ -56,15 +56,12 @@ export async function getReviewRequest(token: string): Promise<RequestInfo | nul
   }
 }
 
-/**
- * The logged-in customer's own reviews, every status. Backend route of ours (src/api/store/hk/reviews/mine): also the
- * reviews written through the magic link of a guest order that was claimed into the account afterwards.
- */
+/** The logged-in customer's own reviews, every status (plugin route) */
 export async function listMyReviews(): Promise<OwnReview[]> {
   const headers = await getAuthHeaders()
   if (!("authorization" in headers)) return []
   try {
-    const { reviews } = await sdk.client.fetch<{ reviews: OwnReview[] }>("/store/hk/reviews/mine", { method: "GET", headers, cache: "no-store" })
+    const { reviews } = await sdk.client.fetch<{ reviews: OwnReview[] }>("/store/customers/me/reviews", { method: "GET", headers, cache: "no-store" })
     return reviews
   } catch {
     return []
