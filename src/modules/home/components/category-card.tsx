@@ -1,12 +1,9 @@
 import { cn } from "@heroui/styles"
-import { ChevronRight } from "lucide-react"
-
 import Link from "@modules/common/components/app-link"
-import { ICON } from "@modules/ds/icons"
 
 /**
  * "Shop by category" card (Faire-style): a very light grey horizontal card with two small photos stacked and
- * slightly tilted on the left (the category's two newest products) and the name on the right. One photo sits
+ * slightly tilted on the left (the category's two newest products) and the name on the right (no arrow). One photo sits
  * straight when there is only one. The whole card is the link; on hover the photos settle (no tilt) and the card
  * darkens a touch; nothing moves with reduced motion.
  */
@@ -42,10 +39,7 @@ export default function CategoryCard({ href, label, images, className }: { href:
           </span>
         )}
       </span>
-      <span className="flex min-w-0 flex-1 items-center justify-between gap-stack-sm">
-        <span className="text-[0.9375rem] font-medium leading-snug">{label}</span>
-        <ChevronRight {...ICON} size={18} className="shrink-0 text-muted transition-transform motion-safe:group-hover:translate-x-0.5" />
-      </span>
+      <span className="min-w-0 flex-1 text-[0.9375rem] font-medium leading-snug">{label}</span>
     </Link>
   )
 }

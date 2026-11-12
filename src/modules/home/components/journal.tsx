@@ -12,7 +12,7 @@ export default async function Journal({ countryCode, t, href }: { countryCode: s
   const posts = await listJournalPicks(countryCode, 3)
   if (!posts.length) return null
   return (
-    <Section id="journal" title={t.journalTitle} action={{ label: t.journalAll, href }}>
+    <Section id="journal" title={t.journalTitle} action={{ label: t.seeAll, href }}>
       <ul className="grid gap-x-gutter gap-y-stack-lg sm:grid-cols-3" data-testid="journal">
         {posts.map((p) => (
           <li key={p.id}>

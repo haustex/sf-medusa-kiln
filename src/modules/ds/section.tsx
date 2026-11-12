@@ -12,9 +12,7 @@ export default function Section({
   eyebrow,
   description,
   action,
-  titleHref,
   titleHidden,
-  titleSize,
   headerExtra,
   contained = true,
   className,
@@ -25,12 +23,10 @@ export default function Section({
   title?: string
   eyebrow?: string
   description?: string
+  /** Small "View all" text link on the title line */
   action?: { label: string; href: string }
-  titleHref?: string
   /** Keep the h2 for screen readers/outline but hide it visually. */
   titleHidden?: boolean
-  /** "display": large title (type-section) */
-  titleSize?: "display" | "heading"
   /** Extra controls next to the action (e.g. carousel arrows). */
   headerExtra?: React.ReactNode
   /** Wrap in .content-container (default). */
@@ -56,8 +52,6 @@ export default function Section({
             eyebrow={eyebrow}
             description={description}
             action={action}
-            titleHref={titleHref}
-            size={titleSize}
           >
             {headerExtra}
           </SectionHeader>

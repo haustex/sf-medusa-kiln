@@ -5,7 +5,7 @@ import { notFound } from "next/navigation"
 import config from "@theme"
 import Flag from "@modules/brand/flags"
 import SocialLinks from "@modules/brand/social"
-import { ProductGrid, type ProductCardData } from "@modules/ds"
+import { ProductGrid, SectionHeader, type ProductCardData } from "@modules/ds"
 import CountBadge from "@modules/layout/components/count-badge"
 import MarketSelect from "@modules/layout/components/market-select"
 import { marketOptions } from "@modules/layout/components/market-select/options"
@@ -87,6 +87,15 @@ export default async function DesignPage(props: { params: Promise<{ countryCode:
         </ul>
       </section>
 
+      <section className="flex flex-col gap-stack-md" aria-labelledby="d-section">
+        <h2 id="d-section" className="type-h2">Section header</h2>
+        <p className="max-w-2xl text-sm text-muted">Title 26px / 500 / -0.02em, small text link on the title line (underline on hover). A: title only (home). B: with an eyebrow.</p>
+        <div className="flex flex-col gap-section rounded-media border border-border p-stack-lg">
+          <SectionHeader title="This week's picks" description="The pieces people come back for." action={{ label: "View all", href: "#" }} />
+          <SectionHeader eyebrow="Journal" title="From the Journal" action={{ label: "View all", href: "#" }} />
+        </div>
+      </section>
+
       <section className="flex flex-col gap-stack-md" aria-labelledby="d-controls">
         <h2 id="d-controls" className="type-h2">Controls</h2>
         <div className="flex flex-wrap items-center gap-stack-sm">
@@ -123,7 +132,7 @@ export default async function DesignPage(props: { params: Promise<{ countryCode:
 
       <section className="flex flex-col gap-stack-md" aria-labelledby="d-card">
         <h2 id="d-card" className="type-h2">Product card</h2>
-        <p className="type-body max-w-2xl text-muted">Category chip top-left, wishlist heart top-right, "+" bottom-right: one variant adds to the cart (tick for 1.6 s), several open the quick view, sold out disables it. All three sit outside the link; 44 px targets.</p>
+        <p className="type-body max-w-2xl text-muted">Category chip top-left, wishlist heart top-right, &quot;+&quot; bottom-right: one variant adds to the cart (tick for 1.6 s), several open the quick view, sold out disables it. All three sit outside the link; 44 px targets.</p>
         <ProductGrid>
           {DEMO_CARDS.map((c) => (
             <CatalogCard key={c.id} product={c} countryCode={countryCode} />

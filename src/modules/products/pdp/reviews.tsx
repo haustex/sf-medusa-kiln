@@ -61,7 +61,7 @@ export default function ProductReviews({ rating, reviews, count, productId, t, l
   const avg = formatAverage(rating.average, lang)
   const total = rating.count
   return (
-    <Section id="reviews" title={t.title} titleSize="display" headerExtra={undefined}>
+    <Section id="reviews" title={t.title}>
       <div className="grid gap-section lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         <div className="flex flex-col gap-stack-md lg:sticky lg:top-36 lg:self-start" data-testid="reviews-summary">
           <div className="flex items-end gap-stack-sm">

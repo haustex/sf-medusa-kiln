@@ -19,7 +19,6 @@ export default function Carousel({
   eyebrow,
   description,
   action,
-  titleSize,
   item = "product",
   labels = { prev: "Sebelumnya", next: "Berikutnya" },
   contained = true,
@@ -32,7 +31,6 @@ export default function Carousel({
   eyebrow?: string
   description?: string
   action?: { label: string; href: string }
-  titleSize?: "display" | "heading"
   item?: keyof typeof widths
   labels?: { prev: string; next: string }
   /** Wrap in .content-container (default); false when already inside one. */
@@ -48,7 +46,6 @@ export default function Carousel({
       eyebrow={eyebrow}
       description={description}
       action={action}
-      titleSize={titleSize}
       contained={contained}
       className={className}
       headerExtra={<CarouselControls targetId={railId} prevLabel={labels.prev} nextLabel={labels.next} />}

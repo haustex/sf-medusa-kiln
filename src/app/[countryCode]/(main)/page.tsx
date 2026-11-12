@@ -73,7 +73,7 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
       <Hero countryCode={countryCode} t={t.home} shopHref={href("/store")} secondaryHref={href(config.brand.navLinks[0]?.href ?? "/store")} />
 
       {categoryCards.length > 0 && (
-        <Section id="categories" title={t.home.categoriesTitle} titleHref={href("/store")}>
+        <Section id="categories" title={t.home.categoriesTitle} action={{ label: t.home.seeAll, href: href("/store") }}>
           {/* phones: a swipeable rail (1.3 cards visible); from sm a grid of 2, from lg of 4 */}
           <ul className="no-scrollbar -mx-container-x flex snap-x snap-mandatory gap-gutter overflow-x-auto scroll-px-container-x px-container-x sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
             {categoryCards.map((c) => (
@@ -86,7 +86,7 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
       )}
 
       {products.length > 0 && (
-        <Section id="featured" title={t.home.featuredTitle} titleHref={href("/store")} description={t.home.featuredDescription}>
+        <Section id="featured" title={t.home.featuredTitle} action={{ label: t.home.seeAll, href: href("/store") }} description={t.home.featuredDescription}>
           <ProductGrid>
             {products.map((p) => (
               <CatalogCard key={p.href} product={p} countryCode={countryCode} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />
