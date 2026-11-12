@@ -1,7 +1,7 @@
 "use client"
 
 import { buttonVariants, cn } from "@heroui/styles"
-import { fill } from "@lib/i18n/dictionaries"
+import { fill } from "@lib/i18n/fill"
 import type { StoreReview } from "medusa-reviews-wishlist/sdk"
 import { Stars } from "@modules/ds"
 import { useState } from "react"

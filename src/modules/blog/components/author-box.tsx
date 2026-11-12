@@ -5,6 +5,7 @@ import { fill, type Dictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
 import { Glyph, glyphForUrl, GLYPH_LABELS } from "@modules/brand/glyphs"
 import { socialLinks } from "@modules/brand/social"
+import { getImageProps } from "next/image"
 
 const iconLink =
   "inline-flex size-11 items-center justify-center rounded-full text-foreground outline-none transition-colors hover:bg-default focus-visible:ring-2 focus-visible:ring-focus"
@@ -26,7 +27,8 @@ export default function AuthorBox({ author, origin, lang, labels: t }: { author:
   return (
     <section aria-label={fill(t.writtenBy, { name })} className="flex flex-col items-center gap-stack-md border-t border-separator pt-stack-lg text-center" data-testid="author-box">
       {author?.avatar ? (
-        <img src={author.avatar} alt="" width={96} height={96} loading="lazy" decoding="async" className="size-24 rounded-full bg-default object-cover" />
+        // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text -- next/image's own props
+        <img {...getImageProps({ src: author.avatar, alt: "", width: 96, height: 96, sizes: "96px", loading: "lazy", decoding: "async", className: "size-24 rounded-full bg-default object-cover" }).props} />
       ) : (
         <span aria-hidden="true" className="flex size-24 items-center justify-center rounded-full bg-foreground text-3xl font-semibold text-background">
           {shop ? <span className="size-7 rounded-md bg-background" /> : name.trim().charAt(0).toUpperCase()}

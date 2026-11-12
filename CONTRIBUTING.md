@@ -110,6 +110,12 @@ cards without hearts, PDP without rating/reviews, account nav without "Reviews" 
 signed in), `/blog`, `/blog/<slug>`, `/blog/feed.xml`, `/wishlist` 404, `/search?q=` still answering, no
 console errors.
 
+## Lighthouse
+
+`docs/lighthouse.md`: production build, standalone server on 9721, the HTTP/2 proxy from `scripts/lighthouse` on
+9722, then `scripts/lighthouse/run.sh <url> <name>`. Read the calibration note there before comparing numbers
+from this machine with PageSpeed Insights.
+
 ## Checks before a commit
 
 ```bash

@@ -1,18 +1,14 @@
-"use client"
-
 import { buttonVariants, cn } from "@heroui/styles"
-import { useDictionary } from "@lib/i18n/use-dictionary"
+import type { Dictionary } from "@lib/i18n/dictionaries"
 import { marketPath } from "@lib/util/market"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { useParams } from "next/navigation"
+import Link from "@modules/common/components/app-link"
 
 /**
- * 404 inside a market (ID / EN from the URL): title, one sentence, product search, buttons to the home page and
- * all products. The status stays 404 and the page is noindex (metadata of the not-found files).
+ * 404 inside a market: title, one sentence, product search, buttons to the home page and all products. A server
+ * component (the labels come from the page), so the dictionary never ships to the browser. The status stays 404
+ * and the page is noindex (metadata of the not-found files).
  */
-export default function NotFoundContent() {
-  const t = useDictionary().notFound
-  const countryCode = (useParams()?.countryCode as string | undefined) ?? "id"
+export default function NotFoundContent({ countryCode, labels: t }: { countryCode: string; labels: Dictionary["notFound"] }) {
   return (
     <div className="content-container py-section">
       <div className="mx-auto flex max-w-xl flex-col items-center gap-stack-md text-center" data-testid="not-found">
@@ -31,12 +27,12 @@ export default function NotFoundContent() {
           <button type="submit" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-12 shrink-0")}>{t.searchButton}</button>
         </form>
         <div className="flex flex-wrap justify-center gap-stack-sm">
-          <LocalizedClientLink href="/" className={cn(buttonVariants({ variant: "primary", size: "lg" }), "h-12 px-6")} data-testid="not-found-home">
+          <Link href={marketPath(countryCode)} className={cn(buttonVariants({ variant: "primary", size: "lg" }), "h-12 px-6")} data-testid="not-found-home">
             {t.home}
-          </LocalizedClientLink>
-          <LocalizedClientLink href="/store" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-12 px-6")}>
+          </Link>
+          <Link href={marketPath(countryCode, "/store")} className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-12 px-6")}>
             {t.store}
-          </LocalizedClientLink>
+          </Link>
         </div>
       </div>
     </div>

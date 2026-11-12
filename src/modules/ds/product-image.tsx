@@ -1,12 +1,13 @@
 import { cn } from "@heroui/styles"
+import { getImageProps } from "next/image"
 import { imageRef, imageSrcSet, imageUrl } from "@lib/util/image-url"
 import ImagePreload from "./image-preload"
 import ImagePlaceholder from "./placeholder"
 
 /**
- * 1:1 product image with the neutral placeholder as fallback. Backend images
- * are served as AVIF / WebP / JPEG in responsive widths through /img
- * (<picture>: the browser picks the first format it supports, `sizes` the width).
+ * 1:1 product image with the neutral placeholder as fallback. Served as AVIF / WebP in responsive widths by
+ * next/image (/_next/image, `sizes` picks the width); with the /img route (lib/util/image-url.ts) a <picture> of
+ * our own files instead.
  * `priority`: the LCP image (one per page: first PDP photo, first card of a grid), loaded eagerly with high priority
  * + one preload with the AVIF <source>'s srcset/sizes (ds/image-preload.tsx). Every other photo is lazy, no hint.
  * `name`: the photo's name in the URL, from lib/util/image-name.ts (productImageName: {handle}-{n}, or the bare
@@ -51,9 +52,20 @@ export default function ProductImage({
           <img src={imageUrl(file, "jpeg", 1080)} srcSet={imageSrcSet(file, "jpeg")} sizes={sizes} {...common} />
         </picture>
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element -- external image, shown as is
-        <img src={src} {...common} />
+        <Optimized src={src} sizes={sizes} priority={priority} {...common} />
       )}
     </div>
+  )
+}
+
+/** next/image markup by hand (getImageProps): the preload stays a client-side link (ds/image-preload.tsx), never a Flight hint */
+function Optimized({ src, sizes, priority, ...rest }: { src: string; sizes: string; priority?: boolean; alt: string; width: number; height: number; loading: "eager" | "lazy"; fetchPriority?: "high"; decoding: "async"; className: string }) {
+  const { props } = getImageProps({ src, sizes, ...rest })
+  return (
+    <>
+      {priority && props.srcSet && <ImagePreload href={props.src} srcSet={props.srcSet} sizes={sizes} type={null} />}
+      {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text -- next/image's own props */}
+      <img {...props} />
+    </>
   )
 }

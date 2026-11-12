@@ -11,6 +11,13 @@ const hostOf = (url) => {
   }
 }
 const IMAGE_HOSTS = [...new Set([hostOf(process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL), hostOf(process.env.MEDUSA_BACKEND_URL_INTERNAL), hostOf(process.env.NEXT_PUBLIC_MEDIA_URL), "localhost", "127.0.0.1"].filter(Boolean))]
+/**
+ * next/image refuses upstream images on loopback / private addresses (SSRF guard) unless told otherwise. A dev
+ * backend on localhost or a LAN address is the normal case here, so allow it exactly then; a public backend host
+ * keeps the guard.
+ */
+const PRIVATE_HOST = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|\[::1\]$|0\.0\.0\.0$)/
+const IMAGES_ON_PRIVATE_HOST = [process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL, process.env.MEDUSA_BACKEND_URL_INTERNAL, process.env.NEXT_PUBLIC_MEDIA_URL].some((u) => PRIVATE_HOST.test(hostOf(u) || ""))
 
 /**
  * @type {import('next').NextConfig}
@@ -139,8 +146,11 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // next/image: AVIF / WebP in responsive widths through /_next/image (sharp), 30-day cache, hosts from the env
   images: {
-    unoptimized: true,
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+    ...(IMAGES_ON_PRIVATE_HOST ? { dangerouslyAllowLocalIP: true } : {}),
     remotePatterns: IMAGE_HOSTS.flatMap((hostname) => [
       { protocol: "https", hostname },
       { protocol: "http", hostname },

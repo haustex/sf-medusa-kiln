@@ -21,7 +21,6 @@
     "@heroui/styles": "3.2.7",
     "@medusajs/icons": "2.22.2",
     "@medusajs/js-sdk": "2.22.2",
-    "@medusajs/ui-preset": "2.22.2",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-slider": "^1.4.7",
     "@stripe/react-stripe-js": "^5.6.1",

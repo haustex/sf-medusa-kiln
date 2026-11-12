@@ -5,11 +5,6 @@
    layer always sits between Tailwind's base and utilities whatever order the CSS chunks load in */
 @import "./blog.css";
 
-/*
- * Legacy starter config (Medusa UI preset tokens, screens, keyframes). Kept so the
- * starter components still render until they are replaced with HeroUI in Tahap 2.
- */
-@config "../../tailwind.config.js";
 
 @theme inline {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -418,14 +413,6 @@
   @apply text-[32px] leading-[44px] font-semibold;
 }
 
-/*
- * The Medusa UI preset sets its own font stack on its typography utilities (txt-*,
- * h1-* … h4-*). Starter markup still uses them; keep the site font (our self-hosted Inter) instead.
- * Unlayered, so it wins over the preset's utility layer. Remove with @config.
- */
-:is([class*="txt-"], [class*="h1-"], [class*="h2-"], [class*="h3-"], [class*="h4-"]) {
-  font-family: var(--font-sans);
-}
 
 /* Native checkboxes/radios in starter forms: Uber black instead of browser blue. */
 input[type="checkbox"],

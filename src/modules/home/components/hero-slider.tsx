@@ -4,7 +4,7 @@ import { cn } from "@heroui/styles"
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 
 import type { HeroSlide } from "@lib/hero"
-import { fill } from "@lib/i18n/dictionaries"
+import { fill } from "@lib/i18n/fill"
 import Link from "@modules/common/components/app-link"
 import ImagePreload from "@modules/ds/image-preload"
 
@@ -192,32 +192,14 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
             const first = i === 0
             const Title = first ? "h1" : "h2"
             return (
-              <li
-                key={s.id}
-                role={many ? "group" : undefined}
-                aria-roledescription={many ? "slide" : undefined}
-                aria-label={many ? fill(labels.slideOf, { n: i + 1, total: count }) : undefined}
-                inert={many && i !== active ? true : undefined}
-                className="relative w-full shrink-0 snap-center"
-                data-active={i === active ? "true" : undefined}
-              >
-                <div className="relative aspect-[4/5] overflow-hidden md:aspect-[12/5]">
-                  {first && <ImagePreload href={s.image.mobile} srcSet={s.image.mobile} sizes="100vw" media={PHONE} type="image/jpeg" />}
-                  {first && <ImagePreload href={s.image.desktop} srcSet={s.image.desktop} sizes="100vw" media={DESKTOP} type="image/jpeg" />}
-                  <picture>
-                    <source media={DESKTOP} srcSet={s.image.desktop} />
-                    <img
-                      src={s.image.mobile}
-                      alt={s.alt}
-                      width={840}
-                      height={1050}
-                      loading={first ? "eager" : "lazy"}
-                      fetchPriority={first ? "high" : undefined}
-                      decoding="async"
-                      draggable={false}
-                      className="pointer-events-none absolute inset-0 size-full object-cover"
-                    />
-                  </picture>
+              <li key={s.id} inert={many && i !== active ? true : undefined} className="relative w-full shrink-0 snap-center" data-active={i === active ? "true" : undefined}>
+                <div
+                  role={many ? "group" : undefined}
+                  aria-roledescription={many ? "slide" : undefined}
+                  aria-label={many ? fill(labels.slideOf, { n: i + 1, total: count }) : undefined}
+                  className="relative aspect-[4/5] overflow-hidden md:aspect-[12/5]"
+                >
+                  <SlideImage slide={s} first={first} />
                   {/* scrim: white copy stays AA on any photo */}
                   <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
                   <div className="absolute inset-0 flex flex-col justify-end gap-stack-md p-6 pb-14 text-white sm:p-8 sm:pb-14 md:p-12 md:pb-16 lg:p-16 lg:pb-20">
@@ -259,5 +241,37 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
         )}
       </div>
     </section>
+  )
+}
+
+/**
+ * The two photos of a slide (next/image URLs computed in lib/hero.ts: AVIF / WebP, responsive): the tall one on
+ * phones, the wide one from md. Slide 1 is the LCP image: eager, high priority, one preload per viewport with the
+ * exact srcset the browser will pick (ds/image-preload.tsx).
+ */
+function SlideImage({ slide: s, first }: { slide: HeroSlide; first: boolean }) {
+  const { desktop, mobile } = s.picture
+  return (
+    <>
+      {first && mobile.srcSet && <ImagePreload href={mobile.src} srcSet={mobile.srcSet} sizes="100vw" media={PHONE} type={null} />}
+      {first && desktop.srcSet && <ImagePreload href={desktop.src} srcSet={desktop.srcSet} sizes="100vw" media={DESKTOP} type={null} />}
+      <picture>
+        <source media={DESKTOP} srcSet={desktop.srcSet} sizes="100vw" />
+        {/* eslint-disable-next-line @next/next/no-img-element -- next/image's own srcset */}
+        <img
+          src={mobile.src}
+          srcSet={mobile.srcSet}
+          sizes="100vw"
+          alt={s.alt}
+          width={840}
+          height={1050}
+          loading={first ? "eager" : "lazy"}
+          fetchPriority={first ? "high" : undefined}
+          decoding="async"
+          draggable={false}
+          className="pointer-events-none absolute inset-0 size-full object-cover"
+        />
+      </picture>
+    </>
   )
 }

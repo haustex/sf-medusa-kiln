@@ -4,7 +4,7 @@ import { useParams } from "next/navigation"
 import { Fragment, useActionState, useState } from "react"
 
 import { login, signup } from "@lib/data/customer"
-import { fill } from "@lib/i18n/dictionaries"
+import { fill } from "@lib/i18n/fill"
 import { useDictionary } from "@lib/i18n/use-dictionary"
 import { marketPath } from "@lib/util/market"
 import config from "@theme"

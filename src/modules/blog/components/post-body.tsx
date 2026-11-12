@@ -1,5 +1,6 @@
 import type { BlogBlock } from "@lib/data/blog"
 import { imageRef, imageSrcSet, imageUrl } from "@lib/util/image-url"
+import { getImageProps } from "next/image"
 import type { ProductCardData } from "@modules/ds"
 
 import ProductEmbed from "./product-embed"
@@ -26,9 +27,12 @@ function Photo({ block }: { block: Extract<BlogBlock, { type: "image" }> }) {
           <source type="image/webp" srcSet={imageSrcSet(file, "webp", 1600)} sizes={SIZES} />
           <img src={imageUrl(file, "jpeg", 1080)} srcSet={imageSrcSet(file, "jpeg", 1600)} sizes={SIZES} alt={block.alt} {...size} loading="lazy" decoding="async" />
         </picture>
+      ) : block.width && block.height ? (
+        // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text -- next/image's own props (AVIF / WebP, responsive)
+        <img {...getImageProps({ src: block.src, alt: block.alt, width: block.width, height: block.height, sizes: SIZES, loading: "lazy", decoding: "async" }).props} />
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element -- not one of our files: shown as is
-        <img src={block.src} alt={block.alt} {...size} loading="lazy" decoding="async" />
+        // eslint-disable-next-line @next/next/no-img-element -- size unknown: shown as is
+        <img src={block.src} alt={block.alt} loading="lazy" decoding="async" />
       )}
       {block.caption && <figcaption>{block.caption}</figcaption>}
     </figure>

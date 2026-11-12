@@ -1,6 +1,7 @@
 import config, { type HeroSlideConfig } from "@theme"
 import { tx } from "@lib/i18n/localized"
 import { getMarket, marketPath } from "@lib/util/market"
+import { getImageProps } from "next/image"
 
 /**
  * Hero slides for one market, already in its language, with market-relative links resolved. This is the only
@@ -18,6 +19,16 @@ export type HeroSlide = {
   href: string
   alt: string
   image: { desktop: string; mobile: string }
+  /** next/image markup for both photos (AVIF / WebP, responsive), computed here so the client slider needs no next/image */
+  picture: { desktop: PictureProps; mobile: PictureProps }
+}
+
+export type PictureProps = { src: string; srcSet?: string }
+
+/** 12:5 desktop (e.g. 1920×800) and 4:5 phone (e.g. 840×1050) photos, full width */
+const picture = (src: string, width: number, height: number): PictureProps => {
+  const { props } = getImageProps({ src, alt: "", width, height, sizes: "100vw" })
+  return { src: props.src, srcSet: props.srcSet }
 }
 
 const isActive = (s: HeroSlideConfig, now: number) => (!s.start || Date.parse(s.start) <= now) && (!s.end || Date.parse(s.end) > now)
@@ -35,6 +46,7 @@ export async function getHeroSlides(countryCode: string): Promise<HeroSlide[]> {
       href: /^https?:\/\//.test(s.href) ? s.href : marketPath(countryCode, s.href),
       alt: s.alt ? tx(s.alt, lang) : "",
       image: s.image,
+      picture: { desktop: picture(s.image.desktop, 1920, 800), mobile: picture(s.image.mobile, 840, 1050) },
     }))
 }
 

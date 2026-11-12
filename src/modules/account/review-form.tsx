@@ -4,7 +4,8 @@ import { cn } from "@heroui/styles"
 import { useRouter } from "next/navigation"
 import { useId, useState } from "react"
 
-import { fill, type Dictionary } from "@lib/i18n/dictionaries"
+import { type Dictionary } from "@lib/i18n/dictionaries"
+import { fill } from "@lib/i18n/fill"
 import { Button } from "@modules/common/components/ui"
 
 type T = Dictionary["reviews"]

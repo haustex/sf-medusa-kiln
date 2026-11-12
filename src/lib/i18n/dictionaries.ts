@@ -1111,8 +1111,7 @@ const withBrand = <T,>(value: T): T => {
 const dictionaries = { id: withBrand(id), en: withBrand(en) }
 
 /** Fills `{name}` placeholders: t("Sisa {n}", { n: 3 }). */
-export const fill = (template: string, values: Record<string, string | number>) =>
-  template.replace(/\{(\w+)\}/g, (_, k) => String(values[k] ?? ""))
+export { fill } from "./fill"
 
 export const getDictionary = (countryCode?: string | null): Dictionary =>
   dictionaries[getMarket(countryCode).dictionary] ?? dictionaries.en

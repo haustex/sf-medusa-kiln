@@ -75,10 +75,9 @@
 
 /*
  * Bridge: Medusa UI preset tokens (used by the remaining starter components:
- * text-ui-fg-*, bg-ui-bg-*, border-ui-border-*, shadow-borders-*) mapped onto the
+ * legacy text-ui-fg-* etc. of the starter are gone) mapped onto the
  * HeroUI/Uber theme, so starter pages read black/white/grey like the rest of the
  * site (no Medusa blue). Unlayered, so it wins over the preset's base-layer :root.
- * Remove together with @config in globals.css once no starter markup is left.
  */
 :root {
   --fg-base: var(--foreground);
