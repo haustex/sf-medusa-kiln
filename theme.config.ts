@@ -225,6 +225,39 @@ const config = {
     ] as HeroSlideConfig[],
   },
 
+  /**
+   * Home page FAQ (and FAQPage JSON-LD): questions and answers per language. Plain text answers.
+   * An empty list hides the section.
+   */
+  faq: {
+    items: [
+      {
+        q: { en: "How long does shipping take?", id: "Berapa lama pengirimannya?" },
+        a: { en: "Orders leave the workshop within 2 working days. In the United States most parcels arrive in 3–6 working days; in Indonesia in 1–4 days. You get a tracking link by e-mail as soon as the parcel ships.", id: "Pesanan dikirim dari bengkel dalam 2 hari kerja. Di Indonesia paket biasanya sampai dalam 1–4 hari, di Amerika Serikat 3–6 hari kerja. Nomor resi dikirim lewat e-mail begitu paket berangkat." },
+      },
+      {
+        q: { en: "Can I return something?", id: "Bisa dikembalikan?" },
+        a: { en: "Yes: 30 days from delivery, unused and in its packaging. Start a return from your account or write to us; we refund the full price once the parcel is back at the workshop. Custom-sized pieces cannot be returned.", id: "Bisa: 30 hari sejak barang diterima, belum dipakai dan masih dalam kemasan. Ajukan retur dari akun Anda atau hubungi kami; harga penuh dikembalikan setelah paket sampai lagi di bengkel. Barang ukuran custom tidak bisa diretur." },
+      },
+      {
+        q: { en: "How do I care for wood, linen and stoneware?", id: "Bagaimana merawat kayu, linen, dan stoneware?" },
+        a: { en: "Wood: hand wash, dry upright, oil once a month. Linen: machine wash warm, tumble low. Stoneware: dishwasher safe. Every product page has the exact care line for that piece.", id: "Kayu: cuci tangan, keringkan berdiri, minyaki sebulan sekali. Linen: cuci mesin air hangat, pengering suhu rendah. Stoneware: aman di mesin cuci piring. Setiap halaman produk punya petunjuk perawatan untuk barang itu." },
+      },
+      {
+        q: { en: "Which payment methods do you take?", id: "Pembayaran apa saja yang diterima?" },
+        a: { en: "Cards (Visa, Mastercard, American Express), Apple Pay and Google Pay in the United States; QRIS, bank transfer and virtual accounts in Indonesia. Prices include tax; shipping is shown at checkout.", id: "Di Indonesia: QRIS, transfer bank, dan virtual account. Di Amerika Serikat: kartu (Visa, Mastercard, American Express), Apple Pay, dan Google Pay. Harga sudah termasuk pajak; ongkos kirim tampil saat checkout." },
+      },
+      {
+        q: { en: "Do you make custom sizes?", id: "Bisa pesan ukuran custom?" },
+        a: { en: "Most wooden pieces can be made to your measurements. Send the dimensions and a photo of the space through the contact page; the maker replies with a quote within two working days.", id: "Sebagian besar barang kayu bisa dibuat sesuai ukuran Anda. Kirim ukuran dan foto ruangannya lewat halaman kontak; pembuatnya membalas dengan penawaran dalam dua hari kerja." },
+      },
+      {
+        q: { en: "Do you sell to shops and restaurants?", id: "Melayani pembelian untuk toko dan restoran?" },
+        a: { en: "Yes. Orders from 20 pieces get wholesale pricing and a dedicated lead time. Write to us with what you have in mind.", id: "Ya. Pesanan mulai 20 pcs mendapat harga grosir dan jadwal produksi tersendiri. Hubungi kami dengan kebutuhan Anda." },
+      },
+    ] as { q: Localized; a: Localized }[],
+  },
+
   /** Blog URL segment when medusa-blog-seo is installed */
   blogPath: "/blog",
 

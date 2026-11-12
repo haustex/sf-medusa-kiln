@@ -191,6 +191,9 @@ const id = {
     slider: { region: "Promo", goTo: "Ke slide {n}", slideOf: "Slide {n} dari {total}" },
     journalTitle: "Dari Jurnal",
     seeAll: "Lihat semua",
+    faqTitle: "Pertanyaan umum",
+    faqIntro: "Pengiriman, retur, perawatan, dan pembayaran, singkatnya. Belum terjawab?",
+    faqContact: "Hubungi kami",
   },
   product: {
     home: "Beranda",
@@ -1036,6 +1039,9 @@ const en: Dictionary = {
     slider: { region: "Promotions", goTo: "Go to slide {n}", slideOf: "Slide {n} of {total}" },
     journalTitle: "From the Journal",
     seeAll: "View all",
+    faqTitle: "Frequently asked questions",
+    faqIntro: "Shipping, returns, care and payment, in short. Not answered here?",
+    faqContact: "Contact us",
   },
   product: {
     home: "Home",
