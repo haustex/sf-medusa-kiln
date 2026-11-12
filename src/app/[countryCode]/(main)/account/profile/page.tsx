@@ -22,7 +22,7 @@ export default async function ProfilePage(props: Props) {
         <h1 className="type-h1">{t.profile}</h1>
         <p className="text-muted">{t.profileIntro}</p>
       </Stack>
-      <Profile customer={customer} />
+      <Profile customer={customer} labels={t} />
     </Stack>
   )
 }

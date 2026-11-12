@@ -5,7 +5,7 @@ import { Fragment, useActionState, useState } from "react"
 
 import { login, signup } from "@lib/data/customer"
 import { fill } from "@lib/i18n/fill"
-import { useDictionary } from "@lib/i18n/use-dictionary"
+import { type Dictionary } from "@lib/i18n/dictionaries"
 import { marketPath } from "@lib/util/market"
 import config from "@theme"
 import Input from "@modules/common/components/input"
@@ -17,9 +17,11 @@ import { Button } from "@modules/common/components/ui"
  * success the action revalidates the customer and the account layout re-renders signed in. When the backend
  * requires e-mail verification the action says so and the card shows where the link went.
  */
-export default function Auth() {
+type Labels = { account: Dictionary["account"]; /** title of the e-mail field's validity hint */ emailInvalid: string }
+
+export default function Auth({ labels }: { labels: Labels }) {
   const [view, setView] = useState<"login" | "register">("login")
-  return view === "login" ? <LoginForm onRegister={() => setView("register")} /> : <RegisterForm onLogin={() => setView("login")} />
+  return view === "login" ? <LoginForm labels={labels} onRegister={() => setView("register")} /> : <RegisterForm labels={labels} onLogin={() => setView("login")} />
 }
 
 function Message({ children, testId }: { children: React.ReactNode; testId: string }) {
@@ -30,9 +32,8 @@ function Message({ children, testId }: { children: React.ReactNode; testId: stri
   )
 }
 
-function LoginForm({ onRegister }: { onRegister: () => void }) {
-  const dict = useDictionary()
-  const t = dict.account
+function LoginForm({ labels, onRegister }: { labels: Labels; onRegister: () => void }) {
+  const t = labels.account
   const [message, formAction, pending] = useActionState(login, null)
   return (
     <div className="flex flex-col gap-stack-lg" data-testid="login-page">
@@ -43,7 +44,7 @@ function LoginForm({ onRegister }: { onRegister: () => void }) {
       {message?.state === "verification_required" && <Message testId="login-verification-message">{fill(t.login.verify, { email: message.email })}</Message>}
       <form action={formAction} className="flex flex-col gap-stack-md">
         <div className="flex flex-col gap-stack-sm">
-          <Input label={t.email} name="email" type="email" title={dict.checkout.emailInvalid} autoComplete="email" required data-testid="email-input" />
+          <Input label={t.email} name="email" type="email" title={labels.emailInvalid} autoComplete="email" required data-testid="email-input" />
           <Input label={t.password} name="password" type="password" autoComplete="current-password" required data-testid="password-input" toggleLabels={{ show: t.showPassword, hide: t.hidePassword }} />
         </div>
         {message?.state === "error" && (
@@ -65,9 +66,8 @@ function LoginForm({ onRegister }: { onRegister: () => void }) {
   )
 }
 
-function RegisterForm({ onLogin }: { onLogin: () => void }) {
-  const dict = useDictionary()
-  const t = dict.account
+function RegisterForm({ labels, onLogin }: { labels: Labels; onLogin: () => void }) {
+  const t = labels.account
   const { countryCode } = useParams() as { countryCode: string }
   const [message, formAction, pending] = useActionState(signup, null)
   const link = (href: string, label: string) => (
@@ -92,7 +92,7 @@ function RegisterForm({ onLogin }: { onLogin: () => void }) {
             <Input label={t.firstName} name="first_name" required autoComplete="given-name" data-testid="first-name-input" />
             <Input label={t.lastName} name="last_name" required autoComplete="family-name" data-testid="last-name-input" />
           </div>
-          <Input label={t.email} name="email" required type="email" title={dict.checkout.emailInvalid} autoComplete="email" data-testid="email-input" />
+          <Input label={t.email} name="email" required type="email" title={labels.emailInvalid} autoComplete="email" data-testid="email-input" />
           <Input label={t.phone} name="phone" type="tel" autoComplete="tel" data-testid="phone-input" />
           <Input label={t.password} name="password" required minLength={8} type="password" autoComplete="new-password" data-testid="password-input" toggleLabels={{ show: t.showPassword, hide: t.hidePassword }} />
         </div>

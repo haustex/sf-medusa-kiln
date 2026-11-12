@@ -4,7 +4,7 @@ import { HttpTypes } from "@medusajs/types"
 import { useState, useTransition } from "react"
 
 import { updateCustomer } from "@lib/data/customer"
-import { useDictionary } from "@lib/i18n/use-dictionary"
+import { type Dictionary } from "@lib/i18n/dictionaries"
 import Input from "@modules/common/components/input"
 import { Button } from "@modules/common/components/ui"
 
@@ -12,11 +12,12 @@ import { Button } from "@modules/common/components/ui"
  * Account → Profile: name and phone as editable rows (Edit opens the fields under the value, Save posts to
  * updateCustomer), the e-mail read-only (Medusa's store API doesn't change it).
  */
-export default function Profile({ customer }: { customer: HttpTypes.StoreCustomer }) {
-  const t = useDictionary().account
+type T = Dictionary["account"]
+
+export default function Profile({ customer, labels: t }: { customer: HttpTypes.StoreCustomer; labels: T }) {
   return (
     <div className="flex flex-col divide-y divide-separator rounded-media bg-default px-stack-lg" data-testid="profile-page-wrapper">
-      <Row label={t.name} value={[customer.first_name, customer.last_name].filter(Boolean).join(" ")} testId="account-name-editor" fields={["first_name", "last_name"]}>
+      <Row t={t} label={t.name} value={[customer.first_name, customer.last_name].filter(Boolean).join(" ")} testId="account-name-editor" fields={["first_name", "last_name"]}>
         <div className="grid grid-cols-2 gap-gutter">
           <Input label={t.firstName} name="first_name" required defaultValue={customer.first_name ?? ""} autoComplete="given-name" data-testid="first-name-input" />
           <Input label={t.lastName} name="last_name" required defaultValue={customer.last_name ?? ""} autoComplete="family-name" data-testid="last-name-input" />
@@ -26,15 +27,14 @@ export default function Profile({ customer }: { customer: HttpTypes.StoreCustome
         <span className="text-sm text-muted">{t.email}</span>
         <span className="font-medium [overflow-wrap:anywhere]">{customer.email}</span>
       </div>
-      <Row label={t.phone} value={customer.phone ?? ""} testId="account-phone-editor" fields={["phone"]}>
+      <Row t={t} label={t.phone} value={customer.phone ?? ""} testId="account-phone-editor" fields={["phone"]}>
         <Input label={t.phone} name="phone" type="tel" defaultValue={customer.phone ?? ""} autoComplete="tel" data-testid="phone-input" />
       </Row>
     </div>
   )
 }
 
-function Row({ label, value, fields, children, testId }: { label: string; value: string; fields: string[]; children: React.ReactNode; testId: string }) {
-  const t = useDictionary().account
+function Row({ t, label, value, fields, children, testId }: { t: T; label: string; value: string; fields: string[]; children: React.ReactNode; testId: string }) {
   const [open, setOpen] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState(false)

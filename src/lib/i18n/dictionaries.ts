@@ -80,6 +80,9 @@ const id = {
     website: "Situs web",
     empty: "Belum ada pembuat.",
   },
+  demo: {
+    notice: "Toko demo: pesanan tidak sungguhan dan datanya direset tiap malam.",
+  },
   notFound: {
     title: "Halaman tidak ditemukan",
     body: "Halaman yang Anda cari tidak ada atau sudah dipindahkan. Coba cari produknya, atau kembali ke beranda.",
@@ -878,6 +881,9 @@ const en: Dictionary = {
     seeAll: "See all {n} products",
     website: "Website",
     empty: "No makers yet.",
+  },
+  demo: {
+    notice: "Demo store: orders are not real and the data is reset every night.",
   },
   notFound: {
     title: "Page not found",

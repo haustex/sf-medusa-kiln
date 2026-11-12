@@ -4,13 +4,12 @@ import { cn } from "@heroui/styles"
 import { useParams, usePathname } from "next/navigation"
 
 import { signout } from "@lib/data/customer"
-import { useDictionary } from "@lib/i18n/use-dictionary"
+import { type Dictionary } from "@lib/i18n/dictionaries"
 import { marketPath, stripMarketPrefix } from "@lib/util/market"
 import Link from "@modules/common/components/app-link"
 
 /** Account navigation: a scrolling pill row on phones, a sidebar list from lg. The current page has aria-current. */
-export default function AccountNav({ email, reviews }: { email: string; /** medusa-reviews-wishlist installed: the "Reviews" item */ reviews: boolean }) {
-  const t = useDictionary().account
+export default function AccountNav({ email, reviews, labels: t }: { email: string; /** medusa-reviews-wishlist installed: the "Reviews" item */ reviews: boolean; labels: Dictionary["account"] }) {
   const { countryCode } = useParams() as { countryCode: string }
   const route = stripMarketPrefix(usePathname() ?? "")
   const items = [

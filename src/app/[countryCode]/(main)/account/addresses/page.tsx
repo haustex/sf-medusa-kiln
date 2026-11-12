@@ -23,7 +23,7 @@ export default async function AddressesPage(props: Props) {
         <h1 className="type-h1">{t.addresses}</h1>
         <p className="text-muted">{t.addressesIntro}</p>
       </Stack>
-      <AddressBook addresses={customer.addresses ?? []} region={region} />
+      <AddressBook addresses={customer.addresses ?? []} region={region} labels={t} />
     </Stack>
   )
 }

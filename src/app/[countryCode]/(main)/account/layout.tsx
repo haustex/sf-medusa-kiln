@@ -12,19 +12,20 @@ import { Page } from "@modules/ds"
 export default async function AccountLayout(props: { children: React.ReactNode; params: Promise<{ countryCode: string }> }) {
   const { countryCode } = await props.params
   const [customer, reviews] = await Promise.all([retrieveCustomer().catch(() => null), feature("reviews")])
-  const t = getDictionary(countryCode).account
+  const dict = getDictionary(countryCode)
+  const t = dict.account
 
   return (
     <Page data-testid="account-page">
       {customer ? (
         <div className="content-container grid grid-cols-1 gap-stack-lg lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-section">
-          <AccountNav email={customer.email} reviews={reviews} />
+          <AccountNav email={customer.email} reviews={reviews} labels={t} />
           <div className="min-w-0">{props.children}</div>
         </div>
       ) : (
         <div className="content-container">
           <div className="mx-auto w-full max-w-md rounded-media bg-default p-stack-lg">
-            <Auth />
+            <Auth labels={{ account: t, emailInvalid: dict.checkout.emailInvalid }} />
           </div>
           <span className="sr-only">{t.login.title}</span>
         </div>

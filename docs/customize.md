@@ -205,7 +205,8 @@ banners.
 `src/lib/i18n/dictionaries.ts` holds every string of the storefront chrome in `en` and `id` (product content
 comes translated from Medusa). To change a wording, edit it there. To add a language, add a dictionary with the
 same shape, add its code to `MarketConfig["dictionary"]` in `theme.config.ts` and reference it from a market.
-Server components read strings with `getDictionary(countryCode)`, client components with `useDictionary()`.
+Server components read strings with `getDictionary(countryCode)` and hand client components the section they
+need as a `labels` prop, so no dictionary ends up in the browser bundle.
 
 ### Information pages
 

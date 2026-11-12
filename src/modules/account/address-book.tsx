@@ -5,7 +5,7 @@ import { Plus } from "lucide-react"
 import { useActionState, useEffect, useState, useTransition } from "react"
 
 import { addCustomerAddress, deleteCustomerAddress, updateCustomerAddress } from "@lib/data/customer"
-import { useDictionary } from "@lib/i18n/use-dictionary"
+import { type Dictionary } from "@lib/i18n/dictionaries"
 import Input from "@modules/common/components/input"
 import NativeSelect from "@modules/common/components/native-select"
 import { Button } from "@modules/common/components/ui"
@@ -13,6 +13,7 @@ import { Sheet } from "@modules/ds"
 import { ICON } from "@modules/ds/icons"
 
 type Address = HttpTypes.StoreCustomerAddress
+type T = Dictionary["account"]
 type FormState = { success: boolean; error: string | null }
 const INITIAL: FormState = { success: false, error: null }
 
@@ -20,8 +21,7 @@ const INITIAL: FormState = { success: false, error: null }
  * Account → Addresses: the saved addresses as cards (edit / remove) and a "new address" tile; the form opens in a
  * centred sheet and posts to the customer address server actions.
  */
-export default function AddressBook({ addresses, region }: { addresses: Address[]; region: HttpTypes.StoreRegion }) {
-  const t = useDictionary().account
+export default function AddressBook({ addresses, region, labels: t }: { addresses: Address[]; region: HttpTypes.StoreRegion; labels: T }) {
   const [editing, setEditing] = useState<Address | "new" | null>(null)
   const [pending, startTransition] = useTransition()
   const [removeError, setRemoveError] = useState<string | null>(null)
@@ -73,13 +73,12 @@ export default function AddressBook({ addresses, region }: { addresses: Address[
           {removeError}
         </p>
       )}
-      {editing && <AddressSheet key={editing === "new" ? "new" : editing.id} address={editing === "new" ? null : editing} region={region} onClose={() => setEditing(null)} />}
+      {editing && <AddressSheet key={editing === "new" ? "new" : editing.id} t={t} address={editing === "new" ? null : editing} region={region} onClose={() => setEditing(null)} />}
     </div>
   )
 }
 
-function AddressSheet({ address, region, onClose }: { address: Address | null; region: HttpTypes.StoreRegion; onClose: () => void }) {
-  const t = useDictionary().account
+function AddressSheet({ t, address, region, onClose }: { t: T; address: Address | null; region: HttpTypes.StoreRegion; onClose: () => void }) {
   const action = address ? updateCustomerAddress : addCustomerAddress
   const [state, formAction, pending] = useActionState(action, address ? { ...INITIAL, addressId: address.id } : INITIAL)
   useEffect(() => {
