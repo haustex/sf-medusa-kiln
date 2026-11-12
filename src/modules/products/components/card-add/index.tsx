@@ -5,7 +5,7 @@ import { Check, LoaderCircle, Plus } from "lucide-react"
 import { useEffect, useRef, useState, useTransition } from "react"
 
 import { addToCart } from "@lib/data/cart"
-import { notifyCartUpdated } from "@lib/util/cart-events"
+import { notifyCartUpdated, openCart } from "@lib/util/cart-events"
 import type { ProductCardData } from "@modules/ds"
 import { ICON } from "@modules/ds/icons"
 import QuickView, { type QuickViewLabels } from "./quick-view"
@@ -55,6 +55,7 @@ export default function CardAdd({ product, countryCode, labels }: { product: Pro
       try {
         await addToCart({ variantId: single.id, quantity: 1, countryCode })
         notifyCartUpdated()
+        openCart()
         flash("added")
       } catch {
         flash("error")

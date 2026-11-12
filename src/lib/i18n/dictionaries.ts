@@ -352,6 +352,9 @@ const id = {
     signInTitle: "Sudah punya akun?",
     signInBody: "Masuk supaya checkout lebih cepat.",
     signIn: "Masuk",
+    close: "Tutup keranjang",
+    viewCart: "Lihat keranjang",
+    loading: "Memuat keranjang…",
   },
   checkout: {
     errorShipping: "Pengiriman belum bisa dipilih. Coba lagi atau muat ulang halaman.",
@@ -998,6 +1001,9 @@ const en: Dictionary = {
     signInTitle: "Already have an account?",
     signInBody: "Sign in for a faster checkout.",
     signIn: "Sign in",
+    close: "Close cart",
+    viewCart: "View cart",
+    loading: "Loading your cart…",
   },
   notFound: {
     title: "Page not found",

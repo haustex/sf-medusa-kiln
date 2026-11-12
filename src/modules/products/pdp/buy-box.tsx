@@ -5,7 +5,7 @@ import { Check, Minus, Plus } from "lucide-react"
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react"
 
 import { addToCart } from "@lib/data/cart"
-import { notifyCartUpdated } from "@lib/util/cart-events"
+import { notifyCartUpdated, openCart } from "@lib/util/cart-events"
 import Link from "@modules/common/components/app-link"
 import { ICON } from "@modules/ds/icons"
 import { formatPrice } from "@modules/ds/price-tag"
@@ -124,6 +124,7 @@ export default function BuyBox({ productId, title, countryCode, currency, option
     try {
       await addToCart({ variantId: variant.id, quantity: qty, countryCode })
       notifyCartUpdated()
+      openCart()
       setStatus("added")
     } catch {
       setStatus("error")

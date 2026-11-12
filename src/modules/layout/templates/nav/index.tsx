@@ -10,6 +10,7 @@ import Logo from "@modules/brand/logo"
 import { socialLinks } from "@modules/brand/social"
 import CartLink from "@modules/layout/components/cart-button/cart-link"
 import CartButton from "@modules/layout/components/cart-button"
+import CartDrawer from "@modules/layout/components/cart-drawer"
 import CategoryMenu from "@modules/layout/components/category-menu"
 import HeaderScroll from "@modules/layout/components/header-scroll"
 import HeaderSearch from "@modules/layout/components/header-search"
@@ -115,6 +116,26 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
       </div>
     </header>
     <HeaderScroll id="site-header" />
+    <CartDrawer
+      labels={{
+        title: t.cart.title,
+        close: t.cart.close,
+        empty: t.cart.empty,
+        emptyCta: t.cart.emptyCta,
+        subtotal: t.cart.subtotal,
+        shippingLater: t.cart.shippingLater,
+        checkout: t.cart.checkout,
+        viewCart: t.cart.viewCart,
+        loading: t.cart.loading,
+        quantity: t.cart.quantity,
+        decrease: t.product.decrease,
+        increase: t.product.increase,
+        remove: t.cart.remove,
+        each: t.cart.each,
+        removeFailed: t.cart.removeFailed,
+        updateFailed: t.cart.updateFailed,
+      }}
+    />
     </>
   )
 }

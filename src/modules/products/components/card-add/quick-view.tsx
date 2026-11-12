@@ -4,7 +4,7 @@ import { cn } from "@heroui/styles"
 import { useMemo, useState, useTransition } from "react"
 
 import { addToCart } from "@lib/data/cart"
-import { notifyCartUpdated } from "@lib/util/cart-events"
+import { notifyCartUpdated, openCart } from "@lib/util/cart-events"
 import { cleanSlug } from "@lib/util/image-name"
 import Link from "@modules/common/components/app-link"
 import { Badge, PriceTag, ProductImage, Sheet, type ProductCardData } from "@modules/ds"
@@ -54,8 +54,9 @@ export default function QuickView({ product, countryCode, labels, onClose }: { p
       try {
         await addToCart({ variantId: variant.id, quantity: 1, countryCode })
         notifyCartUpdated()
-        setMessage({ kind: "ok", text: labels.added })
-        setTimeout(onClose, 900)
+        // the cart drawer takes over as the confirmation: this sheet closes, the drawer opens with the new line
+        onClose()
+        openCart()
       } catch {
         setMessage({ kind: "error", text: labels.addError })
       }

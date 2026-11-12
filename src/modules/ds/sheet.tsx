@@ -21,6 +21,7 @@ export default function Sheet({
   label,
   title,
   closeLabel = "Close",
+  footer,
   className,
   children,
 }: {
@@ -30,6 +31,8 @@ export default function Sheet({
   label: string
   title?: React.ReactNode
   closeLabel?: string
+  /** Stays put under the scrolling body (cart totals + buttons) */
+  footer?: React.ReactNode
   className?: string
   children: React.ReactNode
 }) {
@@ -80,6 +83,7 @@ export default function Sheet({
         </button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-stack-lg py-stack-md">{children}</div>
+      {footer && <div className="shrink-0 border-t border-separator px-stack-lg pb-[max(var(--space-stack-lg),env(safe-area-inset-bottom))] pt-stack-md">{footer}</div>}
     </dialog>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { CART_UPDATED_EVENT } from "@lib/util/cart-events"
+import { CART_UPDATED_EVENT, openCart } from "@lib/util/cart-events"
 import { marketPath } from "@lib/util/market"
 import { ShoppingBag } from "lucide-react"
 import Link from "@modules/common/components/app-link"
@@ -10,8 +10,8 @@ import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 /**
- * Cart link with item count. Static pages can't read the cart cookie, so the
- * count is loaded in the browser and refreshed on CART_UPDATED_EVENT.
+ * Cart button with item count: opens the cart drawer (a link to /cart without JS). Static pages can't read the
+ * cart cookie, so the count is loaded in the browser and refreshed on CART_UPDATED_EVENT.
  *
  * Loaded with a GET to /api/cart/count, not a server action: see the note in
  * app/api/cart/count/route.ts (a first visitor's action POST invalidated every
@@ -35,6 +35,11 @@ export default function CartLink({ initialCount, label }: { initialCount: number
   return (
     <Link
       href={marketPath(countryCode as string, "/cart")}
+      onClick={(e) => {
+        e.preventDefault()
+        openCart()
+      }}
+      aria-haspopup="dialog"
       className="relative inline-flex size-11 items-center justify-center rounded-full outline-none hover:bg-default/60 focus-visible:ring-2 focus-visible:ring-focus"
       aria-label={count > 0 ? `${label} (${count})` : label}
       data-testid="nav-cart-link"
