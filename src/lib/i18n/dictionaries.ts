@@ -1115,4 +1115,4 @@ export const fill = (template: string, values: Record<string, string | number>) 
   template.replace(/\{(\w+)\}/g, (_, k) => String(values[k] ?? ""))
 
 export const getDictionary = (countryCode?: string | null): Dictionary =>
-  dictionaries[getMarket(countryCode).htmlLang as keyof typeof dictionaries] ?? id
+  dictionaries[getMarket(countryCode).dictionary] ?? dictionaries.en

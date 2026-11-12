@@ -1,6 +1,6 @@
 /**
  * Kiln design system: custom components on top of HeroUI v3 styles.
- * Server components unless noted; preview at /_design.
+ * Server components unless noted; preview at /design.
  */
 export { default as Badge, type BadgeTone } from "./badge"
 export { default as Breadcrumb, type Crumb } from "./breadcrumb"
