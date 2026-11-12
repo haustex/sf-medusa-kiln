@@ -1,14 +1,14 @@
 "use client"
 
 import { cn } from "@heroui/styles"
-import { useState, useSyncExternalStore } from "react"
+import { useState } from "react"
 
-import { Glyph, GLYPH_LABELS, type GlyphName } from "@modules/brand/glyphs"
+import { Mark, MARK_LABELS, type MarkName } from "@modules/brand/marks"
 
-export type ShareLabels = { share: string; native: string; shareOn: string; copy: string; copied: string }
+export type ShareLabels = { share: string; shareOn: string; copy: string; copied: string }
 
 /** Share targets: plain intent links, nothing from the networks runs on the page */
-const TARGETS: { key: GlyphName; href: (p: { url: string; title: string; image?: string | null }) => string }[] = [
+const TARGETS: { key: MarkName; href: (p: { url: string; title: string; image?: string | null }) => string }[] = [
   { key: "whatsapp", href: ({ url, title }) => `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}` },
   { key: "telegram", href: ({ url, title }) => `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}` },
   { key: "threads", href: ({ url, title }) => `https://www.threads.net/intent/post?text=${encodeURIComponent(`${title} ${url}`)}` },
@@ -22,36 +22,16 @@ const TARGETS: { key: GlyphName; href: (p: { url: string; title: string; image?:
   },
 ]
 
-const subscribeNever = () => () => {}
-
-const round =
-  "inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-separator bg-surface text-foreground outline-none transition-colors hover:border-foreground focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+// 44px targets, no border or background: the filled mark (22px, Ink) greys on hover
+const btn = "inline-flex size-11 shrink-0 items-center justify-center rounded-full text-foreground outline-none transition-colors hover:text-muted focus-visible:ring-2 focus-visible:ring-focus"
 
 /**
- * Share row at the end of an article (and, from xl, a sticky rail beside the text): one round button per network
- * (WhatsApp, Telegram, Threads, Facebook, X, LinkedIn, Pinterest), "copy link", and on phones the system share
- * sheet (Web Share API) when the browser has one. The links work without JS. `url`: the article's canonical URL;
+ * Share row at the end of an article: one filled brand mark per network (WhatsApp, Telegram, Threads, Facebook, X,
+ * LinkedIn, Pinterest) and "copy link". Plain intent links (work without JS). `url`: the article's canonical URL;
  * `image`: the cover, for Pinterest.
  */
-export default function ShareButtons({
-  url,
-  title,
-  image,
-  labels,
-  orientation = "row",
-  className,
-}: {
-  url: string
-  title: string
-  image?: string | null
-  labels: ShareLabels
-  orientation?: "row" | "column"
-  className?: string
-}) {
+export default function ShareButtons({ url, title, image, labels, className }: { url: string; title: string; image?: string | null; labels: ShareLabels; className?: string }) {
   const [copied, setCopied] = useState(false)
-  // false on the server and in the first client render (hydration), then whatever the browser has
-  const canShare = useSyncExternalStore(subscribeNever, () => typeof navigator.share === "function", () => false)
-
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(url)
@@ -62,37 +42,26 @@ export default function ShareButtons({
       window.prompt(labels.copy, url)
     }
   }
-  const share = async () => {
-    try {
-      await navigator.share({ title, url })
-    } catch {
-      // dismissed
-    }
-  }
   const on = (network: string) => labels.shareOn.replace("{network}", network)
-  const column = orientation === "column"
 
   return (
-    <div className={cn("flex gap-stack-sm", column ? "flex-col items-center" : "flex-wrap items-center", className)} data-testid={column ? "share-rail" : "share-row"}>
-      <p className={cn("text-sm font-medium", column ? "sr-only" : "mr-stack-xs")}>{labels.share}</p>
-      {canShare && (
-        <button type="button" onClick={share} aria-label={labels.native} title={labels.native} className={cn(round, "md:hidden")} data-testid="share-native">
-          <Glyph name="share" />
-        </button>
-      )}
-      {TARGETS.map((x) => {
-        const name = GLYPH_LABELS[x.key] ?? x.key
-        return (
-          <a key={x.key} href={x.href({ url, title, image })} target="_blank" rel="noopener noreferrer" aria-label={on(name)} title={on(name)} className={round} data-share={x.key}>
-            <Glyph name={x.key} />
-          </a>
-        )
-      })}
-      <button type="button" onClick={copy} aria-label={labels.copy} title={labels.copy} className={cn(round, copied && "border-foreground bg-foreground text-background")} data-testid="copy-link">
-        <Glyph name={copied ? "check" : "link"} />
+    <div className={cn("flex flex-wrap items-center gap-x-1 gap-y-stack-xs", className)} data-testid="share-row">
+      <p className="mr-stack-sm text-sm font-medium">{labels.share}</p>
+      {TARGETS.map((x) => (
+        <a key={x.key} href={x.href({ url, title, image })} target="_blank" rel="noopener noreferrer" aria-label={on(MARK_LABELS[x.key])} title={on(MARK_LABELS[x.key])} className={btn} data-share={x.key}>
+          <Mark name={x.key} />
+        </a>
+      ))}
+      <button type="button" onClick={copy} aria-label={labels.copy} title={labels.copy} className={btn} data-testid="copy-link">
+        {copied ? (
+          <svg aria-hidden="true" focusable={false} viewBox="0 0 24 24" width={22} height={22} fill="none" stroke="currentColor" strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 13L9 17L19 7" />
+          </svg>
+        ) : (
+          <Mark name="link" />
+        )}
       </button>
-      {/* Announced when the link was copied; visible text only in the row (the rail has no room for it) */}
-      <span role="status" aria-live="polite" className={cn("text-sm text-muted", (column || !copied) && "sr-only")}>
+      <span role="status" aria-live="polite" className={cn("text-sm text-muted", !copied && "sr-only")}>
         {copied ? labels.copied : ""}
       </span>
     </div>

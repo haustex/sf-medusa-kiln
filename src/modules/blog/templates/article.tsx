@@ -8,25 +8,37 @@ import { marketPath } from "@lib/util/market"
 import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
 import { getSiteOrigin } from "@lib/util/site"
-import { EyebrowLink, Page, ProductCard, type ProductCardData, ProductGrid, SectionHeader, Stack } from "@modules/ds"
+import Link from "@modules/common/components/app-link"
+import { Page, type ProductCardData, SectionHeader, Stack } from "@modules/ds"
 
-import "../blog.css"
 import AuthorBox from "../components/author-box"
+import FromTheShop from "../components/from-the-shop"
 import PostBody from "../components/post-body"
 import PostCard, { PostGrid } from "../components/post-card"
 import PostCover from "../components/post-cover"
 import ShareButtons from "../components/share"
 import Toc from "../components/toc"
 import { formatPostDate } from "../format"
+import { splitForShop } from "../split"
 
 /** Product cards (market prices, photos) for the ids an article mentions; products not sold in this market drop out */
 async function productCards(countryCode: string, ids: string[]): Promise<Record<string, ProductCardData>> {
   if (!ids.length) return {}
-  const products = await listProducts({ countryCode, queryParams: { id: ids, limit: ids.length, fields: PRODUCT_CARD_FIELDS } as any })
+  const products = await listProducts({ countryCode, queryParams: { id: ids, limit: ids.length, fields: PRODUCT_CARD_FIELDS } })
     .then(({ response }) => response.products)
     .catch(() => [])
   const ratings = await getProductRatings(products.map((p) => p.id))
   return Object.fromEntries(products.filter((p) => !isHiddenProduct(p)).map((p) => [p.id, toProductCard(p, countryCode, cardRating(ratings.get(p.id)))]))
+}
+
+/** The newest products of the market: the "From the shop" band when the post links none */
+async function newestCards(countryCode: string, n = 4): Promise<ProductCardData[]> {
+  const products = await listProducts({ countryCode, queryParams: { limit: n + 4, order: "-created_at", fields: PRODUCT_CARD_FIELDS } })
+    .then(({ response }) => response.products)
+    .catch(() => [])
+  const kept = products.filter((p) => !isHiddenProduct(p)).slice(0, n)
+  const ratings = await getProductRatings(kept.map((p) => p.id))
+  return kept.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id))))
 }
 
 /**
@@ -53,7 +65,10 @@ export default async function ArticleTemplate({
 
   const url = `${origin}${href(postPath(post.slug))}`
   const card = toPostCard(post, countryCode, "long")
-  const related = post.product_ids.map((id) => cards[id]).filter(Boolean)
+  const linked = post.product_ids.map((id) => cards[id]).filter(Boolean)
+  const shop = linked.length ? linked : await newestCards(countryCode)
+  const { before, after } = splitForShop(post.blocks)
+  const bodyLabels = { viewProduct: t.blog.viewProduct, playVideo: t.blog.playVideo, videoTitle: t.blog.videoTitle }
   const categoryHref = post.category ? href(categoryPath(post.category.slug)) : null
   // "Diperbarui …" only when the text changed on a later day than it was published
   const updated = formatPostDate(post.updated_at || post.published_at, lang, "long")
@@ -89,36 +104,35 @@ export default async function ArticleTemplate({
             </p>
           )}
           <header className="blog-column flex flex-col gap-stack-md">
-            <Stack gap="sm">
-              {post.category && categoryHref && <EyebrowLink href={categoryHref}>{post.category.name}</EyebrowLink>}
-              <h1 className="blog-title">{post.title}</h1>
-            </Stack>
-            {post.excerpt && <p className="text-lg leading-relaxed text-muted sm:text-xl">{post.excerpt}</p>}
-            <div className="flex flex-col gap-stack-xs">
-              {/* "12 November 2026 • 1 min read | Published by Tilde Goods" (wraps at the bar on narrow screens) */}
-              <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted" data-testid="post-meta">
-                <span className="flex items-center gap-x-2 whitespace-nowrap">
-                  <time dateTime={post.published_at}>{card.dateLabel}</time>
-                  <span aria-hidden="true">•</span>
-                  <span>{card.readingTime}</span>
-                </span>
-                <span aria-hidden="true" className="text-separator max-sm:hidden">
-                  |
-                </span>
-                <span className="whitespace-nowrap max-sm:basis-full">
-                  {publishedBy[0]}
-                  <span className="font-medium text-foreground">{authorName(post)}</span>
-                  {publishedBy[1]}
-                </span>
-              </p>
-              {showUpdated && (
-                <p className="text-sm text-muted">
-                  {updatedText[0]}
-                  <time dateTime={post.updated_at}>{updated}</time>
-                  {updatedText[1]}
-                </p>
+            <h1 className="blog-title">{post.title}</h1>
+            {/* "[Care] · 12 November 2026 | Published by Nadia Tjipto" — the author part drops to its own line on phones */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-stack-xs text-sm text-muted" data-testid="post-meta">
+              {post.category && categoryHref && (
+                <>
+                  <Link href={categoryHref} className="inline-flex h-8 items-center rounded-full border border-separator px-3 text-sm text-foreground transition-colors hover:border-control">
+                    {post.category.name}
+                  </Link>
+                  <span aria-hidden="true">·</span>
+                </>
               )}
+              <time dateTime={post.published_at}>{card.dateLabel}</time>
+              <span aria-hidden="true" className="text-separator max-sm:hidden">
+                |
+              </span>
+              <span className="whitespace-nowrap max-sm:basis-full">
+                {publishedBy[0]}
+                <span className="font-medium text-foreground">{authorName(post)}</span>
+                {publishedBy[1]}
+              </span>
             </div>
+            {post.excerpt && <p className="text-lg leading-relaxed text-muted sm:text-xl">{post.excerpt}</p>}
+            {showUpdated && (
+              <p className="text-sm text-muted">
+                {updatedText[0]}
+                <time dateTime={post.updated_at}>{updated}</time>
+                {updatedText[1]}
+              </p>
+            )}
           </header>
           {post.cover && (
             <PostCover
@@ -136,28 +150,16 @@ export default async function ArticleTemplate({
 
         <div className="blog-layout">
           <Toc items={post.toc} title={t.blog.toc} />
-          <PostBody blocks={post.blocks} products={cards} labels={{ viewProduct: t.blog.viewProduct, playVideo: t.blog.playVideo, videoTitle: t.blog.videoTitle }} />
+          <PostBody blocks={before} products={cards} labels={bodyLabels} />
+          {/* "From the shop" halfway down (split.ts); after the text when the article is short */}
+          <FromTheShop className="blog-shop" title={t.blog.fromShop} products={shop} countryCode={countryCode} />
+          {after.length > 0 && <PostBody blocks={after} products={cards} labels={bodyLabels} />}
           <footer className="flex flex-col gap-section-head">
             <ShareButtons {...share} />
             <AuthorBox author={post.author} origin={origin} lang={lang} labels={t.blog} />
           </footer>
-          {/* xl: the same buttons as a sticky rail in the right margin */}
-          <aside className="blog-share-rail">
-            <ShareButtons {...share} orientation="column" />
-          </aside>
         </div>
       </article>
-
-      {related.length > 0 && (
-        <section className="content-container flex flex-col gap-section-head" aria-labelledby="post-products">
-          <SectionHeader id="post-products" title={t.blog.productsTitle} />
-          <ProductGrid>
-            {related.map((p) => (
-              <ProductCard key={p.href} product={p} />
-            ))}
-          </ProductGrid>
-        </section>
-      )}
 
       {more.posts.length > 0 && (
         <section className="content-container flex flex-col gap-section-head" aria-labelledby="post-more">

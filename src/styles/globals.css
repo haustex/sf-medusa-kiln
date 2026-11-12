@@ -1,6 +1,9 @@
 /* Tailwind CSS v4 + HeroUI v3 (imports tailwindcss itself) */
 @import "./heroui.css";
 @import "./theme.css";
+/* Blog article text (prose, contents, Q&A). Imported here, not from the article component, so its `components`
+   layer always sits between Tailwind's base and utilities whatever order the CSS chunks load in */
+@import "./blog.css";
 
 /*
  * Legacy starter config (Medusa UI preset tokens, screens, keyframes). Kept so the

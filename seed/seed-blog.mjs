@@ -1,7 +1,7 @@
 // Seeds demo articles into medusa-blog-seo through the Admin API (the home page's "From the Journal" block and the
 // /blog pages): two categories, one author (photo, bio, profiles: the "Written by" box), four posts in English +
 // Indonesian, three of them tagged "pilihan" (editor's picks), covers uploaded from seed/images. Idempotent: posts
-// whose title already exists are skipped (those without an author get the demo author).
+// whose title already exists get their text and linked products refreshed (and the demo author when they have none).
 //   MEDUSA_BACKEND_URL=http://127.0.0.1:9710 MEDUSA_ADMIN_EMAIL=admin@kiln.test MEDUSA_ADMIN_PASSWORD=… node seed/seed-blog.mjs
 import { readFileSync } from "node:fs"
 import { dirname, join } from "node:path"
@@ -39,15 +39,29 @@ const POSTS = [
     cover: "oak-serving-board",
     tags: ["pilihan", "wood"],
     featured: true,
+    // the products shown in the "From the shop" band (by handle); the first one is also embedded in the text
+    products: ["oak-serving-board", "walnut-catch-all-tray", "ceramic-serving-bowl", "stoneware-dinner-plate"],
     en: {
       title: "How to oil an oak board so it lasts for years",
       excerpt: "Five minutes a month keeps a cutting board from drying out, cracking or taking on smells. Here is the routine the workshop uses.",
-      body: `<h2>Why oil at all</h2>${p("Oak is dense and forgiving, but it still loses moisture every time it is washed. A thin coat of food-safe oil fills the grain so water cannot.", "Mineral oil or a board butter (oil plus beeswax) both work. Avoid olive oil: it goes rancid.")}<h2>The routine</h2>${p("Wash the board with warm water and a little soap, dry it standing on its edge, and leave it overnight.", "Pour a spoonful of oil on the surface and spread it with a cloth, edges and hanging hole included. Let it soak for an hour, then wipe off what is left.")}<h2>When to sand</h2>${p("If the surface feels rough or has deep knife marks, sand it lightly with 220 grit before oiling. The board will look new again.")}`,
+      body: (pid) => `<h2>Why oil at all</h2>${p("Oak is dense and forgiving, but it still loses moisture every time it is washed. A thin coat of food-safe oil fills the grain so water cannot.", "Mineral oil or a board butter (oil plus beeswax) both work. Avoid olive oil: it goes rancid.")}
+<h2>What you need</h2><ul><li>Food-safe mineral oil or board butter</li><li>A lint-free cloth (an old tea towel is perfect)</li><li>220-grit sandpaper, only for boards that feel rough</li></ul>
+<blockquote><p>A board that drinks the oil in a minute was thirsty. Give it a second coat.</p><p>Pak Tjipto, who has made our boards since 2016</p></blockquote>
+<h2>The routine</h2>${p("Wash the board with warm water and a little soap, dry it standing on its edge, and leave it overnight.")}<div data-product-id="${pid}"></div>${p("Pour a spoonful of oil on the surface and spread it with a cloth, edges and hanging hole included. Let it soak for an hour, then wipe off what is left.")}<ol><li>Wash and dry overnight</li><li>Oil, wait an hour</li><li>Wipe off the excess</li></ol>
+<h2>Oils compared</h2><table><thead><tr><th>Oil</th><th>Finish</th><th>How often</th></tr></thead><tbody><tr><td>Mineral oil</td><td>Matte, soaks in</td><td>Monthly</td></tr><tr><td>Board butter</td><td>Soft sheen, water beads</td><td>Every 2 months</td></tr><tr><td>Tung oil</td><td>Hard, amber</td><td>Twice a year</td></tr></tbody></table>
+<h2>When to sand</h2>${p("If the surface feels rough or has deep knife marks, sand it lightly with 220 grit before oiling. The board will look new again. The <a href=\"/products/oak-serving-board\">oak serving board</a> in the shop arrives already oiled.")}
+<h2>Common questions</h2><h3>Can I use coconut oil?</h3>${p("Only refined (fractionated) coconut oil: it stays liquid and does not go rancid. Virgin coconut oil can.")}<h3>How often should I oil a new board?</h3>${p("Weekly for the first month, then monthly. New wood drinks more.")}`,
     },
     id: {
       title: "Cara meminyaki talenan kayu ek supaya awet bertahun-tahun",
       excerpt: "Lima menit sebulan mencegah talenan kering, retak, atau bau. Ini rutinitas yang dipakai bengkel kami.",
-      body: `<h2>Kenapa perlu diminyaki</h2>${p("Kayu ek padat dan tahan banting, tapi tetap kehilangan kelembapan setiap kali dicuci. Lapisan tipis minyak food-grade mengisi serat supaya air tidak masuk.", "Mineral oil atau board butter (minyak plus lilin lebah) sama-sama bisa. Hindari minyak zaitun: bisa tengik.")}<h2>Rutinitasnya</h2>${p("Cuci talenan dengan air hangat dan sedikit sabun, keringkan dengan posisi berdiri, diamkan semalam.", "Tuang satu sendok minyak ke permukaan dan ratakan dengan kain, termasuk sisi dan lubang gantung. Biarkan meresap satu jam, lalu lap sisanya.")}<h2>Kapan perlu diamplas</h2>${p("Kalau permukaan terasa kasar atau bekas pisaunya dalam, amplas tipis dengan grit 220 sebelum diminyaki. Talenan akan terlihat baru lagi.")}`,
+      body: (pid) => `<h2>Kenapa perlu diminyaki</h2>${p("Kayu ek padat dan tahan banting, tapi tetap kehilangan kelembapan setiap kali dicuci. Lapisan tipis minyak food-grade mengisi serat supaya air tidak masuk.", "Mineral oil atau board butter (minyak plus lilin lebah) sama-sama bisa. Hindari minyak zaitun: bisa tengik.")}
+<h2>Yang dibutuhkan</h2><ul><li>Mineral oil food-grade atau board butter</li><li>Kain bebas serat (lap dapur lama juga bisa)</li><li>Amplas grit 220, hanya untuk talenan yang terasa kasar</li></ul>
+<blockquote><p>Talenan yang menyerap minyak dalam semenit berarti haus. Beri lapisan kedua.</p><p>Pak Tjipto, pembuat talenan kami sejak 2016</p></blockquote>
+<h2>Rutinitasnya</h2>${p("Cuci talenan dengan air hangat dan sedikit sabun, keringkan dengan posisi berdiri, diamkan semalam.")}<div data-product-id="${pid}"></div>${p("Tuang satu sendok minyak ke permukaan dan ratakan dengan kain, termasuk sisi dan lubang gantung. Biarkan meresap satu jam, lalu lap sisanya.")}<ol><li>Cuci, keringkan semalam</li><li>Minyaki, tunggu satu jam</li><li>Lap sisanya</li></ol>
+<h2>Perbandingan minyak</h2><table><thead><tr><th>Minyak</th><th>Hasil</th><th>Seberapa sering</th></tr></thead><tbody><tr><td>Mineral oil</td><td>Doff, meresap</td><td>Sebulan sekali</td></tr><tr><td>Board butter</td><td>Sedikit kilap, air menggelinding</td><td>Dua bulan sekali</td></tr><tr><td>Minyak tung</td><td>Keras, kekuningan</td><td>Dua kali setahun</td></tr></tbody></table>
+<h2>Kapan perlu diamplas</h2>${p("Kalau permukaan terasa kasar atau bekas pisaunya dalam, amplas tipis dengan grit 220 sebelum diminyaki. Talenan akan terlihat baru lagi. <a href=\"/products/oak-serving-board\">Talenan kayu ek</a> di toko sudah diminyaki saat tiba.")}
+<h2>Pertanyaan umum</h2><h3>Boleh pakai minyak kelapa?</h3>${p("Hanya minyak kelapa olahan (fractionated): tetap cair dan tidak tengik. Minyak kelapa murni bisa tengik.")}<h3>Seberapa sering talenan baru diminyaki?</h3>${p("Seminggu sekali di bulan pertama, lalu sebulan sekali. Kayu baru lebih haus.")}`,
     },
   },
   {
@@ -139,24 +153,37 @@ if (!author) {
   author = (await api("POST", "/admin/blog-seo/authors", { ...AUTHOR, avatar: upload.file.url })).author
 }
 
+// products linked to the posts (by handle; the demo catalogue from seed-kiln.ts)
+const catalogue = (await api("GET", "/admin/products?limit=100&fields=id,handle")).products ?? []
+const productId = (handle) => catalogue.find((x) => x.handle === handle)?.id
+const productIds = (post) => (post.products ?? []).map(productId).filter(Boolean)
+const translation = (post, locale, ids) => {
+  const t = post[locale]
+  return { ...t, body: typeof t.body === "function" ? t.body(ids[0] ?? "") : t.body, tags: post.tags, cover_alt: t.title }
+}
+
 const posts = (await api("GET", "/admin/blog-seo/posts?limit=100")).posts ?? []
-const titles = new Set(posts.flatMap((x) => Object.values(x.translations ?? {}).map((t) => t.title)))
+const byTitle = (title) => posts.find((x) => Object.values(x.translations ?? {}).some((t) => t.title === title))
 for (const x of posts) if (!x.author_id) await api("POST", `/admin/blog-seo/posts/${x.id}`, { author_id: author.id })
 
 let created = 0
 for (const post of POSTS) {
-  if (titles.has(post.en.title)) continue
+  const ids = productIds(post)
+  const existing = byTitle(post.en.title)
+  if (existing) {
+    // demo content: keep the text and linked products current (the slug stays, the title does not change)
+    await api("POST", `/admin/blog-seo/posts/${existing.id}`, { translations: { en: translation(post, "en", ids), id: translation(post, "id", ids) }, product_ids: ids })
+    continue
+  }
   const jpg = readFileSync(join(images, `${post.cover}.jpg`))
   const upload = await api("POST", "/admin/blog-seo/uploads", { filename: `${post.cover}.jpg`, data: `data:image/jpeg;base64,${jpg.toString("base64")}`, kind: "cover" })
   const body = {
-    translations: {
-      en: { ...post.en, tags: post.tags, cover_alt: post.en.title },
-      id: { ...post.id, tags: post.tags, cover_alt: post.id.title },
-    },
+    translations: { en: translation(post, "en", ids), id: translation(post, "id", ids) },
     cover: upload.file.url,
     author_id: author.id,
     category_id: categoryIds[post.category],
     featured: !!post.featured,
+    product_ids: ids,
   }
   const { post: row } = await api("POST", "/admin/blog-seo/posts", body)
   await api("POST", `/admin/blog-seo/posts/${row.id}/publish`, {})

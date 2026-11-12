@@ -4,7 +4,9 @@ Kiln itself is MIT. These third-party works ship with it or are drawn by it:
 
 | What | Where | Licence |
 | --- | --- | --- |
-| [Iconoir](https://iconoir.com) glyphs (Facebook, Instagram, X, Pinterest, TikTok, YouTube, LinkedIn, Threads, Telegram, WhatsApp, link, check, share, globe, mail) by Luca Burgio | `src/modules/brand/glyphs.tsx` (inlined SVG paths) | MIT |
+| [Iconoir](https://iconoir.com) glyphs (Facebook, Instagram, X, Pinterest, TikTok, YouTube, LinkedIn, Threads, Telegram, WhatsApp, link, check, share, globe, mail) by Luca Burgio | `src/modules/brand/glyphs.tsx` (inlined SVG paths; footer, phone menu, author box) | MIT |
+| [Simple Icons](https://simpleicons.org) brand marks (WhatsApp, Telegram, Threads, Facebook, X, Pinterest from 16.x; LinkedIn from 8.x) | `src/modules/brand/marks.tsx` (inlined SVG paths; article share row) | CC0 1.0 |
+| [Phosphor Icons](https://phosphoricons.com) "link" (bold) | `src/modules/brand/marks.tsx` | MIT |
 | [Lucide](https://lucide.dev) UI icons | `lucide-react` dependency | ISC |
 | [Inter](https://rsms.me/inter/) by Rasmus Andersson | `src/styles/fonts-files` | SIL Open Font License 1.1 |
 | [HeroUI](https://heroui.com) styles and components | `@heroui/react`, `@heroui/styles` | MIT |
