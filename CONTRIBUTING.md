@@ -103,7 +103,10 @@ cd ~/themes/kiln && MEDUSA_ADMIN_EMAIL=admin@kiln.test MEDUSA_ADMIN_PASSWORD=kil
   PUPPETEER_DIR=<folder with puppeteer in node_modules> node scripts/e2e/checkout-stripe.mjs --provider dev
 ```
 
-With the admin credentials the script enables the provider on the region itself when it is missing.
+With the admin credentials the script enables the provider on the region itself when it is missing. More cases:
+`--card 4000002500003155 --expect 3ds` (3-D Secure challenge, confirmed through Stripe's test button),
+`--card 4000000000000002 --expect decline` (the error message shows, nothing is placed), `KILN_E2E_MARKET=id` (the
+other market, IDR). All four passed on 12 Nov 2026 against Stripe test mode (payments captured).
 Without a system Chrome, run it through whatever launcher sets `PUPPETEER_CACHE_DIR` (and `LD_LIBRARY_PATH`)
 for that puppeteer install: `<launcher> node ~/themes/kiln/scripts/e2e/checkout-stripe.mjs …`.
 

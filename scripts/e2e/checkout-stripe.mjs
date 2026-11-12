@@ -3,6 +3,8 @@
 //
 //   node scripts/e2e/checkout-stripe.mjs                 # Stripe: expects pp_stripe_stripe on the region
 //   node scripts/e2e/checkout-stripe.mjs --provider dev  # pp_system_default, no card
+//   --card 4000002500003155 --expect 3ds                 # 3-D Secure challenge (test button "Complete")
+//   --card 4000000000000002 --expect decline             # declined: error shown, no order, still on /checkout
 //
 // Environment (defaults in brackets):
 //   KILN_URL                 storefront [http://localhost:9720]
@@ -20,6 +22,9 @@ import path from "node:path"
 
 const arg = (name, def) => { const i = process.argv.indexOf(name); return i > -1 ? process.argv[i + 1] : def }
 const PROVIDER = arg("--provider", "stripe") === "dev" ? "pp_system_default" : "pp_stripe_stripe"
+const CARD = arg("--card", "4242424242424242").replace(/\s+/g, "")
+/** success (default) | 3ds (a challenge frame appears, confirm it) | decline (the card is refused) */
+const EXPECT = arg("--expect", "success")
 const BASE = (process.env.KILN_URL || "http://localhost:9720").replace(/\/$/, "")
 const BACKEND = (process.env.MEDUSA_BACKEND_URL || "http://127.0.0.1:9710").replace(/\/$/, "")
 const MARKET = process.env.KILN_E2E_MARKET || "us"
@@ -40,9 +45,11 @@ const log = (...a) => console.log("•", ...a)
 const fail = (msg) => { console.error("✗", msg); process.exitCode = 1 }
 
 // Storefront market prefix: the default market has none (theme.config.ts markets.routing)
+/** "" when the market is the unprefixed default (its /xx URL answers with a redirect), else "/xx" (no trailing slash: Next would redirect that too) */
 const marketPrefix = async () => {
-  const res = await fetch(`${BASE}/${MARKET}/`, { redirect: "manual" })
-  return res.status === 308 || res.status === 307 ? "" : `/${MARKET}`
+  const res = await fetch(`${BASE}/${MARKET}`, { redirect: "manual" })
+  const to = res.headers.get("location") || ""
+  return (res.status === 308 || res.status === 307) && !new URL(to, BASE).pathname.startsWith(`/${MARKET}`) ? "" : `/${MARKET}`
 }
 
 const admin = ADMIN
@@ -151,20 +158,65 @@ try {
       if (!frame) await wait(500)
     }
     if (!frame) throw new Error("Stripe Payment Element: card number field not found (is the card method enabled in the Stripe dashboard?)")
-    await frame.type("input[name=number]", "4242424242424242", { delay: 20 })
+    await frame.type("input[name=number]", CARD, { delay: 20 })
     await frame.type("input[name=expiry]", "1234", { delay: 20 })
     await frame.type("input[name=cvc]", "123", { delay: 20 })
-    const postal = await frame.$("input[name=postalCode]")
-    if (postal) await frame.type("input[name=postalCode]", "97201", { delay: 20 })
+    // country first (the postal field depends on it), then the postal code once it has appeared
     const country = await frame.$("select[name=country]")
-    if (country) await frame.select("select[name=country]", "US").catch(() => {})
-    log("card filled")
+    if (country) await frame.select("select[name=country]", MARKET.toUpperCase()).catch(() => {})
+    const postal = await frame.waitForSelector("input[name=postalCode], input[autocomplete='postal-code']", { timeout: 8000 }).catch(() => null)
+    if (postal) await postal.type(MARKET === "us" ? "97201" : "10110", { delay: 20 })
+    // the Element reports "complete" only after its own validation ran; give it a moment and blur
+    await wait(800)
+    await page.keyboard.press("Tab")
+    // layout check: the Payment Element must get the option's full width (a narrow frame stacks every field)
+    const widths = await page.evaluate(() => {
+      const f = [...document.querySelectorAll("iframe[name^=__privateStripeFrame]")].find((i) => i.getBoundingClientRect().height > 100)
+      if (!f) return null
+      const chain = []
+      for (let el = f; el && chain.length < 6; el = el.parentElement) chain.push(`${el.tagName.toLowerCase()}${el.className && typeof el.className === "string" ? "." + el.className.split(" ").slice(0, 2).join(".") : ""}=${Math.round(el.getBoundingClientRect().width)}`)
+      return chain.join(" < ")
+    })
+    log(`card filled; payment element width: ${widths ?? "frame not found"}`)
     await shot("card-filled")
   }
 
   // 6. Place the order
   await page.waitForFunction(() => !document.querySelector("[data-testid=submit-order-button]")?.disabled, { timeout: 60000 })
   await page.click("[data-testid=submit-order-button]")
+  if (EXPECT === "decline") {
+    // 6b. Declined: Stripe's message appears, nothing is placed
+    await page.waitForSelector("[data-testid=payment-error-message]", { timeout: 60000 })
+    const msg = await page.$eval("[data-testid=payment-error-message]", (el) => el.textContent?.trim())
+    await wait(1500)
+    const path = await page.evaluate(() => location.pathname)
+    if (/\/order\//.test(path)) throw new Error(`declined card still reached ${path}`)
+    log(`declined as expected: "${msg}" (still on ${path})`)
+    await shot("declined")
+    if (admin) {
+      const cartId = await page.evaluate(() => document.cookie.match(/_medusa_cart_id=([^;]+)/)?.[1] ?? null)
+      const { orders } = await admin.call(`/admin/orders?fields=id,display_id&limit=1&order=-created_at`)
+      log(`backend: newest order is #${orders[0]?.display_id ?? "none"}${cartId ? "" : " (cart cookie is httpOnly, not compared)"}`)
+    }
+    console.log(`OK in ${Math.round((Date.now() - t0) / 1000)} s`)
+    await browser.close()
+    process.exit(0)
+  }
+  if (EXPECT === "3ds") {
+    // 6c. 3-D Secure: Stripe opens the challenge in nested iframes; the test page has a "Complete authentication" button
+    let button = null
+    for (let i = 0; i < 120 && !button; i++) {
+      for (const f of page.frames()) {
+        button = await f.$("#test-source-authorize-3ds").catch(() => null)
+        if (button) break
+      }
+      if (!button) await wait(500)
+    }
+    if (!button) throw new Error("3-D Secure challenge frame not found")
+    await shot("3ds-challenge")
+    await button.click()
+    log("3-D Secure challenge completed")
+  }
   await untilPath(/\/order\/.+\/confirmed/, 120000)
   await page.waitForSelector("[data-testid=order-complete-container]", { timeout: 30000 })
   const done = await page.evaluate(() => ({ path: location.pathname, id: document.querySelector("[data-testid=order-id]")?.textContent, total: document.querySelector("[data-testid=cart-total]")?.textContent, payment: document.querySelector("[data-testid=payment-method]")?.textContent }))
