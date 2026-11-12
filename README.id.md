@@ -28,7 +28,8 @@ English: [README.md](README.md).
   datang sudah diterjemahkan dari Translation Module Medusa; teks UI tersedia dalam bahasa Inggris dan Indonesia.
 - **SEO**: metadata dan canonical/hreflang di tiap halaman, JSON-LD (Organization, WebSite, Product,
   BreadcrumbList, Article, FAQ), sitemap dengan alternatif bahasa dan gambar, robots yang menerima crawler AI,
-  gambar share yang digenerate (`/og/…`), halaman produk versi Markdown untuk agen (`/products/x.md`), saklar
+  gambar share yang digenerate (`/og/…`), halaman produk versi Markdown untuk agen (`/products/x.md`), `llms.txt` dan `llms-full.txt` (deskripsi toko untuk asisten AI:
+  market, kategori, pembuat, halaman informasi, jurnal, semua produk dengan harga per market), saklar
   pra-peluncuran yang menahan seluruh situs noindex sampai `SITE_LIVE=true`.
 - **Cepat**: halaman statis diregenerasi tiap menit dan dibersihkan sesuai permintaan (`/api/revalidate`, cache
   tag Cloudflare), satu file font self-host (Inter, 40 KB) dengan fallback metrik, ukuran gambar eksplisit,

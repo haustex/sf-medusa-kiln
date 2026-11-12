@@ -67,8 +67,17 @@ function placeholders(countryCode: string, lang: string): Record<string, string>
 
 const fill = (text: string, values: Record<string, string>) => text.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k: string) => values[k] ?? "")
 
-/** One page in the market's language (fallback `en`); null when no file exists */
-export async function getPage(countryCode: string, slug: string): Promise<ContentPage | null> {
+/** The page's markdown with placeholders filled (llms-full.txt); null when no file exists */
+export async function getPageText(countryCode: string, slug: string): Promise<{ title: string; description: string; markdown: string } | null> {
+  const found = await locate(countryCode, slug)
+  if (!found) return null
+  const values = placeholders(countryCode, found.lang)
+  const { data, body } = frontMatter(found.source)
+  return { title: fill(data.title ?? slug, values), description: fill(data.description ?? "", values), markdown: fill(body, values).trim() }
+}
+
+/** The file for a slug: the market's language, else the fallback */
+async function locate(countryCode: string, slug: string): Promise<{ lang: string; source: string } | null> {
   if (!safeSlug(slug)) return null
   const wanted = getMarket(countryCode).dictionary
   let lang = wanted
@@ -77,8 +86,14 @@ export async function getPage(countryCode: string, slug: string): Promise<Conten
     lang = FALLBACK
     source = await read(lang, slug)
   }
-  if (source === null) return null
+  return source === null ? null : { lang, source }
+}
 
+/** One page in the market's language (fallback `en`); null when no file exists */
+export async function getPage(countryCode: string, slug: string): Promise<ContentPage | null> {
+  const found = await locate(countryCode, slug)
+  if (!found) return null
+  const { lang, source } = found
   const values = placeholders(countryCode, lang)
   const { data, body } = frontMatter(source)
   const html = (await marked.parse(fill(body, values), { gfm: true, async: true }))

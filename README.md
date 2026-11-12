@@ -28,8 +28,9 @@ Bahasa Indonesia: [README.id.md](README.id.md).
   Product content comes translated from Medusa's Translation Module; the UI strings ship in English and Indonesian.
 - **SEO**: metadata and canonical/hreflang on every page, JSON-LD (Organization, WebSite, Product, BreadcrumbList,
   Article, FAQ), sitemap with language alternates and images, robots that welcome AI crawlers, generated share
-  images (`/og/…`), product pages as Markdown for agents (`/products/x.md`), a pre-launch switch that keeps the
-  whole site noindex until `SITE_LIVE=true`.
+  images (`/og/…`), product pages as Markdown for agents (`/products/x.md`), `llms.txt` and `llms-full.txt`
+  (the store described for AI assistants: markets, categories, makers, information pages, journal, every product
+  with prices per market), a pre-launch switch that keeps the whole site noindex until `SITE_LIVE=true`.
 - **Speed**: static pages regenerated every minute and purged on demand (`/api/revalidate`, Cloudflare cache
   tags), one self-hosted font file (Inter, 40 KB) with metric fallbacks, explicit image sizes, little client-side
   JavaScript. Lighthouse (mobile, local production build): see [docs/lighthouse.md](docs/lighthouse.md).
