@@ -32,7 +32,8 @@ export function blogPosting(origin: string, countryCode: string, post: BlogArtic
   const cover = imageRef("blog", name, post.cover)
   const wide = imageRef("blog", `${name}-lebar`, post.cover_wide)
   const images = [cover && imageJpeg(origin, cover), wide && imageJpeg(origin, wide), blogShareImage(origin, countryCode, post).url].filter(Boolean)
-  const byShop = !post.author || post.author.trim().toUpperCase() === ORG.name
+  const a = post.author
+  const byShop = !a || a.type === "organization" && a.name.trim().toLowerCase() === ORG.name.toLowerCase()
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -44,7 +45,16 @@ export function blogPosting(origin: string, countryCode: string, post: BlogArtic
     image: images,
     datePublished: post.published_at,
     dateModified: post.updated_at || post.published_at,
-    author: byShop ? orgRef(origin) : { "@type": "Person", name: post.author },
+    author: byShop
+      ? orgRef(origin)
+      : {
+          "@type": a.type === "organization" ? "Organization" : "Person",
+          name: a.name,
+          ...(a.url ? { url: a.url } : {}),
+          ...(a.avatar ? { image: a.avatar } : {}),
+          ...(a.job_title ? { jobTitle: a.job_title } : {}),
+          ...(a.same_as.length ? { sameAs: a.same_as } : {}),
+        },
     publisher: {
       ...orgRef(origin),
       logo: { "@type": "ImageObject", url: `${origin}/brand/logo.png` },

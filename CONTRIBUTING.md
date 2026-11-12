@@ -72,7 +72,7 @@ The catalogue comes from `seed/seed-kiln.ts` (see its header). Two more generato
 export PATH=~/.local/lib/node/bin:$PATH
 cd ~/themes/kiln
 node seed/demo-hero.mjs    # hero banners → public/hero (theme.config.ts hero.slides)
-node seed/seed-blog.mjs    # 4 demo articles into medusa-blog-seo via the Admin API (needs the backend up)
+node seed/seed-blog.mjs    # 4 demo articles + 1 author into medusa-blog-seo via the Admin API (needs the backend up)
 ```
 
 `seed-blog.mjs` reads `MEDUSA_BACKEND_URL`, `MEDUSA_ADMIN_EMAIL`, `MEDUSA_ADMIN_PASSWORD` (defaults: the dev backend above)

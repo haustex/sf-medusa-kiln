@@ -2,6 +2,7 @@ import "server-only"
 
 import { sdk } from "@lib/config"
 import { getMarket, marketPath } from "@lib/util/market"
+import { STORE_NAME } from "@lib/util/site"
 import { formatPostDate, readingTimeLabel } from "@modules/blog/format"
 import type { PostCardData, TocItem } from "@modules/blog/types"
 
@@ -22,13 +23,26 @@ export type Lang = "id" | "en"
 export const blogLang = (countryCode: string): Lang => (getMarket(countryCode).htmlLang === "en" ? "en" : "id")
 
 export type BlogCategory = { id: string; slug: string; name: string; description: string | null }
+/** Who wrote it, as the lists carry it (the article adds photo, bio and profiles: {@link BlogAuthor}) */
+export type BlogAuthorRef = { id: string; slug: string; name: string; type: "person" | "organization" }
+export type BlogAuthor = BlogAuthorRef & {
+  /** Photo (File Module URL) */
+  avatar: string | null
+  /** Profile or home page */
+  url: string | null
+  /** Other profiles (schema.org sameAs) */
+  same_as: string[]
+  /** In the page's language */
+  job_title: string | null
+  bio: string | null
+}
 export type BlogCard = {
   id: string
   slug: string
   title: string
   excerpt: string
   category: BlogCategory | null
-  author: string
+  author: BlogAuthorRef | null
   published_at: string
   updated_at: string
   reading_minutes: number
@@ -44,7 +58,8 @@ export type BlogBlock =
   | { type: "product"; id: string }
   | { type: "youtube"; id: string }
   | { type: "faq"; items: { q: string; a_html: string; a: string }[] }
-export type BlogArticle = BlogCard & {
+export type BlogArticle = Omit<BlogCard, "author"> & {
+  author: BlogAuthor | null
   seo_title: string
   seo_description: string
   tags: string[]
@@ -58,7 +73,7 @@ export type BlogArticle = BlogCard & {
 export type BlogIndexRow = {
   slug: string
   category: { slug: string; name_id: string; name_en: string } | null
-  author: string
+  author: BlogAuthorRef | null
   published_at: string
   updated_at: string
   cover: string | null
@@ -146,6 +161,9 @@ export const listBlogCategories = (countryCode: string) =>
 /** Every public article in both languages (sitemap, RSS, llms.txt) */
 export const listPostIndex = () =>
   sdk.client.fetch<{ posts: BlogIndexRow[] }>(`${BASE}/posts`, { query: { view: "index" }, ...cached }).then((r) => r.posts)
+
+/** The name shown as the author: the post's author, else the shop (theme.config.ts brand.name) */
+export const authorName = (post: { author: { name: string } | null }) => post.author?.name || STORE_NAME
 
 export const postPath = (slug: string) => `/blog/${slug}`
 export const categoryPath = (slug: string) => `/blog/kategori/${slug}`

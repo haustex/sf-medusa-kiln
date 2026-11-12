@@ -54,6 +54,19 @@
       grid-column: 1;
       grid-row: 1 / span 2; /* beside the text and the share row */
     }
+    .blog-layout > .blog-share-rail {
+      display: block;
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      justify-self: end;
+      position: sticky;
+      top: 8rem;
+      width: auto;
+    }
+  }
+  /* Sticky share rail: only from xl (the row under the text is the one that gets focus; the rail is aria-hidden) */
+  .blog-share-rail {
+    display: none;
   }
 
   /* Contents: Soft box above the text; from xl a sticky list in the left margin */

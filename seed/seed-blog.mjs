@@ -1,6 +1,7 @@
 // Seeds demo articles into medusa-blog-seo through the Admin API (the home page's "From the Journal" block and the
-// /blog pages): two categories, four posts in English + Indonesian, three of them tagged "pilihan" (editor's picks),
-// covers uploaded from seed/images. Idempotent: posts whose slug already exists are skipped.
+// /blog pages): two categories, one author (photo, bio, profiles: the "Written by" box), four posts in English +
+// Indonesian, three of them tagged "pilihan" (editor's picks), covers uploaded from seed/images. Idempotent: posts
+// whose title already exists are skipped (those without an author get the demo author).
 //   MEDUSA_BACKEND_URL=http://127.0.0.1:9710 MEDUSA_ADMIN_EMAIL=admin@kiln.test MEDUSA_ADMIN_PASSWORD=… node seed/seed-blog.mjs
 import { readFileSync } from "node:fs"
 import { dirname, join } from "node:path"
@@ -15,6 +16,20 @@ const CATEGORIES = [
   { key: "care", en: { name: "Care", slug: "care", description: "Keeping wood, linen and stoneware in good shape." }, id: { name: "Perawatan", slug: "perawatan", description: "Menjaga kayu, linen, dan stoneware tetap awet." } },
   { key: "makers", en: { name: "Makers", slug: "makers", description: "The workshops behind the pieces." }, id: { name: "Pembuat", slug: "pembuat", description: "Bengkel-bengkel di balik setiap barang." } },
 ]
+
+// Fictional; the profile links point at the networks' home pages
+const AUTHOR = {
+  name: "Nadia Tjipto",
+  slug: "nadia-tjipto",
+  type: "person",
+  avatar: "author-nadia",
+  url: "https://example.com",
+  same_as: ["https://www.instagram.com/", "https://www.threads.net/", "https://www.linkedin.com/"],
+  translations: {
+    en: { job_title: "Founder, Tilde Goods", bio: "Nadia started Tilde Goods after ten years of sourcing for hotels. She writes about the makers behind the pieces and how to keep them for a long time." },
+    id: { job_title: "Pendiri Tilde Goods", bio: "Nadia memulai Tilde Goods setelah sepuluh tahun mencari barang untuk hotel. Ia menulis tentang para pembuat di balik setiap barang dan cara merawatnya supaya awet." },
+  },
+}
 
 const p = (...xs) => xs.map((x) => `<p>${x}</p>`).join("\n")
 
@@ -107,15 +122,26 @@ await api("POST", "/admin/blog-seo/settings", { locales: [{ code: "en", name: "E
 
 // categories (by English slug)
 const existing = (await api("GET", "/admin/blog-seo/categories?limit=100")).categories ?? []
-const slugOf = (c) => (c.translations ?? []).find((t) => t.locale === "en")?.slug
+// Admin rows carry translations keyed by locale
+const slugOf = (c) => c.translations?.en?.slug
 const categoryIds = {}
 for (const c of CATEGORIES) {
   const found = existing.find((x) => slugOf(x) === c.en.slug)
   categoryIds[c.key] = found ? found.id : (await api("POST", "/admin/blog-seo/categories", { translations: { en: c.en, id: c.id } })).category.id
 }
 
+// author (by slug); existing posts without one get it
+const authors = (await api("GET", "/admin/blog-seo/authors")).authors ?? []
+let author = authors.find((a) => a.slug === AUTHOR.slug)
+if (!author) {
+  const jpg = readFileSync(join(images, `${AUTHOR.avatar}.jpg`))
+  const upload = await api("POST", "/admin/blog-seo/uploads", { filename: `${AUTHOR.avatar}.jpg`, data: `data:image/jpeg;base64,${jpg.toString("base64")}`, kind: "avatar" })
+  author = (await api("POST", "/admin/blog-seo/authors", { ...AUTHOR, avatar: upload.file.url })).author
+}
+
 const posts = (await api("GET", "/admin/blog-seo/posts?limit=100")).posts ?? []
-const titles = new Set(posts.flatMap((x) => (x.translations ?? []).map((t) => t.title)))
+const titles = new Set(posts.flatMap((x) => Object.values(x.translations ?? {}).map((t) => t.title)))
+for (const x of posts) if (!x.author_id) await api("POST", `/admin/blog-seo/posts/${x.id}`, { author_id: author.id })
 
 let created = 0
 for (const post of POSTS) {
@@ -128,6 +154,7 @@ for (const post of POSTS) {
       id: { ...post.id, tags: post.tags, cover_alt: post.id.title },
     },
     cover: upload.file.url,
+    author_id: author.id,
     category_id: categoryIds[post.category],
     featured: !!post.featured,
   }
@@ -135,4 +162,4 @@ for (const post of POSTS) {
   await api("POST", `/admin/blog-seo/posts/${row.id}/publish`, {})
   created++
 }
-console.log(`seed-blog: ${Object.keys(categoryIds).length} categories, ${created} posts created (${POSTS.length - created} already there)`)
+console.log(`seed-blog: ${Object.keys(categoryIds).length} categories, 1 author, ${created} posts created (${POSTS.length - created} already there)`)

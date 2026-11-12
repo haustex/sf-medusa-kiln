@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 
-import { categoryPath, listPosts, pagePath, type BlogArticle } from "@lib/data/blog"
+import { authorName, categoryPath, listPosts, pagePath, type BlogArticle } from "@lib/data/blog"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { brandShareImage, ogBase } from "@lib/og/share"
 import { blogShareImage } from "@lib/seo/blog"
@@ -39,7 +39,7 @@ export async function articleMetadata(countryCode: string, post: BlogArticle): P
   return {
     title: post.seo_title,
     description: post.seo_description,
-    authors: [{ name: post.author || STORE_NAME }],
+    authors: [{ name: authorName(post) }],
     alternates: { canonical: url, languages: marketAlternates(origin, path), types: feed(origin, countryCode) },
     openGraph: {
       ...ogBase(countryCode),
@@ -49,7 +49,7 @@ export async function articleMetadata(countryCode: string, post: BlogArticle): P
       url,
       publishedTime: post.published_at,
       modifiedTime: post.updated_at || post.published_at,
-      authors: [post.author || STORE_NAME],
+      authors: [authorName(post)],
       ...(post.category ? { section: post.category.name } : {}),
       // tags are written once, in Indonesian: only the Indonesian page carries them
       ...(post.tags.length && countryCode !== "us" ? { tags: post.tags } : {}),

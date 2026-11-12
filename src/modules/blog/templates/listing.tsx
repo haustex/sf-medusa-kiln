@@ -29,7 +29,15 @@ export default async function BlogListing({ countryCode, category, page = 1 }: {
   const title = data.category?.name ?? t.blog.title
   const intro = data.category ? data.category.description : t.blog.intro
   const empty = !featured && !posts.length
-
+  const chips = categories.length > 0 && (
+    <CategoryChips
+      label={t.blog.filter}
+      items={[
+        { label: t.blog.all, href: href("/blog"), active: !category },
+        ...categories.map((c) => ({ label: c.name, href: href(categoryPath(c.slug)), active: c.slug === category })),
+      ]}
+    />
+  )
 
   return (
     <Page>
@@ -42,26 +50,22 @@ export default async function BlogListing({ countryCode, category, page = 1 }: {
       />
       <JsonLd data={blogItemList(origin, countryCode, [...(featured ? [featured] : []), ...posts])} />
 
-      <Stack gap="md" className="content-container">
-        <Stack gap="section-head">
-          <Stack gap="xs">
-            <h1 className="type-section">{title}</h1>
-            {intro && <p className="max-w-2xl text-muted">{intro}</p>}
-          </Stack>
-          {categories.length > 0 && (
-            <CategoryChips
-              label={t.blog.filter}
-              items={[
-                { label: t.blog.all, href: href("/blog"), active: !category },
-                ...categories.map((c) => ({ label: c.name, href: href(categoryPath(c.slug)), active: c.slug === category })),
-              ]}
-            />
-          )}
-        </Stack>
-      </Stack>
+      {/* "Blog // Stories from the workshop…": title and intro on one line (the intro wraps under it on phones) */}
+      <div className="content-container flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h1 className="type-h1">{title}</h1>
+        {intro && (
+          <>
+            <span aria-hidden="true" className="type-h1 font-normal text-muted/50">
+              {"//"}
+            </span>
+            <p className="text-lg text-muted sm:text-xl">{intro}</p>
+          </>
+        )}
+      </div>
 
       {empty && (
         <div className="content-container flex flex-col items-start gap-stack-md">
+          {chips}
           <p className="text-muted">{category ? t.blog.emptyCategory : t.blog.empty}</p>
           <ButtonLink href={href("/store")} variant="secondary">
             {t.blog.emptyCta}
@@ -77,6 +81,8 @@ export default async function BlogListing({ countryCode, category, page = 1 }: {
 
       {posts.length > 0 && (
         <section className="content-container flex flex-col gap-section-head" aria-labelledby={featured ? "latest-title" : undefined} aria-label={featured ? undefined : title}>
+          {/* Category chips sit between the featured article and the grid (above the grid when there is no featured one) */}
+          {chips}
           {featured && (
             <h2 id="latest-title" className="type-heading">
               {t.blog.latest}

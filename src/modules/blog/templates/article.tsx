@@ -1,7 +1,7 @@
-import { categoryPath, postPath, toPostCard, type BlogArticle, type BlogCard } from "@lib/data/blog"
+import { authorName, categoryPath, postPath, toPostCard, type BlogArticle, type BlogCard } from "@lib/data/blog"
 import { listProducts } from "@lib/data/products"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
-import { blogPosting } from "@lib/seo/blog"
+import { blogPosting, blogShareImage } from "@lib/seo/blog"
 import { breadcrumbList, faqPage, JsonLd } from "@lib/seo/jsonld"
 import { isHiddenProduct } from "@lib/util/hidden-products"
 import { marketPath } from "@lib/util/market"
@@ -11,8 +11,9 @@ import { getSiteOrigin } from "@lib/util/site"
 import { EyebrowLink, Page, ProductCard, type ProductCardData, ProductGrid, SectionHeader, Stack } from "@modules/ds"
 
 import "../blog.css"
+import AuthorBox from "../components/author-box"
 import PostBody from "../components/post-body"
-import PostCard, { PostGrid, PostMeta } from "../components/post-card"
+import PostCard, { PostGrid } from "../components/post-card"
 import PostCover from "../components/post-cover"
 import ShareButtons from "../components/share"
 import Toc from "../components/toc"
@@ -58,6 +59,9 @@ export default async function ArticleTemplate({
   const updated = formatPostDate(post.updated_at || post.published_at, lang, "long")
   const showUpdated = updated !== card.dateLabel && new Date(post.updated_at) > new Date(post.published_at)
   const updatedText = t.blog.updated.split("{date}")
+  const publishedBy = t.blog.publishedBy.split("{name}")
+  // Pinterest pins the cover itself (the wide one when there is one); the share card otherwise
+  const share = { url, title: post.title, image: post.cover_wide || post.cover || blogShareImage(origin, countryCode, post).url, labels: t.blog.share }
 
   return (
     <Page>
@@ -91,7 +95,22 @@ export default async function ArticleTemplate({
             </Stack>
             {post.excerpt && <p className="text-lg leading-relaxed text-muted sm:text-xl">{post.excerpt}</p>}
             <div className="flex flex-col gap-stack-xs">
-              <PostMeta post={card} author={post.author} />
+              {/* "12 November 2026 • 1 min read | Published by Tilde Goods" (wraps at the bar on narrow screens) */}
+              <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted" data-testid="post-meta">
+                <span className="flex items-center gap-x-2 whitespace-nowrap">
+                  <time dateTime={post.published_at}>{card.dateLabel}</time>
+                  <span aria-hidden="true">•</span>
+                  <span>{card.readingTime}</span>
+                </span>
+                <span aria-hidden="true" className="text-separator max-sm:hidden">
+                  |
+                </span>
+                <span className="whitespace-nowrap max-sm:basis-full">
+                  {publishedBy[0]}
+                  <span className="font-medium text-foreground">{authorName(post)}</span>
+                  {publishedBy[1]}
+                </span>
+              </p>
               {showUpdated && (
                 <p className="text-sm text-muted">
                   {updatedText[0]}
@@ -118,9 +137,14 @@ export default async function ArticleTemplate({
         <div className="blog-layout">
           <Toc items={post.toc} title={t.blog.toc} />
           <PostBody blocks={post.blocks} products={cards} labels={{ viewProduct: t.blog.viewProduct, playVideo: t.blog.playVideo, videoTitle: t.blog.videoTitle }} />
-          <footer>
-            <ShareButtons url={url} title={post.title} labels={t.blog.share} />
+          <footer className="flex flex-col gap-section-head">
+            <ShareButtons {...share} />
+            <AuthorBox author={post.author} origin={origin} lang={lang} labels={t.blog} />
           </footer>
+          {/* xl: the same buttons as a sticky rail in the right margin */}
+          <aside className="blog-share-rail">
+            <ShareButtons {...share} orientation="column" />
+          </aside>
         </div>
       </article>
 

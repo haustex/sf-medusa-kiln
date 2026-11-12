@@ -45,4 +45,10 @@ for (const [name, shape, bg, ink] of DEMO_IMAGES) {
   const jpg = await sharp(Buffer.from(svg)).jpeg({ quality: 84, mozjpeg: true, progressive: true }).toBuffer()
   writeFileSync(join(out, `${name}.jpg`), jpg)
 }
-console.log(`${DEMO_IMAGES.length} images → ${out}`)
+// Demo author photo: a flat portrait silhouette (no real person), 400×400
+{
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="${BG[1]}"/>
+    <circle cx="200" cy="150" r="70" fill="${INK[1]}"/><path d="M60 400 c0 -110 70 -170 140 -170 c70 0 140 60 140 170z" fill="${INK[1]}"/></svg>`
+  writeFileSync(join(out, "author-nadia.jpg"), await sharp(Buffer.from(svg)).jpeg({ quality: 84, mozjpeg: true }).toBuffer())
+}
+console.log(`${DEMO_IMAGES.length + 1} images → ${out}`)

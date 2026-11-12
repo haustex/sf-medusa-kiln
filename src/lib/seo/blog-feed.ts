@@ -30,7 +30,7 @@ export async function blogFeed(countryCode: string, origin: string) {
 <link>${x(url)}</link>
 <guid isPermaLink="true">${x(url)}</guid>
 <pubDate>${new Date(p.published_at).toUTCString()}</pubDate>
-<dc:creator>${x(p.author || ORG.name)}</dc:creator>
+<dc:creator>${x(p.author?.name || ORG.name)}</dc:creator>
 ${p.category ? `<category>${x(p.category[`name_${lang}`])}</category>\n` : ""}<description>${x(p[`excerpt_${lang}`])}</description>
 ${cover ? `<media:content url="${x(imageJpeg(origin, cover, 1080))}" medium="image" type="image/jpeg" />\n` : ""}</item>`
   })
