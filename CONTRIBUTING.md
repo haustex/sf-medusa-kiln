@@ -104,6 +104,8 @@ cd ~/themes/kiln && MEDUSA_ADMIN_EMAIL=admin@kiln.test MEDUSA_ADMIN_PASSWORD=kil
 ```
 
 With the admin credentials the script enables the provider on the region itself when it is missing.
+Without a system Chrome, run it through whatever launcher sets `PUPPETEER_CACHE_DIR` (and `LD_LIBRARY_PATH`)
+for that puppeteer install: `<launcher> node ~/themes/kiln/scripts/e2e/checkout-stripe.mjs …`.
 
 ## Optional integrations off
 
