@@ -18,7 +18,7 @@ export default async function Footer({ countryCode }: { countryCode: string }) {
   const topLevel = categories.filter((c) => !c.parent_category_id).slice(0, 6)
 
   return (
-    <footer className="mt-section border-t border-separator bg-surface">
+    <footer className="mt-section bg-surface">
       <div className="content-container grid gap-x-gutter gap-y-section py-section sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="flex flex-col gap-stack-md">
           <LocalizedClientLink prefetch={false} href="/" aria-label={config.brand.name} className="w-fit">
@@ -63,7 +63,7 @@ export default async function Footer({ countryCode }: { countryCode: string }) {
         ))}
       </div>
 
-      <div className="border-t border-separator">
+      <div>
         <div className="content-container flex flex-col gap-stack-sm py-stack-lg text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {config.brand.name}

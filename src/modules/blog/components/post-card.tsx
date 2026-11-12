@@ -27,7 +27,8 @@ export function PostMeta({ post, author, className }: { post: PostCardData; auth
 }
 
 /**
- * Blog card: 1:1 cover (radius lg), category, title, date + reading time. Same hover as the product card
+ * Blog card: 1:1 cover (radius lg), category, title, date + reading time; variant "journal" (home page): 4:3 cover,
+ * category, title, a two-line excerpt and the date. Same hover as the product card
  * (.hk-card in globals.css: lifts 3px with a soft shadow, nothing with reduced motion). The whole card is one link,
  * so the category is text here; the category chips above the grid are the links.
  */
@@ -36,14 +37,17 @@ export default function PostCard({
   priority,
   sizes = "(min-width: 768px) 33vw, 50vw",
   as: Heading = "h3",
+  variant = "default",
   className,
 }: {
   post: PostCardData
   priority?: boolean
   sizes?: string
   as?: "h2" | "h3"
+  variant?: "default" | "journal"
   className?: string
 }) {
+  const journal = variant === "journal"
   return (
     <Link
       href={post.href}
@@ -52,11 +56,18 @@ export default function PostCard({
         className
       )}
     >
-      <PostCover slug={post.href.split("/").pop() ?? ""} src={post.cover} alt="" priority={priority} sizes={sizes} className="card-media" />
+      <PostCover slug={post.href.split("/").pop() ?? ""} src={post.cover} alt="" shape={journal ? "wide" : "square"} priority={priority} sizes={sizes} className="card-media" />
       <div className="flex flex-col gap-stack-xs px-0.5">
         {post.category && <p className="type-eyebrow">{post.category}</p>}
         <Heading className="line-clamp-3 text-base font-semibold leading-snug tracking-[-0.01em] text-foreground sm:text-lg">{post.title}</Heading>
-        <PostMeta post={post} className="text-xs sm:text-sm" />
+        {journal && post.excerpt && <p className="line-clamp-2 text-sm text-muted">{post.excerpt}</p>}
+        {journal ? (
+          <p className="text-xs text-muted sm:text-sm">
+            <time dateTime={post.publishedAt}>{post.dateLabel}</time>
+          </p>
+        ) : (
+          <PostMeta post={post} className="text-xs sm:text-sm" />
+        )}
       </div>
     </Link>
   )

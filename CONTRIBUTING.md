@@ -64,6 +64,20 @@ mv ~/themes/kiln/.next/dev/cache/fetch-cache ~/themes/kiln/.trash/fetch-cache-$(
 
 then run the storefront start command again.
 
+## Demo content
+
+The catalogue comes from `seed/seed-kiln.ts` (see its header). Two more generators:
+
+```bash
+export PATH=~/.local/lib/node/bin:$PATH
+cd ~/themes/kiln
+node seed/demo-hero.mjs    # hero banners → public/hero (theme.config.ts hero.slides)
+node seed/seed-blog.mjs    # 4 demo articles into medusa-blog-seo via the Admin API (needs the backend up)
+```
+
+`seed-blog.mjs` reads `MEDUSA_BACKEND_URL`, `MEDUSA_ADMIN_EMAIL`, `MEDUSA_ADMIN_PASSWORD` (defaults: the dev backend above)
+and skips articles that already exist.
+
 ## Checks before a commit
 
 ```bash

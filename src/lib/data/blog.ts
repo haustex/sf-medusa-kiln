@@ -6,13 +6,17 @@ import { formatPostDate, readingTimeLabel } from "@modules/blog/format"
 import type { PostCardData, TocItem } from "@modules/blog/types"
 
 /**
- * Blog data from the backend's blog module (/store/blog/…). One language per response, chosen by the market
+ * Blog data from medusa-blog-seo (/store/blog-seo/…). One language per response, chosen by the market
  * (Indonesia = id, United States = en); article bodies arrive as blocks, so nothing is parsed here.
  * Cached like the catalogue (force-cache) and tagged "blog": the backend calls /api/revalidate on every public
  * change, and the pages themselves re-render every 60 s.
  */
 export const BLOG_TAG = "blog"
 export const BLOG_PAGE_SIZE = 12
+/** Store routes of medusa-blog-seo */
+const BASE = "/store/blog-seo"
+/** Articles with this tag are the home page's editor's picks */
+export const PICKS_TAG = "pilihan"
 
 export type Lang = "id" | "en"
 export const blogLang = (countryCode: string): Lang => (getMarket(countryCode).htmlLang === "en" ? "en" : "id")
@@ -74,7 +78,7 @@ export async function listPosts(countryCode: string, opts: { page?: number; cate
   const limit = opts.limit ?? BLOG_PAGE_SIZE
   const page = Math.max(opts.page ?? 1, 1)
   try {
-    const res = await sdk.client.fetch<{ posts: BlogCard[]; featured: BlogCard | null; category: BlogCategory | null; count: number }>("/store/blog/posts", {
+    const res = await sdk.client.fetch<{ posts: BlogCard[]; featured: BlogCard | null; category: BlogCategory | null; count: number }>(`${BASE}/posts`, {
       query: { locale: blogLang(countryCode), limit, offset: (page - 1) * limit, ...(opts.category ? { category: opts.category } : {}) },
       ...cached,
     })
@@ -87,7 +91,7 @@ export async function listPosts(countryCode: string, opts: { page?: number; cate
 
 export async function getPost(countryCode: string, slug: string) {
   try {
-    return await sdk.client.fetch<{ post: BlogArticle; more: { same_category: boolean; posts: BlogCard[] } }>(`/store/blog/posts/${encodeURIComponent(slug)}`, {
+    return await sdk.client.fetch<{ post: BlogArticle; more: { same_category: boolean; posts: BlogCard[] } }>(`${BASE}/posts/${encodeURIComponent(slug)}`, {
       query: { locale: blogLang(countryCode) },
       ...cached,
     })
@@ -101,7 +105,7 @@ export async function getPost(countryCode: string, slug: string) {
 export async function getPreview(countryCode: string, token: string) {
   try {
     return await sdk.client.fetch<{ post: BlogArticle & { status: string }; more: { same_category: boolean; posts: BlogCard[] } }>(
-      `/store/blog/preview/${encodeURIComponent(token)}`,
+      `${BASE}/preview/${encodeURIComponent(token)}`,
       { query: { locale: blogLang(countryCode) }, cache: "no-store" }
     )
   } catch (e) {
@@ -110,15 +114,33 @@ export async function getPreview(countryCode: string, token: string) {
   }
 }
 
+/**
+ * Home page picks: up to `n` articles tagged {@link PICKS_TAG}, topped up with the newest ones. Empty (never an
+ * error) when the plugin is not installed (404), the backend is unreachable or nothing is published.
+ */
+export async function listJournalPicks(countryCode: string, n = 3): Promise<BlogCard[]> {
+  const query = { locale: blogLang(countryCode), featured: "none", limit: n }
+  const fetchCards = (extra: Record<string, string>) => sdk.client.fetch<{ posts: BlogCard[] }>(`${BASE}/posts`, { query: { ...query, ...extra }, ...cached }).then((r) => r.posts)
+  try {
+    const picks = await fetchCards({ tag: PICKS_TAG })
+    if (picks.length >= n) return picks.slice(0, n)
+    const latest = await fetchCards({})
+    const seen = new Set(picks.map((p) => p.id))
+    return [...picks, ...latest.filter((p) => !seen.has(p.id))].slice(0, n)
+  } catch {
+    return []
+  }
+}
+
 /** Categories that have at least one public article */
 export const listBlogCategories = (countryCode: string) =>
   sdk.client
-    .fetch<{ categories: BlogCategory[] }>("/store/blog/categories", { query: { locale: blogLang(countryCode) }, ...cached })
+    .fetch<{ categories: BlogCategory[] }>(`${BASE}/categories`, { query: { locale: blogLang(countryCode) }, ...cached })
     .then((r) => r.categories)
 
 /** Every public article in both languages (sitemap, RSS, llms.txt) */
 export const listPostIndex = () =>
-  sdk.client.fetch<{ posts: BlogIndexRow[] }>("/store/blog/posts", { query: { view: "index" }, ...cached }).then((r) => r.posts)
+  sdk.client.fetch<{ posts: BlogIndexRow[] }>(`${BASE}/posts`, { query: { view: "index" }, ...cached }).then((r) => r.posts)
 
 export const postPath = (slug: string) => `/blog/${slug}`
 export const categoryPath = (slug: string) => `/blog/kategori/${slug}`

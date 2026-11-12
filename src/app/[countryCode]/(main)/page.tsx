@@ -10,13 +10,18 @@ import { JsonLd } from "@lib/seo/jsonld"
 import { getMarket, marketAlternates, marketPath } from "@lib/util/market"
 import { getSiteOrigin } from "@lib/util/site"
 import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
-import { CategoryTile, Page, ProductGrid, Section } from "@modules/ds"
+import { Page, ProductGrid, Section } from "@modules/ds"
 import CatalogCard from "@modules/products/components/catalog-card"
+import CategoryCard from "@modules/home/components/category-card"
 import Hero from "@modules/home/components/hero"
+import Journal from "@modules/home/components/journal"
 import ValueProps from "@modules/home/components/value-props"
 
 export const dynamic = "force-static"
 export const revalidate = 60
+
+/** Top-level categories shown as cards (4 per row from lg) */
+const CATEGORY_CARDS = 8
 
 export async function generateMetadata(props: { params: Promise<{ countryCode: string }> }): Promise<Metadata> {
   const { countryCode } = await props.params
@@ -29,6 +34,15 @@ export async function generateMetadata(props: { params: Promise<{ countryCode: s
   }
 }
 
+/**
+ * The two newest products of a category, as thumbnail URLs (the category cards). Fetched at render time like the
+ * rest of the page, so the cards follow the catalogue within the page's revalidation (60 s).
+ */
+const newestThumbnails = (countryCode: string, categoryId: string) =>
+  listProducts({ countryCode, queryParams: { category_id: [categoryId], limit: 2, order: "-created_at", fields: "id,handle,thumbnail,title" } })
+    .then(({ response }) => response.products.map((p) => p.thumbnail).filter((u): u is string => !!u))
+    .catch(() => [] as string[])
+
 export default async function Home(props: { params: Promise<{ countryCode: string }> }) {
   const { countryCode } = await props.params
   const t = getDictionary(countryCode)
@@ -39,7 +53,16 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
     listCategories({ fields: "id,name,handle,rank,parent_category_id,metadata", limit: 20 }, countryCode).catch(() => []),
   ])
   const products = response.products.map((p) => toProductCard(p, countryCode))
-  const topCategories = categories.filter((c) => !c.parent_category_id).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).slice(0, 6)
+  const topCategories = categories.filter((c) => !c.parent_category_id).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).slice(0, CATEGORY_CARDS)
+  const thumbnails = await Promise.all(topCategories.map((c) => newestThumbnails(countryCode, c.id)))
+  // two newest products; one product = one photo; none = the category's own image (metadata.image); nothing = no card
+  const categoryCards = topCategories
+    .map((c, i) => {
+      const own = typeof c.metadata?.image === "string" ? c.metadata.image : null
+      const images = thumbnails[i].length ? thumbnails[i].slice(0, 2) : own ? [own] : []
+      return { id: c.id, href: href(`/categories/${c.handle}`), label: c.name, images }
+    })
+    .filter((c) => c.images.length > 0)
 
   const origin = await getSiteOrigin()
   const structuredData = [organizationSchema(origin, countryCode), websiteSchema(origin, countryCode)]
@@ -47,14 +70,15 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
   return (
     <Page>
       <JsonLd data={structuredData} />
-      <Hero t={t.home} shopHref={href("/store")} secondaryHref={href(config.brand.navLinks[0]?.href ?? "/store")} />
+      <Hero countryCode={countryCode} t={t.home} shopHref={href("/store")} secondaryHref={href(config.brand.navLinks[0]?.href ?? "/store")} />
 
-      {topCategories.length > 0 && (
+      {categoryCards.length > 0 && (
         <Section id="categories" title={t.home.categoriesTitle} titleHref={href("/store")}>
-          <ul className="grid grid-cols-2 gap-gutter sm:grid-cols-3 lg:grid-cols-6">
-            {topCategories.map((c) => (
-              <li key={c.id}>
-                <CategoryTile href={href(`/categories/${c.handle}`)} label={c.name} image={typeof c.metadata?.image === "string" ? c.metadata.image : undefined} />
+          {/* phones: a swipeable rail (1.3 cards visible); from sm a grid of 2, from lg of 4 */}
+          <ul className="no-scrollbar -mx-container-x flex snap-x snap-mandatory gap-gutter overflow-x-auto scroll-px-container-x px-container-x sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+            {categoryCards.map((c) => (
+              <li key={c.id} className="w-[76%] shrink-0 snap-start sm:w-auto">
+                <CategoryCard href={c.href} label={c.label} images={c.images} />
               </li>
             ))}
           </ul>
@@ -64,14 +88,16 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
       {products.length > 0 && (
         <Section id="featured" title={t.home.featuredTitle} titleHref={href("/store")} description={t.home.featuredDescription}>
           <ProductGrid>
-            {products.map((p, i) => (
-              <CatalogCard key={p.href} product={p} countryCode={countryCode} priority={i < 4} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />
+            {products.map((p) => (
+              <CatalogCard key={p.href} product={p} countryCode={countryCode} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />
             ))}
           </ProductGrid>
         </Section>
       )}
 
       <ValueProps t={t.home} />
+
+      <Journal countryCode={countryCode} t={t.home} href={href(config.blogPath)} />
     </Page>
   )
 }

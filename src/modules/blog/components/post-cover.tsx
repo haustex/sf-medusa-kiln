@@ -7,6 +7,7 @@ import ImagePreload from "@modules/ds/image-preload"
 /**
  * Blog cover. The box has a fixed aspect ratio (no layout shift), the photo fills it.
  *   square:  1:1 everywhere (cards)
+ *   wide:    4:3 everywhere (home page journal cards)
  *   feature: 1:1 on phones, 4:3 from lg (featured article on /blog)
  *   article: 1:1 on phones, 1200:630 from sm, using the wide cover when there is one
  * Backend files go through /img (AVIF / WebP / JPEG, responsive widths), like product photos, named after the
@@ -14,6 +15,7 @@ import ImagePreload from "@modules/ds/image-preload"
  */
 const SHAPES = {
   square: "aspect-square",
+  wide: "aspect-[4/3]",
   feature: "aspect-square lg:aspect-[4/3]",
   article: "aspect-square sm:aspect-[1200/630]",
 } as const

@@ -16,8 +16,8 @@ type ImagePreloadOptions = PreloadOptions & { media?: string }
  * high priority (docs/keputusan.md "Preload gambar LCP"). From a client component React's SSR puts exactly one link
  * in <head>; a prefetch does not render it.
  */
-export default function ImagePreload({ href, srcSet, sizes, media }: { href: string; srcSet: string; sizes: string; media?: string }) {
-  const options: ImagePreloadOptions = { as: "image", type: "image/avif", fetchPriority: "high", imageSrcSet: srcSet, imageSizes: sizes, ...(media ? { media } : {}) }
+export default function ImagePreload({ href, srcSet, sizes, media, type = "image/avif" }: { href: string; srcSet: string; sizes: string; media?: string; /** MIME type of the file (default AVIF: only browsers that take it preload) */ type?: string }) {
+  const options: ImagePreloadOptions = { as: "image", type, fetchPriority: "high", imageSrcSet: srcSet, imageSizes: sizes, ...(media ? { media } : {}) }
   preload(href, options)
   return null
 }

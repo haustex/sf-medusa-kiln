@@ -467,9 +467,6 @@ input[type="radio"] {
   .site-header[data-collapsed] .header-secondary {
     transform: translateY(-100%);
   }
-  .site-header[data-collapsed] .header-top {
-    border-bottom-color: var(--separator);
-  }
 }
 @media (max-width: 767.98px) and (prefers-reduced-motion: reduce) {
   .header-secondary {

@@ -25,7 +25,7 @@ import { ICON } from "@modules/ds/icons"
  * account + cart right; category row below from md. Server-rendered static HTML; the counts (cart, wishlist) and the
  * two menus are the only JS.
  *
- * Frost surface (white alpha + blur, hairline; text Ink only). Sticky from md at a negative top, so its extra top
+ * Frost surface (white alpha + blur, no hairline: the blocks are separated by spacing only; text Ink only). Sticky from md at a negative top, so its extra top
  * padding (--header-tuck) scrolls away: it gets a little smaller without moving the page (CLS 0). A paint-only
  * shadow follows the scroll (.site-header in globals.css).
  *
@@ -56,9 +56,9 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
     <div aria-hidden="true" className="h-[108px] sm:h-[116px] md:hidden" />
     <header
       id="site-header"
-      className="site-header max-md:pointer-events-none max-md:fixed max-md:inset-x-0 max-md:top-0 max-md:z-40 md:sticky md:inset-x-0 md:top-[calc(-1*var(--header-tuck))] md:z-40 md:border-b md:border-separator md:frost"
+      className="site-header max-md:pointer-events-none max-md:fixed max-md:inset-x-0 max-md:top-0 max-md:z-40 md:sticky md:inset-x-0 md:top-[calc(-1*var(--header-tuck))] md:z-40 md:frost"
     >
-      <div className="header-top relative z-10 max-md:pointer-events-auto max-md:border-b max-md:border-transparent max-md:frost">
+      <div className="header-top relative z-10 max-md:pointer-events-auto max-md:frost">
       <div className="content-container grid h-14 grid-cols-[1fr_auto] items-center gap-stack-md sm:h-16 md:h-[calc(4.5rem+var(--header-tuck))] md:pt-[var(--header-tuck)] md:grid-cols-[1fr_minmax(0,640px)_1fr] md:gap-stack-lg">
         <div className="flex items-center gap-1">
           <MobileMenu
@@ -107,7 +107,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
       </div>
       </div>
 
-      <div data-header-secondary className="header-secondary max-md:pointer-events-auto max-md:border-b max-md:border-separator max-md:frost">
+      <div data-header-secondary className="header-secondary max-md:pointer-events-auto max-md:frost">
         <div className="content-container h-[3.25rem] pb-stack-sm md:hidden">{search}</div>
         <div className="hidden md:block">
           <CategoryMenu label={t.nav.menu} items={menuItems} />

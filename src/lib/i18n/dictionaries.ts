@@ -188,6 +188,9 @@ const id = {
     customSecondary: "Lihat furniture",
     productCount: "{n} produk",
     comingSoon: "Segera hadir",
+    slider: { region: "Promo", prev: "Slide sebelumnya", next: "Slide berikutnya", pause: "Jeda putar otomatis", play: "Putar otomatis", goTo: "Ke slide {n}", slideOf: "Slide {n} dari {total}" },
+    journalTitle: "Dari Jurnal",
+    journalAll: "Semua artikel",
   },
   product: {
     home: "Beranda",
@@ -1030,6 +1033,9 @@ const en: Dictionary = {
     customSecondary: "View furniture",
     productCount: "{n} products",
     comingSoon: "Coming soon",
+    slider: { region: "Promotions", prev: "Previous slide", next: "Next slide", pause: "Pause autoplay", play: "Play autoplay", goTo: "Go to slide {n}", slideOf: "Slide {n} of {total}" },
+    journalTitle: "From the Journal",
+    journalAll: "All articles",
   },
   product: {
     home: "Home",

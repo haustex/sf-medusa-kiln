@@ -7,6 +7,22 @@
 /** One string for every language, or one per dictionary code: { en: "Help", id: "Bantuan" } */
 export type Localized = string | Record<string, string>
 
+export type HeroSlideConfig = {
+  /** Stable id (dots, keys) */
+  id: string
+  title: Localized
+  subtitle?: Localized
+  cta: Localized
+  /** Market-relative path ("/store") or absolute URL */
+  href: string
+  /** Desktop (12:5, e.g. 1920×800) and phone (4:5, e.g. 840×1050) images, from /public or any URL */
+  image: { desktop: string; mobile: string }
+  alt?: Localized
+  /** Optional schedule, ISO 8601 (e.g. "2026-12-01" or "2026-12-01T00:00:00+07:00") */
+  start?: string
+  end?: string
+}
+
 export type MarketConfig = {
   /** Medusa region country code (lower case), e.g. "us" */
   countryCode: string
@@ -167,6 +183,46 @@ const config = {
       { en: "Free shipping over $120 · 30-day returns", id: "Gratis ongkir di atas Rp1.500.000 · retur 30 hari" },
       { en: "Custom sizes available on request", id: "Ukuran custom bisa dipesan" },
     ] as Localized[],
+  },
+
+  /**
+   * Home hero: promo banners (Faire-style). Each slide has a desktop and a phone image (fixed ratios 12:5 and 4:5,
+   * so nothing shifts while loading), a title, an optional subtitle and one call to action. `start` / `end`
+   * (ISO dates, optional) schedule a slide. One slide renders as a static banner; several as a slider with dots,
+   * swipe, arrow keys and optional autoplay (ms; false = off; never with prefers-reduced-motion). The components
+   * read slides through src/lib/hero.ts, so a Medusa Admin source can replace this list without touching them.
+   */
+  hero: {
+    autoplay: 6000 as number | false,
+    slides: [
+      {
+        id: "new-season",
+        title: { en: "Objects for the home, made in small batches", id: "Benda rumah yang dibuat dalam jumlah kecil" },
+        subtitle: { en: "Tableware, textiles and lighting from independent makers.", id: "Peralatan makan, tekstil, dan pencahayaan dari pembuat independen." },
+        cta: { en: "Shop now", id: "Belanja sekarang" },
+        href: "/store",
+        image: { desktop: "/hero/new-season-wide.jpg", mobile: "/hero/new-season-tall.jpg" },
+        alt: { en: "Stoneware plates and a linen napkin on an oak table", id: "Piring stoneware dan serbet linen di meja kayu ek" },
+      },
+      {
+        id: "makers",
+        title: { en: "Meet the makers", id: "Kenali pembuatnya" },
+        subtitle: { en: "Four workshops, one promise: every piece ships from the bench that made it.", id: "Empat bengkel, satu janji: setiap barang dikirim dari meja kerja pembuatnya." },
+        cta: { en: "Meet the makers", id: "Lihat pembuat" },
+        href: "/makers",
+        image: { desktop: "/hero/makers-wide.jpg", mobile: "/hero/makers-tall.jpg" },
+        alt: { en: "A turned oak lamp base on a workbench", id: "Kaki lampu kayu ek bubut di meja kerja" },
+      },
+      {
+        id: "textiles",
+        title: { en: "Linen and lambswool for the colder months", id: "Linen dan wol untuk bulan-bulan dingin" },
+        subtitle: { en: "Throws and napkins woven in small runs.", id: "Selimut dan serbet yang ditenun dalam jumlah kecil." },
+        cta: { en: "Shop textiles", id: "Belanja tekstil" },
+        href: "/categories/textiles",
+        image: { desktop: "/hero/textiles-wide.jpg", mobile: "/hero/textiles-tall.jpg" },
+        alt: { en: "A folded wool throw", id: "Selimut wol terlipat" },
+      },
+    ] as HeroSlideConfig[],
   },
 
   /** Blog URL segment when medusa-blog-seo is installed */

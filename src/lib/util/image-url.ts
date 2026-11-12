@@ -44,8 +44,15 @@ function safeDecode(s: string): string | null {
   }
 }
 
+/**
+ * The /img resizer (src/app/img/[...path]/route.ts in Haus Kayu, with its image lookup) is not part of Kiln yet:
+ * until it is, every image is shown as is (the backend's own URL), so nothing points at a route that does not exist.
+ */
+const IMG_ROUTE = false
+
 /** A clean-URL reference for one of our backend's images, else null (external images are shown as is) */
 export function imageRef(kind: ImageKind, name: string, src: string | null | undefined): ImageRef | null {
+  if (!IMG_ROUTE) return null
   const file = staticFile(src)
   return file ? { kind, name, file } : null
 }
