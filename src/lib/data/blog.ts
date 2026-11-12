@@ -89,12 +89,19 @@ export async function listPosts(countryCode: string, opts: { page?: number; cate
   }
 }
 
+export type MorePosts = { same_category: boolean; posts: BlogCard[] }
+
+/** The plugin's `more` is a plain list; "same category" when every one shares the article's category */
+const moreOf = (post: BlogCard, more: BlogCard[] | MorePosts | undefined): MorePosts =>
+  Array.isArray(more) ? { same_category: !!post.category && more.length > 0 && more.every((m) => m.category?.slug === post.category?.slug), posts: more } : (more ?? { same_category: false, posts: [] })
+
 export async function getPost(countryCode: string, slug: string) {
   try {
-    return await sdk.client.fetch<{ post: BlogArticle; more: { same_category: boolean; posts: BlogCard[] } }>(`${BASE}/posts/${encodeURIComponent(slug)}`, {
+    const r = await sdk.client.fetch<{ post: BlogArticle; more: BlogCard[] | MorePosts }>(`${BASE}/posts/${encodeURIComponent(slug)}`, {
       query: { locale: blogLang(countryCode) },
       ...cached,
     })
+    return { post: r.post, more: moreOf(r.post, r.more) }
   } catch (e) {
     if (isNotFound(e)) return null
     throw e
@@ -104,10 +111,8 @@ export async function getPost(countryCode: string, slug: string) {
 /** Any status, by its secret token (Admin's "Pratinjau"). Never cached. */
 export async function getPreview(countryCode: string, token: string) {
   try {
-    return await sdk.client.fetch<{ post: BlogArticle & { status: string }; more: { same_category: boolean; posts: BlogCard[] } }>(
-      `${BASE}/preview/${encodeURIComponent(token)}`,
-      { query: { locale: blogLang(countryCode) }, cache: "no-store" }
-    )
+    const r = await sdk.client.fetch<{ post: BlogArticle & { status: string }; more: BlogCard[] | MorePosts }>(`${BASE}/preview/${encodeURIComponent(token)}`, { query: { locale: blogLang(countryCode) }, cache: "no-store" })
+    return { post: r.post, more: moreOf(r.post, r.more) }
   } catch (e) {
     if (isNotFound(e)) return null
     throw e
