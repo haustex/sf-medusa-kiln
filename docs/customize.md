@@ -264,16 +264,31 @@ Category and preview segments inside the journal are `kategori` and `pratinjau` 
 
 ### Images
 
-Product and article images are served from the backend's own URLs, or from `NEXT_PUBLIC_MEDIA_URL` when your
-File Module uploads to a bucket with a public domain (`medusa-storage-r2` for example). `next/image` optimises
-them on the fly; the hosts it may load from are derived from those two variables in `next.config.js`.
+Product and article photos come from the backend's own URLs, or from `NEXT_PUBLIC_MEDIA_URL` when your File Module
+uploads to a bucket with a public domain (`medusa-storage-r2` for example). `next/image` optimises them on the fly;
+the hosts it may load from are derived from those two variables in `next.config.js`.
+
+With `images.route: true` in theme.config.ts the storefront serves them itself instead, at
+`/img/{products|blog}/{name}-{width}-{hash}.{avif|webp|jpg}` (`src/app/img/[...path]/route.ts`): the name comes
+from the product handle (`{handle}-{n}`, n = the photo's position) or the article slug (`{slug}`, `{slug}-lebar`
+for the wide cover, `{slug}-{n}` for photos in the text), the hash from the file name (a replaced photo gets a new
+URL), and the format is part of the URL, so every CDN caches each one. sharp resizes (320–1600 px) and encodes on
+the server and keeps the result on disk (`IMG_CACHE_DIR`, default `/tmp/kiln-img`); responses are immutable for a
+year. JSON-LD, the image sitemap and the share images use the same JPEG URLs. Which file a URL stands for comes from
+an index built from the store API, published products and, with medusa-blog-seo, the blog index
+(`src/lib/data/image-lookup.ts`), so the backend needs nothing extra: a renamed product or article answers 301 to
+the new name, and the preview of an unpublished article shows its photos through next/image. `images.segments`
+sets the two URL segments (default `products` and `blog`), for shops that keep addresses from before Kiln; the
+`/og/{market}/{segment}/…` share images follow them. On serverless hosts mind the function time limit: encoding a
+large AVIF takes seconds. Off (the default), nothing links to the route and it answers 404.
 
 ### Share images, favicons
 
 `/og/{market}/brand.png`, category and product share images are rendered by `src/app/og/[...path]/route.tsx`
-from the brand name and tagline (`src/lib/og/share.ts`). Favicons and the web manifest are the files in
-`src/app` (`icon.png`, `apple-icon.png`, `favicon.ico`) and `public/site.webmanifest`; the Organization logo in
-JSON-LD is `public/android-chrome-512x512.png`.
+from the brand name and tagline (`src/lib/og/share.ts`). `/brand/wordmark.png` (the logo, black on transparent)
+and `/brand/logo.png` (1200×300 on white) are drawn from `brand.logo` for e-mails, invoices, payment plugins and
+Organization.logo. Favicons and the web manifest are the files in `src/app` (`icon.png`, `apple-icon.png`,
+`favicon.ico`) and `public/site.webmanifest`.
 
 ### Caching and the backend hooks
 

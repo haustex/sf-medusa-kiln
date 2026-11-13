@@ -53,8 +53,8 @@ export type BlogCard = {
 }
 export type BlogBlock =
   | { type: "html"; html: string }
-  /** name: the photo's name in its clean URL (backend lib/image-names.ts); alt: falls back to the title + number */
-  | { type: "image"; src: string; name: string; alt: string; width: number | null; height: number | null; caption: string | null }
+  /** position: 1-based count of the photos in this body (its clean-URL name is {slug}-{position}); alt: falls back to the title + number */
+  | { type: "image"; src: string; position: number; alt: string; width: number | null; height: number | null; caption: string | null }
   | { type: "product"; id: string }
   | { type: "youtube"; id: string }
   | { type: "faq"; items: { q: string; a_html: string; a: string }[] }
@@ -70,21 +70,22 @@ export type BlogArticle = Omit<BlogCard, "author"> & {
   words: number
   text: string
 }
+/** One public article with every readable locale (medusa-blog-seo `view=index`): sitemap, llms.txt, the image index */
 export type BlogIndexRow = {
-  slug: string
-  category: { slug: string; name_id: string; name_en: string } | null
-  author: BlogAuthorRef | null
+  id: string
   published_at: string
   updated_at: string
   cover: string | null
   cover_wide: string | null
-  /** Every photo of the article with its clean-URL name (image sitemap) */
-  images: { src: string; name: string }[]
-  title_id: string
-  title_en: string
-  excerpt_id: string
-  excerpt_en: string
+  author: BlogAuthorRef | null
+  /** Every photo in the article bodies, in order of first appearance (names: lib/util/image-name.ts blogImageNames) */
+  images: { src: string; alt: string }[]
+  /** By locale code: the slug and copy of that language (`translated: false` = the fallback language's) */
+  locales: Record<string, { slug: string; title: string; excerpt: string; translated: boolean; category_slug: string | null; category_name: string | null }>
 }
+
+/** The index row's copy for a market's language, else the first language it has */
+export const indexLocale = (row: BlogIndexRow, countryCode: string) => row.locales[blogLang(countryCode)] ?? Object.values(row.locales)[0]
 
 const cached = { next: { tags: [BLOG_TAG] }, cache: "force-cache" as const }
 const isNotFound = (e: unknown) => (e as { status?: number })?.status === 404

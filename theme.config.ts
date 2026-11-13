@@ -132,6 +132,15 @@ const config = {
    */
   redirects: [] as { from: string; to: string }[],
 
+  /**
+   * Photos. `route: true` serves product and article photos from this storefront at
+   * /img/{products|blog}/{name}-{width}-{hash}.{avif|webp|jpg}: named after the product handle or article slug,
+   * resized and encoded with sharp on the server, cached on disk (IMG_CACHE_DIR) and immutable at the edge; JSON-LD,
+   * the sitemap and the share images use the same files. `false`: next/image on the backend's own URLs.
+   * `segments`: the URL segment of each kind (products, blog), for shops that keep addresses from before Kiln.
+   */
+  images: { route: false as boolean, segments: { product: "products", blog: "blog" } },
+
   /** Colours: white page, ink text, neutral greys. Contrast on white: ink 19.6:1, muted 5.3:1, control 3.5:1. */
   colors: {
     background: "#ffffff",

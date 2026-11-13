@@ -3,7 +3,7 @@ import { HttpTypes } from "@medusajs/types"
 
 import config from "@theme"
 import { getPageText, listPageSlugs } from "@lib/content/pages"
-import { listPostIndex, postPath } from "@lib/data/blog"
+import { listPostIndex, postPath, indexLocale } from "@lib/data/blog"
 import { listCategories } from "@lib/data/categories"
 import { listMakers, listMakerProducts, type Maker } from "@lib/data/makers"
 import { listProducts } from "@lib/data/products"
@@ -112,7 +112,10 @@ async function sections(origin: string, ref: string) {
   }
   if (posts.length) {
     out.push("", "## Journal", "", bullet("Journal", url(config.blogPath)))
-    for (const p of posts) out.push(bullet(p.title_en || p.title_id, url(postPath(p.slug)), p.excerpt_en || p.excerpt_id))
+    for (const p of posts) {
+      const l = indexLocale(p, ref)
+      if (l) out.push(bullet(l.title, url(postPath(l.slug)), l.excerpt))
+    }
   }
   return { out, pages, url }
 }

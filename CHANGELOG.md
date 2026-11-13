@@ -12,6 +12,19 @@ follow [Semantic Versioning](https://semver.org).
 - `text` in theme.config.ts: your own wording on top of the dictionaries, per language, only the keys you change.
 - `redirects` in theme.config.ts: permanent redirects (308) for pre-theme addresses, matched without the market
   prefix and answered in the same market, with `:name` and `:name*` parameters.
+- `images.route` in theme.config.ts: product and article photos served by the storefront at
+  `/img/{products|blog}/{name}-{width}-{hash}.{avif|webp|jpg}` (sharp, disk cache, immutable), named after the
+  handle or slug; the index behind the URLs is built from the store API, no backend route needed. `images.segments`
+  sets the URL segments, also for the `/og` share images.
+- `/brand/wordmark.png` and `/brand/logo.png`, drawn from `brand.logo` (e-mails, invoices, Organization.logo).
+
+### Fixed
+
+- The sitemap and llms.txt read the blog index with fields medusa-blog-seo does not return (`slug`, `title_en`),
+  so every article URL was `/blog/undefined`; they now use the per-language slugs and copy, and the sitemap lists
+  each language's URL as an alternate of the others.
+- Product and article share images (`/og/…/{segment}/…`) looked their photo up on a Haus Kayu-only backend route;
+  they use the store API index now.
 
 ## [0.1.0] — 2026-11-13
 

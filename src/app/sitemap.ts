@@ -1,13 +1,13 @@
-import { marketAlternates, marketPath } from "@lib/util/market"
+import { MARKET_CODES, MARKETS, marketAlternates, marketPath, X_DEFAULT_MARKET } from "@lib/util/market"
 import { sdk } from "@lib/config"
-import { categoryPath, listPostIndex, postPath } from "@lib/data/blog"
+import { type BlogIndexRow, categoryPath, indexLocale, listPostIndex, postPath } from "@lib/data/blog"
 import { feature } from "@lib/features"
 import { listRegions } from "@lib/data/regions"
 import { getSiteOrigin, listCountryCodes } from "@lib/util/site"
 import { SITE_LIVE } from "@lib/util/site-live"
 import type { MetadataRoute } from "next"
 import { isHiddenProduct } from "@lib/util/hidden-products"
-import { productImageName } from "@lib/util/image-name"
+import { productImageName, blogImageNames } from "@lib/util/image-name"
 import { imageJpeg, imageRef } from "@lib/util/image-url"
 
 const STATIC_PATHS = ["", "/store", "/makers", "/shipping", "/returns", "/terms", "/privacy", "/contact", "/about"]
@@ -86,20 +86,56 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     items
       .filter((item) => item.handle)
       .flatMap((item) => entry(`/${prefix}/${item.handle}`, item.updated_at ? new Date(item.updated_at) : undefined, images?.(item)))
-  const postImages = (p: (typeof posts)[number]) =>
-    (p.images ?? []).flatMap((i) => {
-      const ref = imageRef("blog", i.name, i.src)
+  const postImages = (p: BlogIndexRow, slug: string) =>
+    blogImageNames(slug, p).flatMap(({ name, src }) => {
+      const ref = imageRef("blog", name, src)
       return ref ? [imageJpeg(origin, ref)] : []
     })
 
+  // Articles and their categories have a slug per language: one entry per market, each listing every language's URL
+  const localized = (pathFor: (countryCode: string) => string | null, lastModified?: Date, images?: (countryCode: string) => string[]) => {
+    const languages: Record<string, string> = {}
+    for (const code of MARKET_CODES) {
+      const path = pathFor(code)
+      if (path) languages[MARKETS[code].hreflang] = `${origin}${marketPath(code, path)}`
+    }
+    const xDefault = pathFor(X_DEFAULT_MARKET)
+    if (xDefault) languages["x-default"] = `${origin}${marketPath(X_DEFAULT_MARKET, xDefault)}`
+    return markets.flatMap((countryCode) => {
+      const path = pathFor(countryCode)
+      if (!path) return []
+      const imgs = images?.(countryCode)
+      return [{ url: `${origin}${marketPath(countryCode, path)}`, ...(lastModified ? { lastModified } : {}), alternates: { languages }, ...(imgs?.length ? { images: imgs } : {}) }]
+    })
+  }
+
   // Blog listing + category pages carry the date of their newest article
-  const newest = (rows: typeof posts) => (rows.length ? new Date(rows.reduce((max, p) => (p.updated_at > max ? p.updated_at : max), rows[0].updated_at)) : undefined)
-  const blogCategories = Array.from(new Set(posts.flatMap((p) => (p.category ? [p.category.slug] : []))))
+  const newest = (rows: BlogIndexRow[]) => (rows.length ? new Date(rows.reduce((max, p) => (p.updated_at > max ? p.updated_at : max), rows[0].updated_at)) : undefined)
+  // Categories grouped by the slug of the first language (the index has no category id)
+  const byCategory = new Map<string, BlogIndexRow[]>()
+  for (const p of posts) {
+    const key = Object.values(p.locales)[0]?.category_slug
+    if (key) byCategory.set(key, [...(byCategory.get(key) ?? []), p])
+  }
   const blog = posts.length
     ? [
         ...entry("/blog", newest(posts)),
-        ...blogCategories.flatMap((slug) => entry(categoryPath(slug), newest(posts.filter((p) => p.category?.slug === slug)))),
-        ...posts.flatMap((p) => entry(postPath(p.slug), new Date(p.updated_at), postImages(p))),
+        ...Array.from(byCategory.values()).flatMap((group) =>
+          localized((cc) => {
+            const slug = indexLocale(group[0], cc)?.category_slug
+            return slug ? categoryPath(slug) : null
+          }, newest(group))
+        ),
+        ...posts.flatMap((p) =>
+          localized(
+            (cc) => {
+              const slug = indexLocale(p, cc)?.slug
+              return slug ? postPath(slug) : null
+            },
+            new Date(p.updated_at),
+            (cc) => postImages(p, indexLocale(p, cc)?.slug ?? "")
+          )
+        ),
       ]
     : []
 

@@ -1,7 +1,7 @@
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { getMarket } from "@lib/util/market"
 import { imageHash, productImageName, type ImageRef } from "@lib/util/image-name"
-import { imageRef } from "@lib/util/image-url"
+import { imageRef, KIND_SEGMENT } from "@lib/util/image-url"
 import { STORE_NAME } from "@lib/util/site"
 
 /**
@@ -44,7 +44,7 @@ export const categoryShareImage = (origin: string, countryCode: string, handle: 
 
 /** /og/{market}/{kind}/{name}-{hash}.jpg for one of our photos */
 export const photoShareImage = (origin: string, countryCode: string, ref: ImageRef, alt: string) =>
-  img(`${origin}/og/${countryCode}/${ref.kind}/${ref.name}-${imageHash(ref.file)}.jpg`, alt, "image/jpeg")
+  img(`${origin}/og/${countryCode}/${KIND_SEGMENT[ref.kind]}/${ref.name}-${imageHash(ref.file)}.jpg`, alt, "image/jpeg")
 
 /** First product photo when it is one of our backend's files; otherwise the brand image. */
 export const productShareImage = (

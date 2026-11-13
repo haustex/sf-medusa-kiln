@@ -25,6 +25,7 @@ const WIDE = "(min-width: 640px)"
 
 export default function PostCover({
   slug,
+  raw,
   src,
   wideSrc,
   alt,
@@ -35,6 +36,8 @@ export default function PostCover({
 }: {
   /** The article's slug: the photo's name in its URL */
   slug: string
+  /** Show the photo from the backend's own URL (the preview of an unpublished article: not in the /img index) */
+  raw?: boolean
   src?: string | null
   /** Only used by shape "article" */
   wideSrc?: string | null
@@ -55,8 +58,8 @@ export default function PostCover({
   }
   const wide = shape === "article" ? wideSrc : null
   const name = cleanSlug(slug)
-  const file = imageRef("blog", name, src)
-  const wideFile = imageRef("blog", `${name}-lebar`, wide)
+  const file = raw ? null : imageRef("blog", name, src)
+  const wideFile = raw ? null : imageRef("blog", `${name}-lebar`, wide)
   const common = {
     width: 1600,
     height: 1600,

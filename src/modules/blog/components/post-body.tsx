@@ -1,4 +1,5 @@
 import type { BlogBlock } from "@lib/data/blog"
+import { cleanSlug } from "@lib/util/image-name"
 import { imageRef, imageSrcSet, imageUrl } from "@lib/util/image-url"
 import { getImageProps } from "next/image"
 import type { ProductCardData } from "@modules/ds"
@@ -15,9 +16,13 @@ const Plus = () => (
 // The reading column is 680px; phones show the photo edge to edge inside the page padding
 const SIZES = "(min-width: 744px) 680px, calc(100vw - 2rem)"
 
-/** A photo from the article: our backend's file through /img (AVIF / WebP / JPEG); the box is reserved by width/height */
-function Photo({ block }: { block: Extract<BlogBlock, { type: "image" }> }) {
-  const file = imageRef("blog", block.name, block.src)
+/**
+ * A photo from the article: our backend's file through /img (AVIF / WebP / JPEG) named {slug}-{position}, or as is
+ * (`raw`: the preview of an unpublished article, whose photos the /img index does not know); the box is reserved by
+ * width/height.
+ */
+function Photo({ block, slug, raw }: { block: Extract<BlogBlock, { type: "image" }>; slug: string; raw?: boolean }) {
+  const file = raw ? null : imageRef("blog", `${cleanSlug(slug)}-${block.position}`, block.src)
   const size = block.width && block.height ? { width: block.width, height: block.height } : {}
   return (
     <figure>
@@ -46,10 +51,16 @@ function Photo({ block }: { block: Extract<BlogBlock, { type: "image" }> }) {
  */
 export default function PostBody({
   blocks,
+  slug,
+  raw,
   products,
   labels,
 }: {
   blocks: BlogBlock[]
+  /** The article's slug: the photos' names in their URLs */
+  slug: string
+  /** Show the photos from the backend's own URLs (unpublished preview) */
+  raw?: boolean
   /** Product cards by product id, for the market of the page; a product that is missing there is skipped */
   products: Record<string, ProductCardData>
   labels: { viewProduct: string; playVideo: string; videoTitle: string }
@@ -61,7 +72,7 @@ export default function PostBody({
           case "html":
             return <div key={i} className="blog-html" dangerouslySetInnerHTML={{ __html: b.html }} />
           case "image":
-            return <Photo key={i} block={b} />
+            return <Photo key={i} block={b} slug={slug} raw={raw} />
           case "product":
             return products[b.id] ? <ProductEmbed key={i} product={products[b.id]} cta={labels.viewProduct} /> : null
           case "youtube":

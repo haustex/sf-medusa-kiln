@@ -1,5 +1,5 @@
 import "server-only"
-import { listPostIndex } from "@lib/data/blog"
+import { indexLocale, listPostIndex } from "@lib/data/blog"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { cleanSlug } from "@lib/util/image-name"
 import { imageJpeg, imageRef } from "@lib/util/image-url"
@@ -16,22 +16,24 @@ const x = (s: unknown) =>
  */
 export async function blogFeed(countryCode: string, origin: string) {
   const market = getMarket(countryCode)
-  const lang = market.htmlLang === "en" ? "en" : "id"
   const t = getDictionary(countryCode).blog
   const posts = (await listPostIndex()).slice(0, 50)
   const home = `${origin}${marketPath(countryCode, "/blog")}`
   const self = `${origin}${marketPath(countryCode, "/blog/feed.xml")}`
   const newest = posts.reduce((max, p) => (p.updated_at > max ? p.updated_at : max), posts[0]?.updated_at ?? new Date(0).toISOString())
-  const items = posts.map((p) => {
-    const url = `${origin}${marketPath(countryCode, `/blog/${p.slug}`)}`
-    const cover = imageRef("blog", cleanSlug(p.slug), p.cover)
+  const items = posts.flatMap((p) => {
+    // The market's language, else the first language the article has (medusa-blog-seo answers the fallback too)
+    const l = indexLocale(p, countryCode)
+    if (!l) return []
+    const url = `${origin}${marketPath(countryCode, `/blog/${l.slug}`)}`
+    const cover = imageRef("blog", cleanSlug(l.slug), p.cover)
     return `<item>
-<title>${x(p[`title_${lang}`])}</title>
+<title>${x(l.title)}</title>
 <link>${x(url)}</link>
 <guid isPermaLink="true">${x(url)}</guid>
 <pubDate>${new Date(p.published_at).toUTCString()}</pubDate>
 <dc:creator>${x(p.author?.name || ORG.name)}</dc:creator>
-${p.category ? `<category>${x(p.category[`name_${lang}`])}</category>\n` : ""}<description>${x(p[`excerpt_${lang}`])}</description>
+${l.category_name ? `<category>${x(l.category_name)}</category>\n` : ""}<description>${x(l.excerpt)}</description>
 ${cover ? `<media:content url="${x(imageJpeg(origin, cover, 1080))}" medium="image" type="image/jpeg" />\n` : ""}</item>`
   })
   return `<?xml version="1.0" encoding="UTF-8"?>

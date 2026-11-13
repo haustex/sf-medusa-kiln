@@ -139,6 +139,7 @@ export default async function ArticleTemplate({
           {post.cover && (
             <PostCover
               slug={post.slug}
+              raw={preview}
               src={post.cover}
               wideSrc={post.cover_wide}
               alt={post.cover_alt}
@@ -152,10 +153,10 @@ export default async function ArticleTemplate({
 
         <div className="blog-layout">
           <Toc items={post.toc} title={t.blog.toc} />
-          <PostBody blocks={before} products={cards} labels={bodyLabels} />
+          <PostBody blocks={before} slug={post.slug} raw={preview} products={cards} labels={bodyLabels} />
           {/* "From the shop" halfway down (split.ts); after the text when the article is short */}
           <FromTheShop className="blog-shop" title={t.blog.fromShop} products={shop} countryCode={countryCode} />
-          {after.length > 0 && <PostBody blocks={after} products={cards} labels={bodyLabels} />}
+          {after.length > 0 && <PostBody blocks={after} slug={post.slug} raw={preview} products={cards} labels={bodyLabels} />}
           <footer className="flex flex-col gap-section-head">
             <ShareButtons {...share} />
             <AuthorBox author={post.author} origin={origin} lang={lang} labels={t.blog} />

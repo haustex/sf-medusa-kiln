@@ -7,12 +7,13 @@ import { getDictionary } from "@lib/i18n/dictionaries"
 import { INTER_400, INTER_600 } from "@lib/og/inter-fonts"
 import { OG_SIZE } from "@lib/og/share"
 import { imageHash } from "@lib/util/image-name"
+import { KIND_SEGMENT, kindFromSegment } from "@lib/util/image-url"
 import { isMarketCode } from "@lib/util/market"
 import config from "@theme"
 
 /**
  * Share images, see lib/og/share.ts for the layout rules.
- *   GET /og/{id|us}/brand.png · /og/{id|us}/c/{handle…}.png · /og/{id|us}/{produk|blog}/{name}-{hash}.jpg
+ *   GET /og/{id|us}/brand.png · /og/{id|us}/c/{handle…}.png · /og/{id|us}/{products|blog}/{name}-{hash}.jpg
  *   old /og/{id|us}/p/{file}.jpg and /og/{id|us}/w/{file}.jpg -> 301 to the clean URL
  * Only our own categories and photos our backend knows (no remote URLs, no text from the URL is drawn).
  */
@@ -156,7 +157,7 @@ async function wide(entry: ImageEntry) {
   }
 }
 
-const ogPath = (cc: string, e: ImageEntry) => `/og/${cc}/${e.kind}/${e.name}-${imageHash(e.file)}.jpg`
+const ogPath = (cc: string, e: ImageEntry) => `/og/${cc}/${KIND_SEGMENT[e.kind]}/${e.name}-${imageHash(e.file)}.jpg`
 const moved = (req: Request, path: string) =>
   new Response(null, { status: 301, headers: { Location: path + new URL(req.url).search, "Cache-Control": "public, max-age=86400", "Cache-Tag": "og" } })
 
@@ -175,10 +176,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ path: st
   }
 
   // photo: the wide layout for an article's wide cover ({slug}-lebar), the square one for everything else
-  if ((kind === "produk" || kind === "blog") && rest.length === 1) {
+  const photoKind = kind ? kindFromSegment(kind) : null
+  if (photoKind && rest.length === 1) {
     const m = /^([a-z0-9]+(?:-[a-z0-9]+)*)-([0-9a-f]{6})\.jpg$/.exec(rest[0])
     if (!m) return notFound()
-    const found = await resolveImage(kind, m[1], m[2])
+    const found = await resolveImage(photoKind, m[1], m[2])
     if (!found) return brand(cc)
     if (!found.exact) return moved(req, ogPath(cc, found.entry))
     const e = found.entry

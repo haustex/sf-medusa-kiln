@@ -40,3 +40,23 @@ export function productImageName(product: ProductLike, url: string | null | unde
   const n = files.indexOf(url)
   return n >= 0 ? `${slug}-${n + 1}` : slug
 }
+
+/**
+ * Names of an article's photos from a blog index row (medusa-blog-seo `view=index`): the square cover {slug}, the
+ * wide cover {slug}-lebar, then the body photos {slug}-{n} in order of first appearance; a file used twice is named once.
+ */
+export function blogImageNames(slug: string, row: { cover?: string | null; cover_wide?: string | null; images?: { src: string }[] | null }): { name: string; src: string }[] {
+  const s = cleanSlug(slug)
+  const out: { name: string; src: string }[] = []
+  const seen = new Set<string>()
+  let n = 0
+  const add = (src: string | null | undefined, name: () => string) => {
+    if (!src || seen.has(src)) return
+    seen.add(src)
+    out.push({ name: name(), src })
+  }
+  add(row.cover, () => s)
+  add(row.cover_wide, () => `${s}-lebar`)
+  for (const i of row.images ?? []) add(i.src, () => `${s}-${++n}`)
+  return out
+}
