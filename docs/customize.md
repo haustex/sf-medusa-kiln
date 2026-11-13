@@ -307,10 +307,30 @@ refresh within a minute at the origin.
 
 ### Payment providers
 
-`src/modules/checkout/components/payment.tsx` lists the region's providers. Stripe (`pp_stripe_*`) renders the
-Payment Element; the dev provider and any provider that completes on "Place order" work unchanged. A provider
-with its own screen (QR, bank details, redirect) gets a branch there and, if it needs a page after the order, a
-route under `src/app/[countryCode]/(main)`.
+`src/modules/checkout/components/payment.tsx` lists the region's providers (README, "Payments"). Stripe
+(`pp_stripe_*`) renders the Payment Element; the dev provider and any provider that completes on "Place order" work
+unchanged. Two plugins have their screens built in and switch on when the backend registers them:
+
+- **medusa-payment-manual-transfer** (`pp_manual-transfer_manual-transfer`): "Place order" calls
+  `placeManualTransferOrder` (`src/lib/manual-transfer/data.ts`), which completes the cart, fetches the guest upload
+  token and redirects to `/transfer/{order}?token=…`. That page (`src/app/[countryCode]/(main)/transfer/[orderId]`)
+  renders the plugin's own `TransferView` from `src/modules/manual-transfer/core` (a verbatim copy of the package's
+  `src/storefront`, update it from there) styled through `src/modules/manual-transfer/kiln-theme.ts`: change the
+  look there, not in `core`. Proof uploads and the invoice go through `src/app/api/manual-transfer/[orderId]/…`, which
+  adds the buyer's IP and `MANUAL_TRANSFER_PROXY_SECRET` (the plugin's `trustedProxySecret`). Wording comes from the
+  plugin's `labels.ts` (en, id), picked by the market's language. The order page in the account links back to the
+  tokenless page (it needs the customer's session); guests keep the link from the order e-mail. Medusa's order
+  transfer requests (`/order/{id}/transfer/{token}`) have their accept/decline page next to it.
+- **medusa-payment-doit** (`pp_doit_doit`, IDR): `src/modules/checkout/components/doit/` — the method picker (QRIS,
+  virtual accounts with the fee for the cart), the "Pay" button (`selectDoitMethod` in `src/lib/data/doit.ts` creates
+  the payment session) and the waiting panel (QR / VA number, countdown, polling of `/store/doit/carts/:id/payment`;
+  the order is placed when doit.id confirms). `NEXT_PUBLIC_DOIT_REDIRECT_TO_HOSTED=true` sends the buyer to doit.id's
+  hosted page instead. Texts: `doit/labels.ts` (en, id). Without credentials in Admin → Settings → doit.id the option
+  shows "not available right now" and the buyer picks another method.
+
+A provider with its own screen (QR, bank details, redirect) gets a branch in `payment.tsx` the same way and, if it
+needs a page after the order, a route under `src/app/[countryCode]/(main)`. The confirmation page and the account's
+order page (`src/modules/order/parts.tsx`, `OrderMeta`) name the method; add yours to `label()` there.
 
 ### Design system
 

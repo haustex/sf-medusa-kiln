@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { Check } from "lucide-react"
 
+import { retrieveCustomer } from "@lib/data/customer"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { getMarket, marketPath } from "@lib/util/market"
 import { ButtonLink, Page, Stack } from "@modules/ds"
@@ -12,8 +13,10 @@ import { CARD, OrderLines, OrderMeta } from "./parts"
  * Order confirmation: thanks + what happens next, order number and date, the lines, totals, where it ships and
  * how it was paid. One narrow column; the same card style as the cart summary.
  */
-export default function OrderConfirmed({ order, countryCode }: { order: HttpTypes.StoreOrder; countryCode: string }) {
+export default async function OrderConfirmed({ order, countryCode }: { order: HttpTypes.StoreOrder; countryCode: string }) {
   const dict = getDictionary(countryCode)
+  // The transfer-instructions link needs the customer's session (see OrderMeta)
+  const customer = order.customer_id ? await retrieveCustomer().catch(() => null) : null
   const t = dict.order
   const market = getMarket(countryCode)
   const date = new Intl.DateTimeFormat(market.locale, { dateStyle: "long" }).format(new Date(order.created_at))
@@ -42,7 +45,7 @@ export default function OrderConfirmed({ order, countryCode }: { order: HttpType
           </h2>
           <OrderLines order={order} t={t} />
         </section>
-        <OrderMeta order={order} t={t} tc={dict.checkout} />
+        <OrderMeta order={order} t={t} tc={dict.checkout} countryCode={countryCode} transferLink={!!customer && customer.id === order.customer_id} />
         <div>
           <ButtonLink href={marketPath(countryCode, "/store")} variant="secondary">
             {t.continueShopping}

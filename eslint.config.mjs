@@ -27,5 +27,7 @@ export default defineConfig([
     "*.config.js",
     "check-env-variables.js",
     "next-sitemap.js",
+    // Copied verbatim from medusa-payment-manual-transfer (src/storefront): updated by re-copying, not edited here
+    "src/modules/manual-transfer/core/**",
   ]),
 ])

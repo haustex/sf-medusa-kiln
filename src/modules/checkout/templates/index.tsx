@@ -3,7 +3,7 @@ import { HttpTypes } from "@medusajs/types"
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
-import { marketPath } from "@lib/util/market"
+import { getMarket, marketPath } from "@lib/util/market"
 import config from "@theme"
 import { formatPrice } from "@modules/ds/price-tag"
 
@@ -76,6 +76,7 @@ export default async function CheckoutTemplate({ cart, customer, countryCode, st
             providers={paymentProviders ?? []}
             stripeKey={process.env.NEXT_PUBLIC_STRIPE_KEY || null}
             error={error}
+            locale={getMarket(countryCode).htmlLang}
             labels={{ card: t.providers.card, cardHint: t.providers.cardHint, manual: t.providers.manual, manualHint: t.providers.manualHint, stripeMissing: t.stripeMissing, loadingPayment: t.loadingPayment, paymentFailed: t.paymentFailed, errorPayment: t.errorPayment, errorPlaceOrder: t.errorPlaceOrder, placeOrder: t.placeOrder, consent: fill(t.reviewConsent, { brand: config.brand.name }), selectPayment: t.selectPayment }}
           />
         </Step>

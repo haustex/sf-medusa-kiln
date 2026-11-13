@@ -50,7 +50,8 @@ Demo: [kiln.hauskayu.com](https://kiln.hauskayu.com) (Stripe test mode, the data
 - Node 22+, pnpm 10.
 - A Medusa 2.22+ backend with at least one region, a sales channel and a publishable API key. The demo seed
   (`seed/`) creates all of it for a fictional studio, Tilde Goods, in two markets (USD and IDR).
-- Optional: `medusa-reviews-wishlist` ≥ 0.1.2, `medusa-blog-seo` ≥ 0.1.3, Stripe keys, a
+- Optional: `medusa-reviews-wishlist` ≥ 0.1.2, `medusa-blog-seo` ≥ 0.1.3, Stripe keys,
+  `medusa-payment-manual-transfer` ≥ 0.1.4, `medusa-payment-doit` ≥ 0.1.5 (see Payments), a
   `/store/meilisearch/products` route in the backend (see `src/lib/data/search.ts` for the contract).
 
 ## Quick start
@@ -71,8 +72,8 @@ pnpm dev                        # http://localhost:9720
 
 `.env` keys: `NEXT_PUBLIC_MEDUSA_BACKEND_URL` (and `MEDUSA_BACKEND_URL_INTERNAL` when the server reaches Medusa on
 another address), `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL`, optional `NEXT_PUBLIC_MEDIA_URL`,
-`MEILISEARCH_HOST` / `MEILISEARCH_SEARCH_KEY`, `NEXT_PUBLIC_STRIPE_KEY`, `REVALIDATE_SECRET`, `SITE_LIVE`,
-`KILN_FEATURE_*`. Demo articles: `node seed/seed-blog.mjs` once the backend runs with medusa-blog-seo.
+`MEILISEARCH_HOST` / `MEILISEARCH_SEARCH_KEY`, `NEXT_PUBLIC_STRIPE_KEY`, `MANUAL_TRANSFER_PROXY_SECRET`,
+`NEXT_PUBLIC_DOIT_REDIRECT_TO_HOSTED`, `REVALIDATE_SECRET`, `SITE_LIVE`, `KILN_FEATURE_*`. Demo articles: `node seed/seed-blog.mjs` once the backend runs with medusa-blog-seo.
 
 Production: `pnpm build` produces a standalone server (`.next/standalone`, `output: "standalone"`); run it with
 `node .next/standalone/server.js` behind any reverse proxy or CDN. `SITE_LIVE` and `NEXT_PUBLIC_*` are read at
@@ -80,34 +81,45 @@ build time.
 
 ## Payments
 
-Checkout lists the payment providers enabled on the region. Stripe renders its Payment Element inside the option
-and confirms the PaymentIntent on "Place order"; Medusa's `pp_system_default` ("Pay later", for development) and
-any provider that completes with "Place order" alone work as they are. A provider that needs its own screen
-(QR code, bank instructions, redirect) gets a component in `src/modules/checkout/components/payment.tsx` next to
-the Stripe one. Two such plugins by the same author ship their own storefront parts:
-[medusa-payment-doit](https://www.npmjs.com/package/medusa-payment-doit) (QRIS and virtual accounts, Indonesia)
-and [medusa-payment-manual-transfer](https://www.npmjs.com/package/medusa-payment-manual-transfer) (bank transfer
-with a payment page).
+Checkout lists the payment providers enabled on the region; Medusa's `pp_system_default` ("Pay later", for
+development) and any provider that completes with "Place order" alone work as they are. Three providers have their
+own screens built in, each switched on by nothing more than the backend having it:
 
-Stripe in the backend (`medusa-config.ts`):
+| Provider | Backend | In Kiln |
+| --- | --- | --- |
+| **Stripe** (`pp_stripe_*`) | `@medusajs/medusa/payment-stripe`, `STRIPE_API_KEY` | Payment Element inside the option (card, wallets, redirect methods back through `/api/payment-return`); `NEXT_PUBLIC_STRIPE_KEY` in `.env` |
+| **Bank transfer** (`pp_manual-transfer_manual-transfer`) | [medusa-payment-manual-transfer](https://www.npmjs.com/package/medusa-payment-manual-transfer) | "Place order" creates the order and opens `/transfer/{order}?token=…`: bank details, reference, deadline, pro-forma invoice, proof upload (also from the account's order page); set `MANUAL_TRANSFER_PROXY_SECRET` in both `.env` files |
+| **QRIS / Virtual Account** (`pp_doit_doit`, IDR) | [medusa-payment-doit](https://www.npmjs.com/package/medusa-payment-doit) | method picker with fees, then the QR code or VA number with countdown and polling; the order is placed when doit.id confirms. Credentials in Admin → Settings → doit.id |
+
+The plugin texts are in English and Indonesian and follow the market's language. A provider of your own gets a
+branch in `src/modules/checkout/components/payment.tsx` next to these (docs/customize.md, "Payment providers").
+
+Backend side (`medusa-config.ts`), all three together:
 
 ```ts
-{
-  resolve: "@medusajs/medusa/payment",
-  options: {
-    providers: [
-      {
-        resolve: "@medusajs/medusa/payment-stripe",
-        id: "stripe",
-        options: { apiKey: process.env.STRIPE_API_KEY, webhookSecret: process.env.STRIPE_WEBHOOK_SECRET, capture: true },
-      },
-    ],
+plugins: [
+  { resolve: "medusa-payment-manual-transfer", options: { notifications: { paymentUrl: "https://your-store.com/transfer/{order_id}?token={token}" } } },
+  { resolve: "medusa-payment-doit", options: {} },
+],
+modules: [
+  {
+    resolve: "@medusajs/medusa/payment",
+    options: {
+      providers: [
+        { resolve: "@medusajs/medusa/payment-stripe", id: "stripe", options: { apiKey: process.env.STRIPE_API_KEY, webhookSecret: process.env.STRIPE_WEBHOOK_SECRET, capture: true } },
+        { resolve: "medusa-payment-manual-transfer/providers/manual-transfer", id: "manual-transfer", options: { referencePrefix: "MT", deadlineBusinessDays: 3, timezone: "Asia/Jakarta" } },
+        { resolve: "medusa-payment-doit/providers/doit", id: "doit", options: {} },
+      ],
+    },
   },
-}
+]
 ```
 
-Enable the provider on the region in Admin → Settings → Regions, put the publishable key in `NEXT_PUBLIC_STRIPE_KEY`
-and point a Stripe webhook at `<backend>/hooks/payment/stripe_stripe`.
+Then `medusa db:migrate`, enable each provider on its regions (Admin → Settings → Regions, or
+`node seed/enable-payments.mjs` for the demo), a bank account in Settings → Manual transfer, a Stripe webhook at
+`<backend>/hooks/payment/stripe_stripe` and the doit.id webhook at `<backend>/hooks/payment/doit_doit`. Secrets:
+`STRIPE_API_KEY`, `MANUAL_TRANSFER_SECRET`, `MANUAL_TRANSFER_PROXY_SECRET`, `DOIT_ENCRYPTION_KEY` (each plugin's
+README has the details).
 
 ## Folders
 
@@ -115,10 +127,10 @@ and point a Stripe webhook at `<backend>/hooks/payment/stripe_stripe`.
 theme.config.ts        brand, markets, colours, radii, font, features, listing, hero, contact
 src/app/[countryCode]  pages: (main) home, store, categories, collections, products, search, cart, wishlist,
                        blog, account, order, design; (checkout)
-src/app/api            cart, health, payment-return, revalidate, reviews, wishlist
+src/app/api            cart, health, payment-return, manual-transfer (proof/invoice relay), revalidate, reviews, wishlist
 src/app/og             generated share images
 src/modules/ds         the design system (cards, grids, sections, price, stars, sheet, carousel)
-src/modules/*          home, layout, products, store, cart, checkout, account, order, blog, wishlist, brand
+src/modules/*          home, layout, products, store, cart, checkout (+ doit), manual-transfer, account, order, blog, wishlist, brand
 src/lib                data (Medusa SDK), i18n, listing filters, seo, util, features.ts
 src/styles             globals.css (tokens, type scale, utilities), theme.css (HeroUI mapping), fonts
 seed                   demo catalogue, articles and generated images (CC0)

@@ -80,8 +80,13 @@ and skips articles that already exist.
 
 ## Payments
 
-The dev backend has only Medusa's `pp_system_default` provider ("Pay later (test)" at checkout: no payment,
-the order is created). Stripe is wired in and switches on with keys:
+The dev backend (`~/themes/kiln-backend`) registers Medusa's `pp_system_default` ("Pay later (test)": no payment,
+the order is created), `medusa-payment-manual-transfer` and `medusa-payment-doit` (both in `medusa-config.ts`,
+off with `KILN_PLUGINS=none`; secrets `MANUAL_TRANSFER_SECRET`, `MANUAL_TRANSFER_PROXY_SECRET`, `DOIT_ENCRYPTION_KEY`
+in its `.env`, the proxy secret also in the storefront `.env`). `node seed/enable-payments.mjs` enables the two on
+the regions and creates demo bank accounts. Bank transfer is testable end to end (order → `/transfer/…` page →
+proof upload); doit.id has no sandbox key here, so checkout only shows its "not available" state until credentials
+are entered in Admin → Settings → doit.id. Stripe is wired in and switches on with keys:
 
 1. Backend: put `STRIPE_API_KEY=sk_test_…` (and `STRIPE_WEBHOOK_SECRET` once a webhook points at
    `/hooks/payment/stripe_stripe`) in `~/themes/kiln-backend/.env`, restart it, then enable the provider on the

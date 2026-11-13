@@ -8,8 +8,12 @@ import { useEffect, useRef, useState, useTransition } from "react"
 
 import { isManual, isStripeLike } from "@lib/constants"
 import { initiatePaymentSession, placeOrder } from "@lib/data/cart"
+import { placeManualTransferOrder } from "@lib/manual-transfer/data"
 import { Button } from "@modules/common/components/ui"
+import { labelsFor as transferLabels, pickLocale } from "@modules/manual-transfer/core/labels"
+import { isManualTransfer } from "@modules/manual-transfer/core/types"
 
+import { DoitOption, doitLabels, isDoit } from "./doit"
 import Option from "./option"
 
 export type PaymentLabels = {
@@ -38,8 +42,12 @@ const pendingSession = (cart: HttpTypes.StoreCart) => cart.payment_collection?.p
  * redirect methods from the Stripe dashboard) and "Place order" confirms the PaymentIntent, then completes the
  * cart. The dev provider (pp_system_default) completes the cart directly. Address, e-mail and a shipping method
  * must already be on the cart.
+ * Optional plugins, recognised by their provider id (nothing shows without them on the region):
+ *   medusa-payment-manual-transfer  "Place order" completes the cart and continues to /transfer/{orderId}
+ *   medusa-payment-doit             the option holds the method picker and the QR / VA waiting panel (./doit)
+ * `locale`: the market's language, for the plugins' own labels.
  */
-export default function Payment({ cart, providers, stripeKey, error, labels: t }: { cart: HttpTypes.StoreCart; providers: { id: string }[]; stripeKey: string | null; error: string | null; labels: PaymentLabels }) {
+export default function Payment({ cart, providers, stripeKey, error, locale, labels: t }: { cart: HttpTypes.StoreCart; providers: { id: string }[]; stripeKey: string | null; error: string | null; locale: string; labels: PaymentLabels }) {
   const session = pendingSession(cart)
   const [selected, setSelected] = useState<string>(() => session?.provider_id ?? (providers.length === 1 ? providers[0].id : ""))
   const [message, setMessage] = useState<string | null>(error === "payment_failed" ? t.paymentFailed : null)
@@ -58,9 +66,9 @@ export default function Payment({ cart, providers, stripeKey, error, labels: t }
     })
   }
 
-  // One provider and no session yet: open it without a click
+  // One provider and no session yet: open it without a click (not doit: its session carries the chosen method)
   useEffect(() => {
-    if (started.current || session || providers.length !== 1) return
+    if (started.current || session || providers.length !== 1 || isDoit(providers[0].id)) return
     started.current = true
     start(providers[0].id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,12 +76,15 @@ export default function Payment({ cart, providers, stripeKey, error, labels: t }
 
   const choose = (id: string) => {
     setSelected(id)
-    if (session?.provider_id !== id) start(id)
+    if (session?.provider_id !== id && !isDoit(id)) start(id)
   }
 
   const notReady = !cart.shipping_address || !cart.email || !(cart.shipping_methods?.length ?? 0)
   const active = session && session.provider_id === selected ? session : null
-  const label = (id: string) => (isStripeLike(id) ? { title: t.card, hint: t.cardHint } : isManual(id) ? { title: t.manual, hint: t.manualHint } : { title: id, hint: undefined })
+  const mt = transferLabels(pickLocale([locale]))
+  const dt = doitLabels(locale)
+  const label = (id: string) =>
+    isStripeLike(id) ? { title: t.card, hint: t.cardHint } : isManualTransfer(id) ? { title: mt.method, hint: mt.methodHint } : isDoit(id) ? { title: dt.methodTitle, hint: dt.methodHint } : isManual(id) ? { title: t.manual, hint: t.manualHint } : { title: id, hint: undefined }
 
   const stripeOptions: StripeElementsOptions | null =
     active && isStripeLike(active.provider_id) && typeof active.data?.client_secret === "string"
@@ -86,6 +97,7 @@ export default function Payment({ cart, providers, stripeKey, error, labels: t }
         {providers.map((p) => (
           <Option key={p.id} name="payment_provider" value={p.id} checked={selected === p.id} onChange={choose} title={label(p.id).title} hint={label(p.id).hint} testId={`payment-option-${p.id}`}>
             {isStripeLike(p.id) && (!stripeKey ? <p className="text-sm text-danger">{t.stripeMissing}</p> : stripeOptions ? <PaymentElement options={{ layout: "tabs" }} /> : <p className="text-sm text-muted">{t.loadingPayment}</p>)}
+            {isDoit(p.id) && <DoitOption cart={cart} providerId={p.id} notReady={notReady || pending} labels={dt} onError={setMessage} />}
           </Option>
         ))}
       </div>
@@ -96,8 +108,8 @@ export default function Payment({ cart, providers, stripeKey, error, labels: t }
       )}
       {active && isStripeLike(active.provider_id) ? (
         stripeOptions && stripeKey ? <StripePlaceOrder cart={cart} notReady={notReady || pending} labels={t} onError={setMessage} /> : null
-      ) : (
-        <ManualPlaceOrder notReady={notReady || pending || !active} labels={t} onError={setMessage} />
+      ) : isDoit(selected) ? null : (
+        <ManualPlaceOrder notReady={notReady || pending || !active} action={active && isManualTransfer(active.provider_id) ? placeManualTransferOrder : placeOrder} labels={active && isManualTransfer(active.provider_id) ? { ...t, placeOrder: mt.placeOrder } : t} onError={setMessage} />
       )}
       <p className="text-xs text-muted">{t.consent}</p>
     </div>
@@ -168,12 +180,13 @@ function StripePlaceOrder({ cart, notReady, labels: t, onError }: { cart: HttpTy
   )
 }
 
-function ManualPlaceOrder({ notReady, labels: t, onError }: { notReady: boolean; labels: PaymentLabels; onError: (m: string | null) => void }) {
+/** "Place order" for providers that complete on the click: the dev provider, bank transfer (`action` redirects on success) */
+function ManualPlaceOrder({ notReady, action = () => placeOrder(), labels: t, onError }: { notReady: boolean; action?: () => Promise<unknown>; labels: PaymentLabels; onError: (m: string | null) => void }) {
   const [submitting, setSubmitting] = useState(false)
   const submit = async () => {
     setSubmitting(true)
     onError(null)
-    await placeOrder().catch((e) => {
+    await action().catch((e) => {
       unstable_rethrow(e)
       console.error("[checkout] place order", e)
       onError(t.errorPlaceOrder)

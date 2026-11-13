@@ -46,7 +46,7 @@ export default async function OrderDetailPage(props: Props) {
         </h2>
         <OrderLines order={order} t={t} />
       </section>
-      <OrderMeta order={order} t={t} tc={dict.checkout} />
+      <OrderMeta order={order} t={t} tc={dict.checkout} countryCode={countryCode} />
     </Stack>
   )
 }

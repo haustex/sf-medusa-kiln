@@ -17,6 +17,14 @@ follow [Semantic Versioning](https://semver.org).
   handle or slug; the index behind the URLs is built from the store API, no backend route needed. `images.segments`
   sets the URL segments, also for the `/og` share images.
 - `/brand/wordmark.png` and `/brand/logo.png`, drawn from `brand.logo` (e-mails, invoices, Organization.logo).
+- Bank transfer at checkout with [medusa-payment-manual-transfer](https://www.npmjs.com/package/medusa-payment-manual-transfer):
+  "Place order" opens `/transfer/{order}?token=…` (bank details, payment reference, deadline, pro-forma invoice,
+  proof upload) in the plugin's own component restyled with Kiln's tokens; the order page in the account links to
+  it; the order-transfer accept/decline page for Medusa's order transfers. Needs `MANUAL_TRANSFER_PROXY_SECRET`.
+- QRIS and virtual accounts (Indonesia) at checkout with [medusa-payment-doit](https://www.npmjs.com/package/medusa-payment-doit):
+  method picker with fees, QR code / VA number with countdown and status polling, hosted-page option
+  (`NEXT_PUBLIC_DOIT_REDIRECT_TO_HOSTED`). Both switch on when the backend registers the provider and need no
+  config in the theme; `seed/enable-payments.mjs` enables them on the demo backend.
 
 ### Fixed
 

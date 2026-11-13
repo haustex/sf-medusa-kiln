@@ -3,9 +3,14 @@ import { HttpTypes } from "@medusajs/types"
 import { isManual, isStripeLike } from "@lib/constants"
 import { type Dictionary } from "@lib/i18n/dictionaries"
 import { cleanSlug } from "@lib/util/image-name"
+import { getMarket, marketPath } from "@lib/util/market"
+import { doitLabels, isDoit } from "@modules/checkout/components/doit/labels"
+import Link from "@modules/common/components/app-link"
 import CartTotals from "@modules/common/components/cart-totals"
-import { ProductImage } from "@modules/ds"
+import { ArrowRight, ProductImage } from "@modules/ds"
 import { formatPrice } from "@modules/ds/price-tag"
+import { labelsFor as transferLabels, pickLocale } from "@modules/manual-transfer/core/labels"
+import { isManualTransfer } from "@modules/manual-transfer/core/types"
 
 /** Pieces shared by the order confirmation and Account → Orders → order: lines + totals, address/method/payment */
 export const CARD = "flex flex-col gap-stack-lg rounded-media bg-default p-stack-lg"
@@ -53,10 +58,18 @@ function Block({ title, children, testId }: { title: string; children: React.Rea
   )
 }
 
-export function OrderMeta({ order, t, tc }: { order: HttpTypes.StoreOrder; t: Dictionary["order"]; tc: Dictionary["checkout"] }) {
+/**
+ * Shipping address, delivery method and payment of an order. `transferLink`: show the "payment instructions" link of a
+ * bank-transfer order; the tokenless /transfer/{id} page only opens for the logged-in customer who placed it (a guest
+ * keeps the tokened link from the order e-mail, and already landed on that page after checkout).
+ */
+export function OrderMeta({ order, t, tc, countryCode, transferLink = true }: { order: HttpTypes.StoreOrder; t: Dictionary["order"]; tc: Dictionary["checkout"]; countryCode: string; transferLink?: boolean }) {
   const method = order.shipping_methods?.[0]
-  const payment = order.payment_collections?.[0]?.payments?.[0]
-  const paymentLabel = payment ? (isStripeLike(payment.provider_id) ? tc.providers.card : isManual(payment.provider_id) ? tc.providers.manual : payment.provider_id) : null
+  // A bank-transfer order has no payment until the money arrived: the session names the provider
+  const payment = order.payment_collections?.[0]?.payments?.[0] ?? order.payment_collections?.[0]?.payment_sessions?.[0]
+  const lang = getMarket(countryCode).htmlLang
+  const transfer = isManualTransfer(payment?.provider_id) ? transferLabels(pickLocale([lang])) : null
+  const paymentLabel = payment ? (isStripeLike(payment.provider_id) ? tc.providers.card : transfer ? transfer.method : isDoit(payment.provider_id) ? doitLabels(lang).methodTitle : isManual(payment.provider_id) ? tc.providers.manual : payment.provider_id) : null
   return (
     <section className="grid grid-cols-1 gap-stack-lg rounded-media bg-default p-stack-lg sm:grid-cols-3" aria-label={t.fulfillment}>
       <Block title={t.shippingAddress} testId="shipping-address-summary">
@@ -72,6 +85,12 @@ export function OrderMeta({ order, t, tc }: { order: HttpTypes.StoreOrder; t: Di
       <Block title={t.payment} testId="payment-method">
         {paymentLabel && <span>{paymentLabel}</span>}
         {payment && <span className="text-muted tabular-nums">{formatPrice(payment.amount, order.currency_code)}</span>}
+        {transfer && transferLink && (
+          <Link href={marketPath(countryCode, `/transfer/${order.id}`)} prefetch={false} className="inline-flex items-center gap-1 font-medium underline underline-offset-4" data-testid="order-transfer-link">
+            {transfer.instructionsLink}
+            <ArrowRight />
+          </Link>
+        )}
       </Block>
     </section>
   )
