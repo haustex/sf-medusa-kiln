@@ -47,6 +47,8 @@ follow [Semantic Versioning](https://semver.org).
 - `/products/{handle}.md` and the page URL with `Accept: text/markdown` answered 404: the rewrites in next.config.js
   pointed at a route that did not exist. The Markdown page (title, description, specifications, variants with
   prices and stock, FAQ, delivery estimate, information-page links) is in the market's language; llms.txt mentions it.
+- Edge-cache rules (Cache-Tag, Cloudflare TTL) and the no-prefetch list covered the `/us` prefix only; they apply to
+  every market prefix now. A Haus Kayu-only order-claim call that nothing used is gone.
 - A dot in a per-visitor address (`/review/unsubscribe/revreq_….<signature>`) was taken for a file by the proxy and
   answered 404 on the default market.
 - The no-store / noindex / no-referrer headers of the wishlist, review and preview pages applied to `/us/…` only; they

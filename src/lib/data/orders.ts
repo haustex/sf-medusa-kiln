@@ -122,26 +122,3 @@ export const declineTransferRequest = async (id: string, token: string) => {
     .then(({ order }) => ({ success: true, error: null, order }))
     .catch((err) => ({ success: false, error: err.message, order: null }))
 }
-
-/** Claim a guest order: order number + the order's e-mail (backend: /store/hk/order-claims). */
-type ClaimState = {
-  success: boolean
-  error: string | null
-  order: { display_id: number; email: string } | null
-  values?: { display_id: string; email: string }
-}
-export const claimGuestOrder = async (_state: ClaimState, formData: FormData): Promise<ClaimState> => {
-  const display_id = String(formData.get("display_id") ?? "").trim()
-  const email = String(formData.get("email") ?? "").trim()
-  const values = { display_id, email }
-  if (!display_id || !email) return { success: false, error: "missing", order: null, values }
-  const headers = await getAuthHeaders()
-  return sdk.client
-    .fetch<{ order: { display_id: number; email: string } }>("/store/hk/order-claims", {
-      method: "POST",
-      headers,
-      body: { display_id, email },
-    })
-    .then(({ order }) => ({ success: true, error: null, order }))
-    .catch((err: Error) => ({ success: false, error: err.message, order: null, values }))
-}

@@ -17,7 +17,7 @@ import type { ComponentProps } from "react"
  * `prefetch` does not render into the HTML, so deciding it during render on the client (navigator) cannot cause
  * a hydration mismatch.
  */
-const NO_PREFETCH = /^(?:\/us)?\/(?:shipping|returns|privacy|terms|contact|account|lacak|track|search)(?:[/?#]|$)/
+const NO_PREFETCH = /^(?:\/[a-z]{2})?\/(?:shipping|returns|privacy|terms|contact|account|lacak|track|review|transfer|search)(?:[/?#]|$)/
 
 type Connection = { saveData?: boolean; effectiveType?: string }
 

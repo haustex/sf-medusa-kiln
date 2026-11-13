@@ -40,14 +40,14 @@ function edgeCacheHeaders() {
   })
   const info = "(shipping|returns|contact|privacy|terms)"
   return [
-    rule("/", "html,home,home-id"),
-    rule("/us", "html,home,home-us"),
-    rule("/products/:handle([^/.]+)", "html,pdp,product-:handle", NOT_MARKDOWN),
-    rule("/us/products/:handle([^/.]+)", "html,pdp,product-:handle", NOT_MARKDOWN),
-    rule(`/:page${info}`, "html,info"),
-    rule(`/us/:page${info}`, "html,info"),
+    // "" = the default market without prefix, "/:market" = any two-letter market prefix (theme.config.ts markets)
+    ...["", "/:market([a-z]{2})"].flatMap((m) => [
+      rule(m || "/", "html,home"),
+      rule(`${m}/products/:handle([^/.]+)`, "html,pdp,product-:handle", NOT_MARKDOWN),
+      rule(`${m}/:page${info}`, "html,info"),
+    ]),
     // Blog (api/revalidate purges these tags when an article is published or changed)
-    ...["", "/us"].flatMap((m) => [
+    ...["", "/:market([a-z]{2})"].flatMap((m) => [
       rule(`${m}/blog`, "html,blog,blog-list"),
       rule(`${m}/blog/page/:n(\\d+)`, "html,blog,blog-list"),
       rule(`${m}/blog/kategori/:slug([^/.]+)`, "html,blog,blog-list,blog-cat-:slug"),
