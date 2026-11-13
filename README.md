@@ -42,7 +42,7 @@ Demo: [kiln.hauskayu.com](https://kiln.hauskayu.com) (Stripe test mode, the data
   (medusa-blog-seo) and a Meilisearch route are probed once at start; a backend without them gets a storefront
   without hearts, stars or a journal link, and search falls back to Medusa's own.
 - **One config file**: `theme.config.ts` holds the brand, logo, social profiles, markets, colours, radii, frosted
-  surfaces, font, feature switches, listing filters, product notes, hero slides and contact. Every colour and
+  surfaces, font, feature switches, listing filters, product notes, hero slides, contact and analytics. Every colour and
   radius becomes a CSS variable, so the whole look changes without touching a component.
   See [docs/customize.md](docs/customize.md).
 

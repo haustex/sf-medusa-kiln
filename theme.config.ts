@@ -269,6 +269,12 @@ const config = {
 
   /** Pages that show the "ships worldwide" line etc. are plain config, not secrets */
   contact: { email: "hello@example.com", whatsapp: "" },
+
+  /**
+   * Visit statistics. `metricool`: the hash of your Metricool tracker code ("" = off); loaded only when SITE_LIVE is
+   * true and never on checkout, account, order, transfer, review-link or tracking pages. Say so on your privacy page.
+   */
+  analytics: { metricool: "" as string },
 }
 
 export type ThemeConfig = typeof config

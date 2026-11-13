@@ -82,6 +82,7 @@ async function header(origin: string) {
     ...MARKET_CODES.map((c) => `- [${countryName(c)}](${origin}${marketPath(c) || "/"}): ${MARKETS[c].currency.toUpperCase()}, ${languageName(MARKETS[c].dictionary)}${MARKETS[c].prefix ? ` (URLs start with ${MARKETS[c].prefix})` : ""}`),
     "",
     `Every page below exists in each market; the links point at the ${countryName(ref)} version.`,
+    "Every product page is also available as Markdown: append `.md` to its URL, or request it with `Accept: text/markdown`.",
   ]
   return { lines, ref }
 }

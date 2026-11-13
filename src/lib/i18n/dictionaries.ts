@@ -165,6 +165,8 @@ const id = {
     handmade: "Buatan tangan",
     yes: "Ya",
     faqTitle: "Pertanyaan umum",
+    /** The product page as Markdown (/products/{handle}.md, Accept: text/markdown) */
+    markdown: { variants: "Varian", options: "Opsi", price: "Harga", availability: "Ketersediaan", variantId: "ID varian", url: "URL", links: "Tautan", page: "Halaman produk" },
     faq: {
       foodSafeQ: "Apakah aman untuk makanan?",
       foodSafeA:
@@ -976,6 +978,8 @@ const en: Dictionary = {
     handmade: "Handmade",
     yes: "Yes",
     faqTitle: "FAQ",
+    /** The product page as Markdown (/products/{handle}.md, Accept: text/markdown) */
+    markdown: { variants: "Variants", options: "Options", price: "Price", availability: "Availability", variantId: "Variant ID", url: "URL", links: "Links", page: "Product page" },
     faq: {
       foodSafeQ: "Is it food safe?",
       foodSafeA:

@@ -39,9 +39,14 @@ follow [Semantic Versioning](https://semver.org).
   items of the order, one form each, in the market's language; the review form (also in the account) takes up to
   three photos through `/api/reviews/upload`. Opt-out page `/review/unsubscribe/{id}` in the shop's design for the
   e-mail's unsubscribe link (`/api/reviews/unsubscribe`). Both never indexed or cached.
+- `analytics.metricool` in theme.config.ts: Metricool's page-view tracker (no cookies), only with `SITE_LIVE=true`
+  and never on the per-visitor pages.
 
 ### Fixed
 
+- `/products/{handle}.md` and the page URL with `Accept: text/markdown` answered 404: the rewrites in next.config.js
+  pointed at a route that did not exist. The Markdown page (title, description, specifications, variants with
+  prices and stock, FAQ, delivery estimate, information-page links) is in the market's language; llms.txt mentions it.
 - A dot in a per-visitor address (`/review/unsubscribe/revreq_….<signature>`) was taken for a file by the proxy and
   answered 404 on the default market.
 - The no-store / noindex / no-referrer headers of the wishlist, review and preview pages applied to `/us/…` only; they

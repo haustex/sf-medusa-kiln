@@ -6,6 +6,8 @@ import { getBaseURL } from "@lib/util/env"
 import { brandShareImage, ogBase } from "@lib/og/share"
 import { MARKET_CODES, getMarket, isMarketCode } from "@lib/util/market"
 import { SITE_LIVE } from "@lib/util/site-live"
+import { analyticsExclude } from "@modules/analytics/exclude"
+import Metricool from "@modules/analytics/metricool"
 import { inter } from "styles/fonts"
 import "styles/globals.css"
 
@@ -64,6 +66,7 @@ export default async function RootLayout(props: { children: React.ReactNode; par
     <html lang={market.htmlLang} data-theme="light" className={inter.variable} style={themeVars}>
       <body className="bg-background text-foreground antialiased">
         <main className="relative">{props.children}</main>
+        {SITE_LIVE && config.analytics.metricool && <Metricool hash={config.analytics.metricool} exclude={analyticsExclude()} />}
       </body>
     </html>
   )

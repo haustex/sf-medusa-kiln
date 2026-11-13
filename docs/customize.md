@@ -223,11 +223,15 @@ appears or disappears within a minute. `src/lib/hero.ts` is the one place the co
 Medusa Admin source only has to return the same shape there. `node seed/demo-hero.mjs` regenerates the demo
 banners.
 
-## blogPath, contact
+## blogPath, contact, analytics
 
 - `blogPath`: the journal's URL segment (`/blog`). Changing it also means renaming the folder
   `src/app/[countryCode]/(main)/blog` and the edge-cache rules in `next.config.js`.
 - `contact: { email, whatsapp }`: Organization `email`, contact links. Nothing here is secret.
+- `analytics: { metricool }`: the hash from your Metricool tracker code switches on its page-view tracker
+  (`src/modules/analytics/metricool.tsx`: a 400-byte script loaded in idle time, no cookies, no storage). Only
+  when `SITE_LIVE=true`, and never on checkout, account, order, transfer, review-link and tracking pages, whose
+  URLs carry ids or tokens. Mention it on your privacy page (`content/pages/*/privacy.md`).
 
 ## Outside the config file
 
