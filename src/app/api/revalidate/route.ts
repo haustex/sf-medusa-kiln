@@ -2,6 +2,8 @@ import { revalidatePath, revalidateTag } from "next/cache"
 import { timingSafeEqual } from "node:crypto"
 import { after, NextRequest, NextResponse } from "next/server"
 
+import { MARKET_CODES, marketPath } from "@lib/util/market"
+
 /**
  * Called by the backend after catalog changes (src/subscribers/storefront-revalidate.ts):
  * 1. marks every ISR page stale, 2. renders the affected pages here so the
@@ -28,6 +30,9 @@ function authorized(req: NextRequest) {
   const a = new Uint8Array(Buffer.from(secret)), b = new Uint8Array(Buffer.from(got))
   return a.length === b.length && timingSafeEqual(a, b)
 }
+
+/** The public URL of a path in every market (theme.config.ts markets: the default one unprefixed, the others prefixed) */
+const everyMarket = (path: string) => Array.from(new Set(MARKET_CODES.map((code) => marketPath(code, path) || "/")))
 
 const PUBLIC_ORIGIN = (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9720").replace(/\/$/, "")
 
@@ -81,9 +86,8 @@ async function revalidateBlog(blog: { slugs?: unknown; categories?: unknown; all
   // { expire: 0 }: the next render waits for fresh data instead of answering the old page once more.
   revalidateTag("blog", { expire: 0 })
   // and the article URLs by path: a "not found" answer cached just before the article went public must go as well
-  for (const s of posts) for (const market of ["id", "us"]) revalidatePath(`/${market}/blog/${s}`)
-  const both = (p: string) => [p, `/us${p}`]
-  const paths = [...both("/blog"), ...categories.flatMap((c) => both(`/blog/kategori/${c}`)), ...posts.flatMap((s) => both(`/blog/${s}`))]
+  for (const s of posts) for (const market of MARKET_CODES) revalidatePath(`/${market}/blog/${s}`)
+  const paths = [...everyMarket("/blog"), ...categories.flatMap((c) => everyMarket(`/blog/kategori/${c}`)), ...posts.flatMap((s) => everyMarket(`/blog/${s}`))]
   await warm(paths)
   const tags =
     blog.all === true
@@ -104,7 +108,7 @@ export async function POST(req: NextRequest) {
   const all = body.all === true || handles.length === 0
 
   revalidatePath("/", "layout")
-  const paths = ["/", "/us", ...handles.flatMap((h) => [`/products/${h}`, `/us/products/${h}`])]
+  const paths = [...everyMarket(""), ...handles.flatMap((h) => everyMarket(`/products/${h}`))]
   await warm(paths)
   const tags = all ? ["html"] : ["home", ...handles.map((h) => `product-${h}`)]
   const cloudflare = await purge(tags)
