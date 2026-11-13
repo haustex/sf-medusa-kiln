@@ -19,6 +19,7 @@ follow [Semantic Versioning](https://semver.org).
 
 ### Fixed
 - Blog category chips no longer list categories without a public article (a chip led to an empty page).
+- The blog index shows the category chips when its only article is the featured one (they sat in the grid, which was empty).
 
 ## [0.2.0] — 2026-11-13
 

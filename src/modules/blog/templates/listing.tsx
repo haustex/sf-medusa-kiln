@@ -79,6 +79,9 @@ export default async function BlogListing({ countryCode, category, page = 1 }: {
         </section>
       )}
 
+      {/* Only the featured article so far: the chips still link the categories */}
+      {featured && posts.length === 0 && chips && <div className="content-container">{chips}</div>}
+
       {posts.length > 0 && (
         <section className="content-container flex flex-col gap-section-head" aria-labelledby={featured ? "latest-title" : undefined} aria-label={featured ? undefined : title}>
           {/* Category chips sit between the featured article and the grid (above the grid when there is no featured one) */}
