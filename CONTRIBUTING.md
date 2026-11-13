@@ -107,7 +107,10 @@ With the admin credentials the script enables the provider on the region itself 
 `--card 4000002500003155 --expect 3ds` (3-D Secure challenge, confirmed through Stripe's test button),
 `--card 4000000000000002 --expect decline` (the error message shows, nothing is placed), `KILN_E2E_MARKET=id` (the
 other market, IDR), `KILN_URL=https://…` (a hosted storefront; on failure the script prints what Stripe.js was given,
-without key values). All four passed on 12 Nov 2026 against Stripe test mode (payments captured).
+without key values). All four passed on 12 Nov 2026 locally and on 13 Nov 2026 against the hosted demo
+(kiln.hauskayu.com on Vercel, backend on a VPS), payments captured and the Stripe webhook answered 200.
+The Place order click is paced like a finger (move, pause, press, pause, release): with focus still inside Stripe's
+frame, headless Chrome drops an instantaneous click. `KILN_E2E_DEBUG_CLICK=1` logs that click phase by phase.
 Without a system Chrome, run it through whatever launcher sets `PUPPETEER_CACHE_DIR` (and `LD_LIBRARY_PATH`)
 for that puppeteer install: `<launcher> node ~/themes/kiln/scripts/e2e/checkout-stripe.mjs …`.
 

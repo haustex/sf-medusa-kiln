@@ -42,6 +42,17 @@ try {
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms))
 const log = (...a) => console.log("•", ...a)
+/**
+ * Move, pause, press, pause, release: the way a finger does it. With focus still inside Stripe's cross-origin
+ * frame, headless Chrome loses an instantaneous page.click() while focus moves between the frame processes
+ * (the development provider, with no frame focused, never showed this); at human speed the click always lands.
+ */
+const humanClick = async (selector) => {
+  const box = await page.$eval(selector, (el) => { el.scrollIntoView({ block: "center" }); const r = el.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 } })
+  await page.mouse.move(box.x, box.y); await wait(300)
+  await page.mouse.down(); await wait(150)
+  await page.mouse.up()
+}
 const fail = (msg) => { console.error("✗", msg); process.exitCode = 1 }
 
 // Storefront market prefix: the default market has none (theme.config.ts markets.routing)
@@ -216,15 +227,24 @@ try {
     const active = () => page.evaluate(() => { const a = document.activeElement; return a ? `${a.tagName.toLowerCase()}${a.name ? "[" + a.name.slice(0, 24) + "]" : ""}${a.dataset?.testid ? "#" + a.dataset.testid : ""}` : "none" })
     const msgs = async () => { const out = []; for (const f of page.frames()) { const t = await f.evaluate(() => [...document.querySelectorAll("[role=alert], .p-FieldError, .p-Error")].map((e) => e.textContent.trim()).filter(Boolean).join(" | ")).catch(() => ""); if (t) out.push(t.slice(0, 80)) } return out.join(" || ") || "none" }
     const box = await page.$eval("[data-testid=submit-order-button]", (b) => { b.scrollIntoView({ block: "center" }); const r = b.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 } })
+    // is the button node replaced (React remount) during the press? mark it, watch the subtree for node changes
+    await page.evaluate(() => {
+      const b = document.querySelector("[data-testid=submit-order-button]"); b.dataset.probe = "1"
+      window.__mut = []
+      new MutationObserver((list) => { for (const m of list) if (m.type === "childList") window.__mut.push(`${m.target.tagName.toLowerCase()}.${(m.target.className || "").toString().split(" ")[0]}: +${m.addedNodes.length}/-${m.removedNodes.length} ${[...m.removedNodes].map((n) => n.nodeName + (n.dataset?.testid ? "#" + n.dataset.testid : "")).join(",")}`) }).observe(document.querySelector("[data-testid=payment-step]").parentElement, { childList: true, subtree: true })
+    })
+    const probe = () => page.evaluate(() => `probe=${document.querySelector("[data-testid=submit-order-button]")?.dataset.probe === "1" ? "same node" : "NEW NODE"} mutations=${window.__mut.length}${window.__mut.length ? " [" + window.__mut.slice(0, 6).join(" ; ") + "]" : ""}`)
     log(`before: rect=${await rect()} active=${await active()} msgs=${await msgs()}`)
     await page.mouse.move(box.x, box.y); await wait(300)
-    log(`after move: rect=${await rect()} active=${await active()} msgs=${await msgs()}`)
+    log(`after move: rect=${await rect()} active=${await active()} ${await probe()} msgs=${await msgs()}`)
     await page.mouse.down(); await wait(300)
-    log(`after down: rect=${await rect()} active=${await active()} msgs=${await msgs()}`)
+    log(`after down: rect=${await rect()} active=${await active()} ${await probe()} msgs=${await msgs()}`)
     await page.mouse.up(); await wait(1500)
-    log(`after up: rect=${await rect()} active=${await active()} msgs=${await msgs()} stripe=${stripeCalls.filter((c) => /confirm/.test(c)).join(",") || "no confirm"}`)
+    log(`after up: rect=${await rect()} active=${await active()} ${await probe()} msgs=${await msgs()} stripe=${stripeCalls.filter((c) => /confirm/.test(c)).join(",") || "no confirm"}`)
   } else {
-    await page.click("[data-testid=submit-order-button]")
+    // like a finger, not a 0 ms down/up: with focus still inside Stripe's cross-origin frame, Chrome loses an
+    // instantaneous click while focus moves between the frame processes (the dev provider never showed this)
+    await humanClick("[data-testid=submit-order-button]")
   }
   await wait(4000)
   await shot("after-click")
@@ -265,7 +285,18 @@ try {
     }
     if (!button) throw new Error("3-D Secure challenge frame not found")
     await shot("3ds-challenge")
-    await button.click()
+    // the challenge frame re-renders once more right after it appears: look the button up again until the click lands
+    let clicked = false
+    for (let i = 0; i < 10 && !clicked; i++) {
+      await wait(500)
+      for (const f of page.frames()) {
+        const b = await f.$("#test-source-authorize-3ds").catch(() => null)
+        if (!b) continue
+        clicked = await b.click().then(() => true).catch(() => false)
+        if (clicked) break
+      }
+    }
+    if (!clicked) throw new Error("3-D Secure test button could not be clicked")
     log("3-D Secure challenge completed")
   }
   await untilPath(/\/order\/.+\/confirmed/, 120000)
