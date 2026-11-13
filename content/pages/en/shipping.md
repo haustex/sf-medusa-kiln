@@ -17,6 +17,12 @@ We ship within {{country}} and to most countries worldwide. The delivery options
 
 Made-to-order pieces say their lead time on the product page; it starts when the order is placed.
 
+## Rates
+
+Shipping is calculated at checkout from the destination and the chargeable weight of the parcel. The current rates per kilogram:
+
+{{rates}}
+
 ## Tracking
 
 You receive a tracking link by e-mail as soon as the parcel is on its way. It can take a day before the carrier shows the first scan.

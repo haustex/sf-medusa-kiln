@@ -86,7 +86,12 @@ off with `KILN_PLUGINS=none`; secrets `MANUAL_TRANSFER_SECRET`, `MANUAL_TRANSFER
 in its `.env`, the proxy secret also in the storefront `.env`). `node seed/enable-payments.mjs` enables the two on
 the regions and creates demo bank accounts. Bank transfer is testable end to end (order → `/transfer/…` page →
 proof upload); doit.id has no sandbox key here, so checkout only shows its "not available" state until credentials
-are entered in Admin → Settings → doit.id. Stripe is wired in and switches on with keys:
+are entered in Admin → Settings → doit.id. `medusa-fulfillment-zone-rate` is registered too (demo rates in
+`~/themes/kiln-backend/shipping.config.ts`, `ZONE_RATE_PROXY_SECRET` in both `.env` files); `node
+seed/enable-shipping.mjs` links the provider, creates the calculated options and gives the demo variants a parcel
+size. A shipment for an order comes from the Admin API (`POST /admin/zone-rate/shipments {order_id}`, then
+`…/shipments/:id/status`), the tracking page is `/track/{number}` (`/id/lacak/{number}`). Stripe is wired in and
+switches on with keys:
 
 1. Backend: put `STRIPE_API_KEY=sk_test_…` (and `STRIPE_WEBHOOK_SECRET` once a webhook points at
    `/hooks/payment/stripe_stripe`) in `~/themes/kiln-backend/.env`, restart it, then enable the provider on the

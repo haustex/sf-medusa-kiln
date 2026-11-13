@@ -5,6 +5,7 @@ import { marked } from "marked"
 
 import config from "@theme"
 import { getMarket, marketPath } from "@lib/util/market"
+import { rateCardHtml } from "@lib/data/shipping-rates"
 
 /**
  * Information pages (shipping, returns, contact, privacy, terms, about …) are markdown files in
@@ -12,8 +13,9 @@ import { getMarket, marketPath } from "@lib/util/market"
  * market's dictionary (theme.config.ts `markets`); a page missing in one language falls back to `en`.
  *
  * Placeholders in the text: {{brand}}, {{email}}, {{whatsapp}}, {{location}} (theme.config.ts), {{country}}
- * (the market's country name in its language), {{year}} and {{date}} (today). Links that start with `/` get the
- * market prefix, so `[Returns](/returns)` works in every market.
+ * (the market's country name in its language), {{year}} and {{date}} (today), and {{rates}}: the shipping
+ * plugin's rate card as tables (lib/data/shipping-rates.ts; empty without medusa-fulfillment-zone-rate). Links
+ * that start with `/` get the market prefix, so `[Returns](/returns)` works in every market.
  */
 export type ContentPage = { slug: string; lang: string; title: string; description: string; html: string }
 
@@ -94,8 +96,8 @@ export async function getPage(countryCode: string, slug: string): Promise<Conten
   const found = await locate(countryCode, slug)
   if (!found) return null
   const { lang, source } = found
-  const values = placeholders(countryCode, lang)
   const { data, body } = frontMatter(source)
+  const values = { ...placeholders(countryCode, lang), rates: body.includes("{{rates}}") ? await rateCardHtml(countryCode) : "" }
   const html = (await marked.parse(fill(body, values), { gfm: true, async: true }))
     // market prefix on internal links; tables in the blog's scrolling wrapper (styles/blog.css)
     .replace(/href="\/(?!\/)/g, `href="${marketPath(countryCode, "/")}`)

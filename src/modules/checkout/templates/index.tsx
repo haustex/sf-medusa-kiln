@@ -2,13 +2,14 @@ import { HttpTypes } from "@medusajs/types"
 
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
+import { formatEstimate, getShippingRateCard, serviceForOption } from "@lib/data/shipping-rates"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { getMarket, marketPath } from "@lib/util/market"
 import config from "@theme"
 import { formatPrice } from "@modules/ds/price-tag"
 
 import AddressForm from "../components/address-form"
-import Delivery from "../components/delivery"
+import Delivery, { type DeliveryExtras } from "../components/delivery"
 import Payment from "../components/payment"
 import Step, { type StepState } from "../components/step"
 import CheckoutSummary from "./summary"
@@ -29,10 +30,18 @@ export default async function CheckoutTemplate({ cart, customer, countryCode, st
   const dict = getDictionary(countryCode)
   const t = dict.checkout
   const href = (p: string) => marketPath(countryCode, p)
-  const [shippingOptions, paymentProviders] = await Promise.all([
+  const [shippingOptions, paymentProviders, rateCard] = await Promise.all([
     step === "address" ? Promise.resolve([]) : listCartShippingMethods(cart.id).catch(() => null),
     step === "payment" ? listCartPaymentMethods(cart.region?.id ?? "").catch(() => null) : Promise.resolve(null),
+    step === "delivery" ? getShippingRateCard(countryCode) : Promise.resolve(null),
   ])
+  // delivery estimate and notice per option, from the shipping plugin's rate card (nothing without the plugin)
+  const extras: DeliveryExtras = Object.fromEntries(
+    (shippingOptions ?? []).map((o) => {
+      const service = serviceForOption(rateCard, o)
+      return [o.id, { estimate: service?.estimate ? fill(t.deliveryEstimate, { range: formatEstimate(service.estimate, countryCode) }) : null, notice: service?.notice ?? null }]
+    })
+  )
   const state = (s: CheckoutStep): StepState => (s === step ? "open" : ORDER.indexOf(s) < ORDER.indexOf(step) ? "done" : "todo")
   const method = cart.shipping_methods?.at(-1)
   const shipping = addressLines(cart.shipping_address)
@@ -68,7 +77,7 @@ export default async function CheckoutTemplate({ cart, customer, countryCode, st
           testId="checkout-step-delivery"
           summary={method && <span data-testid="shipping-method-summary">{`${method.name} · ${method.amount ? formatPrice(method.amount, cart.currency_code) : t.free}`}</span>}
         >
-          <Delivery cart={cart} options={shippingOptions ?? []} currency={cart.currency_code} nextHref={href("/checkout?step=payment")} labels={{ hint: t.shippingMethodHint, free: t.free, calculating: t.calculating, noShipping: t.noShipping, errorShipping: t.errorShipping, continuePayment: t.continuePayment }} />
+          <Delivery cart={cart} options={shippingOptions ?? []} currency={cart.currency_code} nextHref={href("/checkout?step=payment")} labels={{ hint: t.shippingMethodHint, free: t.free, calculating: t.calculating, noShipping: t.noShipping, errorShipping: t.errorShipping, continuePayment: t.continuePayment, calcFailed: t.shippingCalcFailed }} extras={extras} />
         </Step>
         <Step index={3} title={t.payment} state={state("payment")} editHref={href("/checkout?step=payment")} editLabel={t.edit} testId="checkout-step-payment">
           <Payment

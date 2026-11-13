@@ -51,7 +51,8 @@ Demo: [kiln.hauskayu.com](https://kiln.hauskayu.com) (Stripe test mode, the data
 - A Medusa 2.22+ backend with at least one region, a sales channel and a publishable API key. The demo seed
   (`seed/`) creates all of it for a fictional studio, Tilde Goods, in two markets (USD and IDR).
 - Optional: `medusa-reviews-wishlist` ≥ 0.1.2, `medusa-blog-seo` ≥ 0.1.3, Stripe keys,
-  `medusa-payment-manual-transfer` ≥ 0.1.4, `medusa-payment-doit` ≥ 0.1.5 (see Payments), a
+  `medusa-payment-manual-transfer` ≥ 0.1.4, `medusa-payment-doit` ≥ 0.1.5 (see Payments),
+  `medusa-fulfillment-zone-rate` ≥ 0.3.2 (see Shipping), a
   `/store/meilisearch/products` route in the backend (see `src/lib/data/search.ts` for the contract).
 
 ## Quick start
@@ -73,7 +74,7 @@ pnpm dev                        # http://localhost:9720
 `.env` keys: `NEXT_PUBLIC_MEDUSA_BACKEND_URL` (and `MEDUSA_BACKEND_URL_INTERNAL` when the server reaches Medusa on
 another address), `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL`, optional `NEXT_PUBLIC_MEDIA_URL`,
 `MEILISEARCH_HOST` / `MEILISEARCH_SEARCH_KEY`, `NEXT_PUBLIC_STRIPE_KEY`, `MANUAL_TRANSFER_PROXY_SECRET`,
-`NEXT_PUBLIC_DOIT_REDIRECT_TO_HOSTED`, `REVALIDATE_SECRET`, `SITE_LIVE`, `KILN_FEATURE_*`. Demo articles: `node seed/seed-blog.mjs` once the backend runs with medusa-blog-seo.
+`NEXT_PUBLIC_DOIT_REDIRECT_TO_HOSTED`, `ZONE_RATE_PROXY_SECRET`, `REVALIDATE_SECRET`, `SITE_LIVE`, `KILN_FEATURE_*`. Demo articles: `node seed/seed-blog.mjs` once the backend runs with medusa-blog-seo.
 
 Production: `pnpm build` produces a standalone server (`.next/standalone`, `output: "standalone"`); run it with
 `node .next/standalone/server.js` behind any reverse proxy or CDN. `SITE_LIVE` and `NEXT_PUBLIC_*` are read at
@@ -121,16 +122,26 @@ Then `medusa db:migrate`, enable each provider on its regions (Admin → Setting
 `STRIPE_API_KEY`, `MANUAL_TRANSFER_SECRET`, `MANUAL_TRANSFER_PROXY_SECRET`, `DOIT_ENCRYPTION_KEY` (each plugin's
 README has the details).
 
+## Shipping
+
+With [medusa-fulfillment-zone-rate](https://www.npmjs.com/package/medusa-fulfillment-zone-rate) in the backend
+(calculated rates by zone and chargeable weight, shipments with tracking numbers and e-mails) checkout shows each
+option's delivery estimate and the plugin's own message when it refuses an address or a product without a size,
+the product page says how long delivery takes after dispatch, `{{rates}}` on the shipping page prints the rate
+card, `/track` (Indonesian: `/lacak`) is a live tracking page and the account's order page lists the shipments
+with their timeline and photos. Nothing to configure in the theme beyond `ZONE_RATE_PROXY_SECRET`; details in
+docs/customize.md "Shipping and tracking". `seed/enable-shipping.mjs` switches it on for the demo backend.
+
 ## Folders
 
 ```
 theme.config.ts        brand, markets, colours, radii, font, features, listing, hero, contact
 src/app/[countryCode]  pages: (main) home, store, categories, collections, products, search, cart, wishlist,
                        blog, account, order, design; (checkout)
-src/app/api            cart, health, payment-return, manual-transfer (proof/invoice relay), revalidate, reviews, wishlist
+src/app/api            cart, health, payment-return, manual-transfer (proof/invoice relay), zone-rate (tracking relay), revalidate, reviews, wishlist
 src/app/og             generated share images
 src/modules/ds         the design system (cards, grids, sections, price, stars, sheet, carousel)
-src/modules/*          home, layout, products, store, cart, checkout (+ doit), manual-transfer, account, order, blog, wishlist, brand
+src/modules/*          home, layout, products, store, cart, checkout (+ doit), manual-transfer, tracking, shipping, account, order, blog, wishlist, brand
 src/lib                data (Medusa SDK), i18n, listing filters, seo, util, features.ts
 src/styles             globals.css (tokens, type scale, utilities), theme.css (HeroUI mapping), fonts
 seed                   demo catalogue, articles and generated images (CC0)

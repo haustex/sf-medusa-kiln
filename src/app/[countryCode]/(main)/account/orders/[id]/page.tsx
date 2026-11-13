@@ -8,6 +8,7 @@ import { getMarket, marketPath } from "@lib/util/market"
 import Link from "@modules/common/components/app-link"
 import { Stack } from "@modules/ds"
 import { CARD, OrderLines, OrderMeta, OrderStatus } from "@modules/order/parts"
+import { OrderShipments } from "@modules/tracking/order-shipments"
 
 type Props = { params: Promise<{ countryCode: string; id: string }> }
 
@@ -40,6 +41,7 @@ export default async function OrderDetailPage(props: Props) {
         </p>
         <OrderStatus order={order} t={t} />
       </Stack>
+      <OrderShipments orderId={order.id} countryCode={countryCode} />
       <section className={CARD} aria-labelledby="order-items">
         <h2 id="order-items" className="type-h3">
           {t.items}

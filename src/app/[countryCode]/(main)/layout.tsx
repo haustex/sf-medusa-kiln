@@ -9,6 +9,7 @@ import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
 import Footer from "@modules/layout/templates/footer"
 import Nav from "@modules/layout/templates/nav"
 import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-price-nudge"
+import { nudgeLabels } from "@modules/shipping/nudge-labels"
 
 export default async function PageLayout(props: { children: React.ReactNode; params: Promise<{ countryCode: string }> }) {
   const { countryCode } = await props.params
@@ -34,7 +35,7 @@ export default async function PageLayout(props: { children: React.ReactNode; par
       )}
       <Nav countryCode={countryCode} />
       {customer && cart && <CartMismatchBanner customer={customer} cart={cart} />}
-      {cart && <FreeShippingPriceNudge variant="popup" cart={cart} shippingOptions={shippingOptions} />}
+      {cart && <FreeShippingPriceNudge variant="popup" cart={cart} shippingOptions={shippingOptions} labels={nudgeLabels(countryCode)} cartHref={marketPath(countryCode, "/cart")} />}
       {/* At least one screen tall (minus the header): pages that stream in never push a visible footer down (CLS 0) */}
       <div className="min-h-[calc(100svh-7rem)]">{props.children}</div>
       <Footer countryCode={countryCode} />

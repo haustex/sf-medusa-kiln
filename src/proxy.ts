@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { ALWAYS_PREFIX, DEFAULT_MARKET, MARKETS, isMarketCode } from "@lib/util/market"
 import { redirectFor } from "@lib/util/redirects"
+import { trackingRoute } from "@lib/util/tracking-path"
 
 /**
  * Market routing (theme.config.ts `markets.routing`; no geo-IP redirects):
@@ -43,6 +44,13 @@ export async function proxy(request: NextRequest) {
     const prefix = hasPrefix ? `/${market}` : ""
     return NextResponse.redirect(new URL(`${prefix}${legacy === "/" && prefix ? "" : legacy}${search}`, request.url), 308)
   }
+  // The tracking page: the language's public address (/lacak) is served by /track; /track itself redirects to it
+  const tracking = trackingRoute(market, marketless)
+  if (tracking && "redirect" in tracking) {
+    const prefix = hasPrefix ? `/${market}` : ""
+    return NextResponse.redirect(new URL(`${prefix}${tracking.redirect}${search}`, request.url), 308)
+  }
+  const internal = tracking && "rewrite" in tracking ? tracking.rewrite : marketless
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set("x-kiln-locale", MARKETS[market].locale)
   requestHeaders.set("x-kiln-market", market)
@@ -51,18 +59,20 @@ export async function proxy(request: NextRequest) {
   const cacheId = cacheIdCookie?.value || crypto.randomUUID()
 
   let response: NextResponse
-  if (!hasPrefix) {
+  if (!hasPrefix || internal !== marketless) {
     // Built from nextUrl (not request.url), so Next serves the rewrite internally whatever host it listens on.
     const target = request.nextUrl.clone()
-    target.pathname = `/${DEFAULT_MARKET}${pathname === "/" ? "" : pathname}`
-    response = NextResponse.rewrite(target, { request: { headers: requestHeaders } })
+    target.pathname = `/${market}${internal === "/" ? "" : internal}`
+    response = NextResponse.rewrite(target, {
+      request: { headers: requestHeaders },
+    })
   } else {
     response = NextResponse.next({ request: { headers: requestHeaders } })
   }
 
   // Per-visitor fetch cache id (cart, customer, checkout), only where those are read: a Set-Cookie on static
   // pages would stop CDNs from caching the HTML.
-  if (!cacheIdCookie && needsCacheId(request, marketless)) {
+  if (!cacheIdCookie && needsCacheId(request, internal)) {
     response.cookies.set("_medusa_cache_id", cacheId, { maxAge: 60 * 60 * 24 })
   }
 

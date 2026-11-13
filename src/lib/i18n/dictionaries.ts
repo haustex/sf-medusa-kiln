@@ -55,6 +55,16 @@ const id = {
     preview: "Pratinjau: artikel ini belum tentu sudah terbit. Link ini rahasia dan tidak diindeks mesin pencari.",
     feedTitle: "Blog {brand}",
   },
+  /** Rate-card tables on the shipping page ({{rates}} in content/pages, medusa-fulfillment-zone-rate) */
+  shippingRates: {
+    zone: "Zona",
+    perKg: "Per kg",
+    kg: "kg",
+    destinations: "Tujuan",
+    delivery: "Pengiriman {range} setelah paket dikirim",
+    minimum: "minimal {kg} kg",
+    howCounted: "Berat tagih = berat asli atau berat volume (P × L × T / {divisor}, dalam {unit}), mana yang lebih besar, dibulatkan ke atas ke kg penuh.",
+  },
   footer: {
     tagline: "Benda rumah dalam jumlah kecil, dari pembuat independen.",
     shop: "Belanja",
@@ -269,6 +279,10 @@ const id = {
     close: "Tutup keranjang",
     viewCart: "Lihat keranjang",
     loading: "Memuat keranjang…",
+    freeShippingUnlocked: "Gratis ongkir aktif untuk pesanan ini.",
+    freeShippingAway: "Tambah {amount} lagi untuk gratis ongkir.",
+    freeShippingProgress: "Progres menuju gratis ongkir",
+    dismiss: "Tutup",
   },
   checkout: {
     errorShipping: "Pengiriman belum bisa dipilih. Coba lagi atau muat ulang halaman.",
@@ -874,6 +888,10 @@ const en: Dictionary = {
     close: "Close cart",
     viewCart: "View cart",
     loading: "Loading your cart…",
+    freeShippingUnlocked: "Free shipping unlocked for this order.",
+    freeShippingAway: "{amount} away from free shipping.",
+    freeShippingProgress: "Progress towards free shipping",
+    dismiss: "Dismiss",
   },
   makers: {
     title: "Makers",
@@ -1042,6 +1060,15 @@ const en: Dictionary = {
     pagination: { nav: "Pages", prev: "Previous", next: "Next", page: "Page" },
     preview: "Preview: this article may not be published yet. This link is private and is not indexed by search engines.",
     feedTitle: "{brand} Blog",
+  },
+  shippingRates: {
+    zone: "Zone",
+    perKg: "Per kg",
+    kg: "kg",
+    destinations: "Destinations",
+    delivery: "Delivery {range} after dispatch",
+    minimum: "minimum {kg} kg",
+    howCounted: "Chargeable weight = the actual weight or the volumetric weight (L × W × H / {divisor}, in {unit}), whichever is greater, rounded up to a whole kg.",
   },
   footer: {
     tagline: "Small-batch objects for the home, made by independent makers.",

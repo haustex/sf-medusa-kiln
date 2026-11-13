@@ -151,6 +151,8 @@ export default async function seed({ container }: ExecArgs) {
       { name: "Standard", price_type: "flat", provider_id: "manual_manual", service_zone_id: zone("United States"), shipping_profile_id: profile.id, type: { label: "Standard", description: "5–8 business days", code: "standard" }, prices: [{ currency_code: "usd", amount: 9 }], rules },
       { name: "Express", price_type: "flat", provider_id: "manual_manual", service_zone_id: zone("United States"), shipping_profile_id: profile.id, type: { label: "Express", description: "2–3 business days", code: "express" }, prices: [{ currency_code: "usd", amount: 24 }], rules },
       { name: "Reguler", price_type: "flat", provider_id: "manual_manual", service_zone_id: zone("Indonesia"), shipping_profile_id: profile.id, type: { label: "Reguler", description: "3–6 hari kerja", code: "standard" }, prices: [{ currency_code: "idr", amount: 25000 }], rules },
+      // Free above $100 (price rule on item_total): drives the storefront's free-shipping nudge
+      { name: "Free shipping", price_type: "flat", provider_id: "manual_manual", service_zone_id: zone("United States"), shipping_profile_id: profile.id, type: { label: "Free shipping", description: "Orders over $100, 5–8 business days", code: "free" }, prices: [{ currency_code: "usd", amount: 0, rules: [{ attribute: "item_total", operator: "gte" as const, value: 100 }] }], rules },
     ],
   })
 

@@ -4,6 +4,7 @@ import { features, linkEnabled } from "@lib/features"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
 import { getMarket } from "@lib/util/market"
+import { trackingPath } from "@lib/util/tracking-path"
 import Logo from "@modules/brand/logo"
 import SocialLinks from "@modules/brand/social"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -55,7 +56,7 @@ export default async function Footer({ countryCode }: { countryCode: string }) {
             <ul className="flex flex-col gap-stack-sm">
               {col.links.filter((l) => linkEnabled(l.href, f)).map((l) => (
                 <li key={l.href}>
-                  <LocalizedClientLink prefetch={false} href={l.href} className="hover:underline underline-offset-4">
+                  <LocalizedClientLink prefetch={false} href={l.href === "/track" ? trackingPath(countryCode) : l.href} className="hover:underline underline-offset-4">
                     {tx(l.label, lang)}
                   </LocalizedClientLink>
                 </li>

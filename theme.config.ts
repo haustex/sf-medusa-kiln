@@ -54,6 +54,8 @@ const config = {
     /** Short line under the logo in the footer; the demo content is fictional */
     footerText: { en: "Every piece ships from the workshop that made it.", id: "Setiap barang dikirim dari bengkel yang membuatnya." } as Localized,
     location: "Jepara, Indonesia",
+    /** IANA time zone of the shop: shipping dates and tracking times are shown in it */
+    timeZone: "Asia/Jakarta",
     /** Logo: "text" renders the name in the site font with a small mark; "svg" uses `svgPath` (one path, fill currentColor) */
     logo: { type: "text" as "text" | "svg", svgPath: "", svgViewBox: "0 0 100 20" },
     /** Links in the header's category row, after the categories */
@@ -68,6 +70,9 @@ const config = {
         links: [
           { label: { en: "Shipping", id: "Pengiriman" }, href: "/shipping" },
           { label: { en: "Returns", id: "Pengembalian" }, href: "/returns" },
+          // "/track" is the tracking page (medusa-fulfillment-zone-rate); shown only with the plugin, at the
+          // language's own address (dictionary footer.trackPath, e.g. /lacak in Indonesian)
+          { label: { en: "Track order", id: "Lacak pesanan" }, href: "/track" },
           { label: { en: "Contact", id: "Kontak" }, href: "/contact" },
         ],
       },
@@ -184,6 +189,8 @@ const config = {
     wishlist: "auto" as "auto" | "on" | "off",
     blog: "auto" as "auto" | "on" | "off",
     search: "auto" as "auto" | "on" | "off",
+    /** medusa-fulfillment-zone-rate: delivery estimates, the tracking page, shipments in the account */
+    tracking: "auto" as "auto" | "on" | "off",
   },
 
   /**

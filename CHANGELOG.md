@@ -25,6 +25,16 @@ follow [Semantic Versioning](https://semver.org).
   method picker with fees, QR code / VA number with countdown and status polling, hosted-page option
   (`NEXT_PUBLIC_DOIT_REDIRECT_TO_HOSTED`). Both switch on when the backend registers the provider and need no
   config in the theme; `seed/enable-payments.mjs` enables them on the demo backend.
+- Shipping with [medusa-fulfillment-zone-rate](https://www.npmjs.com/package/medusa-fulfillment-zone-rate)
+  (`features.tracking`): delivery estimates and service notices on the checkout options, the plugin's refusal
+  message in place of a price, "Delivery after dispatch" on the product page, `{{rates}}` rate-card tables on the
+  shipping page, the live tracking page at `/track` (per-language address from the dictionary, `/lacak` in
+  Indonesian) with lookup form and Server-Sent Events relay, shipments with timeline and photos on the account's
+  order page, footer link. Needs `ZONE_RATE_PROXY_SECRET`; `seed/enable-shipping.mjs` for the demo backend.
+- Free-shipping nudge in Kiln's own style and words (card on the catalogue pages, inline in the cart) for a
+  shipping option priced 0 above an `item_total` rule; the demo seed adds "Free shipping" over $100. Below the
+  threshold Medusa lists that option without a price; the delivery step leaves it out instead of showing "–".
+- `brand.timeZone` in theme.config.ts (shipping dates, tracking times).
 
 ### Fixed
 

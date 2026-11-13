@@ -17,6 +17,12 @@ Kami mengirim ke seluruh {{country}} dan ke sebagian besar negara. Pilihan kurir
 
 Barang pesanan khusus (made to order) mencantumkan waktu pengerjaan di halaman produknya, dihitung sejak pesanan dibuat.
 
+## Tarif
+
+Ongkos kirim dihitung saat checkout dari tujuan dan berat tagih paket. Tarif per kilogram saat ini:
+
+{{rates}}
+
 ## Lacak paket
 
 Tautan pelacakan dikirim lewat e-mail begitu paket berangkat. Kadang butuh satu hari sebelum kurir menampilkan pindaian pertama.

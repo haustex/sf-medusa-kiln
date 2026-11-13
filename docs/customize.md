@@ -140,7 +140,7 @@ headings get the display cut (`src/styles/fonts-files`, 40 KB). To use another f
 ## features
 
 ```ts
-features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto" },
+features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto" },
 ```
 
 `"auto"` probes one store route per integration when the server starts (`src/lib/features.ts`): a 404 switches
@@ -153,6 +153,7 @@ environment overrides the file: `KILN_FEATURE_BLOG=off`. What "off" means:
 | `wishlist` | medusa-reviews-wishlist | No hearts, no wishlist icon in the header, `/wishlist` and `/api/wishlist` 404 |
 | `blog` | medusa-blog-seo | `/blog/…` and the feed 404, journal band and links hidden, sitemap without articles |
 | `search` | `/store/meilisearch/products` route | `/search` uses Medusa's own `/store/products?q=` |
+| `tracking` | medusa-fulfillment-zone-rate | No delivery estimates, `{{rates}}` empty, `/track` (and its language address) and `/api/zone-rate/…` 404, footer link hidden, no shipments on the order page |
 
 ## listing
 
@@ -246,7 +247,39 @@ missing in one language falls back to `en`. The front matter holds `title` and `
 `{{brand}}`, `{{email}}`, `{{whatsapp}}`, `{{location}}` (from `theme.config.ts`), `{{country}}` (the market's
 country), `{{year}}` and `{{date}}`. Links that start with `/` get the market prefix. Add a file to add a page;
 link it from `brand.footerColumns`. The demo texts are placeholders: replace the policies with your own before
-going live. An order-tracking page (`/track`) is not part of the theme yet.
+going live. `{{rates}}` in a page puts the shipping plugin's rate card there as tables (see "Shipping and tracking").
+
+### Shipping and tracking
+
+With [medusa-fulfillment-zone-rate](https://www.npmjs.com/package/medusa-fulfillment-zone-rate) in the backend
+(calculated shipping by zone and chargeable weight, shipments with tracking numbers) the theme adds, detected
+through `features.tracking` ("auto" probes `/store/zone-rate/services`):
+
+- **Checkout**: every zone-rate option shows its delivery estimate ("Delivery 2–7 days") under the name and, once
+  picked, the service's notice (duties, for example). An option the plugin refuses (unknown province, a product
+  without weight or size) is greyed out with the plugin's own message instead of a price.
+- **Product page**: "Delivery after dispatch: Air freight 1–2 weeks or Sea freight 1–2 months" in "Shipping &
+  returns", from the services that deliver to the market's country.
+- **Shipping page**: `{{rates}}` in `content/pages/{language}/shipping.md` renders one table per service (zone,
+  price per kg in the market's currency, destinations) with the estimate, the notice and how the chargeable weight
+  is counted (`src/lib/data/shipping-rates.ts`). The rate card is cached five minutes.
+- **Tracking page**: `/track` inside the app, shown at the language's own address from the dictionary
+  `footer.trackPath` ("/lacak" in Indonesian; set it per language in `text`). The proxy rewrites that address to
+  `/track` and sends `/track` itself to it (308), so each market has one URL. Lookup form, live card (status,
+  destination, dates, timeline) updated over Server-Sent Events through `/api/zone-rate/track/…`, with the buyer's
+  IP and `ZONE_RATE_PROXY_SECRET` (the plugin's `trustedProxySecret`) so the per-IP limit counts buyers. The
+  footer link `/track` in `brand.footerColumns` follows the same path and disappears without the plugin.
+- **Account**: the order page lists the order's shipments with the full timeline, notes and proof photos
+  (`/api/zone-rate/photos/…`, the customer's session).
+
+Texts come from the plugin (`src/modules/tracking/core`, a verbatim copy of the package's `src/storefront`:
+update it from there); the look is `src/modules/tracking/theme.ts`; times use `brand.timeZone`. The province
+names of Indonesian addresses come from `src/lib/util/id-provinces.ts`. `seed/enable-shipping.mjs` switches the
+provider on for the demo backend (stock location, one calculated option per service, parcel sizes).
+
+The free-shipping nudge (`src/modules/shipping`) is independent of the plugin: a flat option priced 0 above an
+`item_total` price rule shows "$12 away from free shipping" with a progress line, as a small card on the catalogue
+pages (dismissible for the session) and inline in the cart summary.
 
 ### Makers
 

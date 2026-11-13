@@ -4,6 +4,7 @@ import { productReviews } from "medusa-reviews-wishlist/jsonld"
 
 import config from "@theme"
 import { listProducts } from "@lib/data/products"
+import { formatEstimate, shippingEstimates } from "@lib/data/shipping-rates"
 import { cardRating, getProductRating, getProductRatings, listProductReviews, PDP_REVIEWS } from "@lib/data/reviews"
 import { feature } from "@lib/features"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
@@ -74,6 +75,13 @@ export default async function ProductTemplate({ product, region, countryCode }: 
   ])
   const relatedRatings = await getProductRatings(related.map((p) => p.id))
   const hasReviews = !!rating && rating.count > 0
+  // delivery time after dispatch per service (medusa-fulfillment-zone-rate); [] without the plugin
+  const estimates = await shippingEstimates(countryCode)
+  const estimateLine = estimates.length
+    ? fill(t.deliveryAfter, {
+        range: new Intl.ListFormat(market.locale, { type: "disjunction" }).format(estimates.map((e) => (estimates.length > 1 ? `${e.name} ${formatEstimate(e.estimate, countryCode)}` : formatEstimate(e.estimate, countryCode)))),
+      })
+    : null
 
   const description = product.description?.trim() || null
   const intro = product.subtitle?.trim() || firstParagraph(description)
@@ -101,16 +109,19 @@ export default async function ProductTemplate({ product, region, countryCode }: 
     {
       title: t.shippingReturns,
       body: (
-        <p>
-          {fill(t.shippingReturnsBody, { location })}{" "}
-          <Link href={href("/shipping")} className="underline underline-offset-4">
-            {t.shippingLink}
-          </Link>
-          {" · "}
-          <Link href={href("/returns")} className="underline underline-offset-4">
-            {t.returnsLink}
-          </Link>
-        </p>
+        <div className="flex flex-col gap-stack-xs">
+          {estimateLine && <p data-testid="delivery-estimate">{estimateLine}</p>}
+          <p>
+            {fill(t.shippingReturnsBody, { location })}{" "}
+            <Link href={href("/shipping")} className="underline underline-offset-4">
+              {t.shippingLink}
+            </Link>
+            {" · "}
+            <Link href={href("/returns")} className="underline underline-offset-4">
+              {t.returnsLink}
+            </Link>
+          </p>
+        </div>
       ),
     },
     ...faq.map((f) => ({ title: f.q, body: <p>{f.a}</p> })),
