@@ -92,6 +92,10 @@ const page = await browser.newPage()
 await page.setViewport({ width: 1280, height: 900 })
 const issues = []
 page.on("pageerror", (e) => issues.push(`pageerror: ${e.message.slice(0, 200)}`))
+// the Stripe publishable key the storefront passes to the client (RSC payload or HTML); only compared, never printed
+let seenPk = ""
+page.on("response", (r) => { const ct = r.headers()["content-type"] || ""; if (/text\/x-component|text\/html/.test(ct) && /checkout/.test(r.url())) r.text().then((t) => { const m = t.match(/pk_(test|live)_[A-Za-z0-9]+/); if (m) seenPk = m[0] }).catch(() => {}) })
+page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") issues.push(`console.${m.type()}: ${m.text().slice(0, 200)}`) })
 page.on("response", (r) => { if (r.status() >= 400 && !/stripe\.com/.test(r.url())) issues.push(`${r.status()} ${r.url().slice(0, 120)}`) })
 const goto = async (p) => { await page.goto(`${BASE}${p}`, { waitUntil: "networkidle0", timeout: 120000 }); await wait(300) }
 const untilPath = (re, ms = 60000) => page.waitForFunction((s) => new RegExp(s).test(location.pathname + location.search), { timeout: ms }, re.source)
@@ -150,14 +154,34 @@ try {
     await page.waitForSelector("iframe[name^=__privateStripeFrame], iframe[title*='payment input']", { timeout: 60000 })
     // Stripe mounts several frames; the Payment Element is the one with the card number field
     let frame = null
-    for (let i = 0; i < 40 && !frame; i++) {
+    for (let i = 0; i < 90 && !frame; i++) {
       for (const f of page.frames()) {
-        if (await f.$("input[name=number]").catch(() => null)) { frame = f; break }
-        if (await f.$("#card-tab, [data-testid=card-tab]").catch(() => null)) { await f.click("#card-tab, [data-testid=card-tab]").catch(() => {}); }
+        // Stripe swaps its loader frame for the real one while we look: a detached frame throws synchronously
+        try {
+          if (await f.$("input[name=number]")) { frame = f; break }
+          if (await f.$("#card-tab, [data-testid=card-tab]")) await f.click("#card-tab, [data-testid=card-tab]")
+        } catch { /* detached or navigating frame: look again */ }
       }
       if (!frame) await wait(500)
     }
-    if (!frame) throw new Error("Stripe Payment Element: card number field not found (is the card method enabled in the Stripe dashboard?)")
+    if (!frame) {
+      const frames = page.frames().map((f) => f.url().replace(/\?.*$/, "").slice(0, 90)).filter((u) => u && u !== "about:blank")
+      const step = await page.evaluate(() => document.querySelector("[data-testid=payment-step]")?.innerText.replace(/\s+/g, " ").slice(0, 300) || null)
+      const dom = await page.evaluate(() => {
+        const opt = document.querySelector("[data-testid=payment-option-pp_stripe_stripe]")
+        const el = opt?.closest("label, li, div")
+        const iframes = [...document.querySelectorAll("[data-testid=payment-step] iframe")].map((f) => `${new URL(f.src).pathname.split("/").pop().slice(0, 30)} ${f.offsetWidth}x${f.offsetHeight}`)
+        return { optionChecked: opt?.querySelector("input")?.checked ?? opt?.checked ?? null, stripeElementDivs: document.querySelectorAll("[data-testid=payment-step] .StripeElement, [data-testid=payment-step] .__PrivateStripeElement").length, iframes, hydrated: !!document.querySelector("[data-testid=payment-step]")?.closest("[data-reactroot], body") && typeof window.__next_f !== "undefined", optionHtmlTail: el ? el.innerHTML.replace(/\s+/g, " ").slice(-400) : null }
+      })
+      console.log("  dom:", JSON.stringify(dom))
+      // Which key the page gave Stripe.js, never printed: shape (prefix, length) and whether it equals NEXT_PUBLIC_STRIPE_KEY of
+      // this shell. Stripe's controller frame carries the key in its URL hash (apiKey=…); the RSC payload may carry it too.
+      const apiKey = page.frames().map((f) => decodeURIComponent(f.url()).match(/[?&#]apiKey=([^&]*)/)?.[1]).find(Boolean)
+      if (apiKey !== undefined) console.log(`  Stripe.js initialised with key: ${apiKey.length ? `${apiKey.slice(0, 3)}… (${apiKey.length} chars)` : "EMPTY string"}`)
+      const pk = seenPk || apiKey || (await page.content()).match(/pk_(test|live)_[A-Za-z0-9]+/)?.[0] || ""
+      const pkInfo = pk ? `pk_${pk.split("_")[1]} (${pk.length} chars${process.env.NEXT_PUBLIC_STRIPE_KEY ? pk === process.env.NEXT_PUBLIC_STRIPE_KEY ? ", same as NEXT_PUBLIC_STRIPE_KEY here" : ", DIFFERENT from NEXT_PUBLIC_STRIPE_KEY here" : ""})` : "none in the page"
+      throw new Error(`Stripe Payment Element: card number field not found (is the card method enabled in the Stripe dashboard?)\n  frames: ${frames.join(" | ")}\n  publishable key in page: ${pkInfo}\n  payment step text: ${step}`)
+    }
     await frame.type("input[name=number]", CARD, { delay: 20 })
     await frame.type("input[name=expiry]", "1234", { delay: 20 })
     await frame.type("input[name=cvc]", "123", { delay: 20 })
