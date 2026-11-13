@@ -96,7 +96,10 @@ page.on("pageerror", (e) => issues.push(`pageerror: ${e.message.slice(0, 200)}`)
 let seenPk = ""
 page.on("response", (r) => { const ct = r.headers()["content-type"] || ""; if (/text\/x-component|text\/html/.test(ct) && /checkout/.test(r.url())) r.text().then((t) => { const m = t.match(/pk_(test|live)_[A-Za-z0-9]+/); if (m) seenPk = m[0] }).catch(() => {}) })
 page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") issues.push(`console.${m.type()}: ${m.text().slice(0, 200)}`) })
-page.on("response", (r) => { if (r.status() >= 400 && !/stripe\.com/.test(r.url())) issues.push(`${r.status()} ${r.url().slice(0, 120)}`) })
+page.on("response", (r) => { if (r.status() >= 400) issues.push(`${r.status()} ${r.url().slice(0, 120)}`) })
+// Stripe API traffic (method, path, status), printed when a run fails: shows whether confirmPayment was attempted
+const stripeCalls = []
+page.on("response", (r) => { const u = new URL(r.url()); if (u.hostname === "api.stripe.com") stripeCalls.push(`${r.request().method()} ${u.pathname.replace(/pi_[A-Za-z0-9]+/, "pi_…")} ${r.status()}`) })
 const goto = async (p) => { await page.goto(`${BASE}${p}`, { waitUntil: "networkidle0", timeout: 120000 }); await wait(300) }
 const untilPath = (re, ms = 60000) => page.waitForFunction((s) => new RegExp(s).test(location.pathname + location.search), { timeout: ms }, re.source)
 const type = async (sel, v) => { await page.click(sel, { clickCount: 3 }); await page.type(sel, v) }
@@ -207,7 +210,31 @@ try {
 
   // 6. Place the order
   await page.waitForFunction(() => !document.querySelector("[data-testid=submit-order-button]")?.disabled, { timeout: 60000 })
-  await page.click("[data-testid=submit-order-button]")
+  if (process.env.KILN_E2E_DEBUG_CLICK) {
+    // slow-motion click: where the button is at each pointer phase, what has focus, what the Element says
+    const rect = () => page.evaluate(() => { const r = document.querySelector("[data-testid=submit-order-button]").getBoundingClientRect(); return `${Math.round(r.x)},${Math.round(r.y)} ${Math.round(r.width)}x${Math.round(r.height)}` })
+    const active = () => page.evaluate(() => { const a = document.activeElement; return a ? `${a.tagName.toLowerCase()}${a.name ? "[" + a.name.slice(0, 24) + "]" : ""}${a.dataset?.testid ? "#" + a.dataset.testid : ""}` : "none" })
+    const msgs = async () => { const out = []; for (const f of page.frames()) { const t = await f.evaluate(() => [...document.querySelectorAll("[role=alert], .p-FieldError, .p-Error")].map((e) => e.textContent.trim()).filter(Boolean).join(" | ")).catch(() => ""); if (t) out.push(t.slice(0, 80)) } return out.join(" || ") || "none" }
+    const box = await page.$eval("[data-testid=submit-order-button]", (b) => { b.scrollIntoView({ block: "center" }); const r = b.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 } })
+    log(`before: rect=${await rect()} active=${await active()} msgs=${await msgs()}`)
+    await page.mouse.move(box.x, box.y); await wait(300)
+    log(`after move: rect=${await rect()} active=${await active()} msgs=${await msgs()}`)
+    await page.mouse.down(); await wait(300)
+    log(`after down: rect=${await rect()} active=${await active()} msgs=${await msgs()}`)
+    await page.mouse.up(); await wait(1500)
+    log(`after up: rect=${await rect()} active=${await active()} msgs=${await msgs()} stripe=${stripeCalls.filter((c) => /confirm/.test(c)).join(",") || "no confirm"}`)
+  } else {
+    await page.click("[data-testid=submit-order-button]")
+  }
+  await wait(4000)
+  await shot("after-click")
+  if (PROVIDER === "pp_stripe_stripe" && !stripeCalls.some((c) => /confirm/.test(c))) {
+    // no confirm call after the first click: what does the Payment Element show, and does a DOM click behave differently?
+    const inner = []
+    for (const f of page.frames()) { const t = await f.evaluate(() => [...document.querySelectorAll("[role=alert], .p-FieldError, .p-Error")].map((e) => e.textContent.trim()).filter(Boolean).join(" | ")).catch(() => ""); if (t) inner.push(t.slice(0, 200)) }
+    log(`no confirm call 4 s after the click; element messages: ${inner.join(" || ") || "none"}; page alert: ${await page.evaluate(() => document.querySelector("[role=alert]")?.textContent?.trim() || "none")}`)
+  }
+  log(`after click: ${await page.evaluate(() => { const b = document.querySelector("[data-testid=submit-order-button]"); return b ? `button ${b.disabled ? "disabled" : "enabled"} busy=${b.getAttribute("aria-busy") || b.dataset.loading || "no"} text="${b.textContent.trim().slice(0, 30)}"` : "button gone" })}; stripe calls so far: ${stripeCalls.length}`)
   if (EXPECT === "decline") {
     // 6b. Declined: Stripe's message appears, nothing is placed
     await page.waitForSelector("[data-testid=payment-error-message]", { timeout: 60000 })
@@ -257,6 +284,14 @@ try {
   }
 } catch (e) {
   fail(e.message)
+  // what the payment step holds at that moment: its buttons (visibility, disabled) and any alert
+  const state = await page.evaluate(() => {
+    const vis = (el) => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== "hidden" && cs.opacity !== "0" }
+    const buttons = [...document.querySelectorAll("[data-testid=payment-step] button")].map((b) => `${b.dataset.testid || b.textContent.trim().slice(0, 20)}: ${b.disabled ? "disabled" : "enabled"}, ${vis(b) ? "visible" : "hidden"}`)
+    return { url: location.pathname + location.search, buttons, alert: document.querySelector("[role=alert]")?.textContent?.trim().slice(0, 200) || null }
+  }).catch(() => null)
+  if (state) log("state at failure:", JSON.stringify(state))
+  if (stripeCalls.length) log("stripe api calls:", stripeCalls.join(" | "))
   await shot("failed")
 } finally {
   await browser.close()

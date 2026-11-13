@@ -3,7 +3,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { loadStripe, type Stripe, type StripeElementsOptions, type StripeError } from "@stripe/stripe-js"
-import { useParams } from "next/navigation"
+import { unstable_rethrow, useParams } from "next/navigation"
 import { useEffect, useRef, useState, useTransition } from "react"
 
 import { isManual, isStripeLike } from "@lib/constants"
@@ -119,19 +119,10 @@ function StripePlaceOrder({ cart, notReady, labels: t, onError }: { cart: HttpTy
   const elements = useElements()
   const { countryCode } = useParams() as { countryCode: string }
   const [submitting, setSubmitting] = useState(false)
-  const [complete, setComplete] = useState(false)
 
-  useEffect(() => {
-    if (!elements) return
-    const el = elements.getElement("payment")
-    if (!el) return
-    const onChange = (e: { complete: boolean }) => setComplete(e.complete)
-    el.on("change", onChange)
-    return () => {
-      el.off("change", onChange)
-    }
-  }, [elements])
-
+  // The button is not gated on the Element's `complete` flag: Stripe toggles it while focus leaves the Element,
+  // which disabled the button between pointer-down and pointer-up and swallowed the press. An incomplete card
+  // makes confirmPayment() return a validation error that the Element shows inline.
   const pay = async () => {
     if (!stripe || !elements) return
     setSubmitting(true)
@@ -156,6 +147,7 @@ function StripePlaceOrder({ cart, notReady, labels: t, onError }: { cart: HttpTy
     const status = paymentIntent?.status ?? error?.payment_intent?.status
     if (status === "succeeded" || status === "requires_capture") {
       await placeOrder().catch((e) => {
+        unstable_rethrow(e) // the server action redirects to the confirmation page by throwing
         console.error("[checkout] place order", e)
         onError(t.errorPlaceOrder)
         setSubmitting(false)
@@ -170,7 +162,7 @@ function StripePlaceOrder({ cart, notReady, labels: t, onError }: { cart: HttpTy
   }
 
   return (
-    <Button type="button" size="large" disabled={notReady || !stripe || !elements || !complete} isLoading={submitting} onClick={pay} data-testid="submit-order-button">
+    <Button type="button" size="large" disabled={notReady || !stripe || !elements} isLoading={submitting} onClick={pay} data-testid="submit-order-button">
       {t.placeOrder}
     </Button>
   )
@@ -182,6 +174,7 @@ function ManualPlaceOrder({ notReady, labels: t, onError }: { notReady: boolean;
     setSubmitting(true)
     onError(null)
     await placeOrder().catch((e) => {
+      unstable_rethrow(e)
       console.error("[checkout] place order", e)
       onError(t.errorPlaceOrder)
       setSubmitting(false)
