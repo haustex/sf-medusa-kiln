@@ -35,9 +35,17 @@ follow [Semantic Versioning](https://semver.org).
   shipping option priced 0 above an `item_total` rule; the demo seed adds "Free shipping" over $100. Below the
   threshold Medusa lists that option without a price; the delivery step leaves it out instead of showing "–".
 - `brand.timeZone` in theme.config.ts (shipping dates, tracking times).
+- Review-request magic link page `/review/{token}` (medusa-reviews-wishlist `review_requests.link_url`): the open
+  items of the order, one form each, in the market's language; the review form (also in the account) takes up to
+  three photos through `/api/reviews/upload`. Opt-out page `/review/unsubscribe/{id}` in the shop's design for the
+  e-mail's unsubscribe link (`/api/reviews/unsubscribe`). Both never indexed or cached.
 
 ### Fixed
 
+- A dot in a per-visitor address (`/review/unsubscribe/revreq_….<signature>`) was taken for a file by the proxy and
+  answered 404 on the default market.
+- The no-store / noindex / no-referrer headers of the wishlist, review and preview pages applied to `/us/…` only; they
+  now cover every market prefix.
 - The sitemap and llms.txt read the blog index with fields medusa-blog-seo does not return (`slug`, `title_en`),
   so every article URL was `/blog/undefined`; they now use the per-language slugs and copy, and the sitemap lists
   each language's URL as an alternate of the others.

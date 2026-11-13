@@ -90,8 +90,11 @@ are entered in Admin → Settings → doit.id. `medusa-fulfillment-zone-rate` is
 `~/themes/kiln-backend/shipping.config.ts`, `ZONE_RATE_PROXY_SECRET` in both `.env` files); `node
 seed/enable-shipping.mjs` links the provider, creates the calculated options and gives the demo variants a parcel
 size. A shipment for an order comes from the Admin API (`POST /admin/zone-rate/shipments {order_id}`, then
-`…/shipments/:id/status`), the tracking page is `/track/{number}` (`/id/lacak/{number}`). Stripe is wired in and
-switches on with keys:
+`…/shipments/:id/status`), the tracking page is `/track/{number}` (`/id/lacak/{number}`). Review-request e-mails:
+the dev backend's local notification provider also takes the `email` channel, so `POST
+/admin/review-requests/schedule {order_id, send_now: true}` (Admin API) prints the e-mail payload with `review_url`
+(`/review/{token}`) and `unsubscribe_url` in `.state/server.log`; the storefront's opt-out page is
+`/review/unsubscribe/{id}` with the id of that link. Stripe is wired in and switches on with keys:
 
 1. Backend: put `STRIPE_API_KEY=sk_test_…` (and `STRIPE_WEBHOOK_SECRET` once a webhook points at
    `/hooks/payment/stripe_stripe`) in `~/themes/kiln-backend/.env`, restart it, then enable the provider on the

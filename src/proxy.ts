@@ -15,7 +15,9 @@ import { trackingRoute } from "@lib/util/tracking-path"
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
 
-  if (pathname.includes(".")) {
+  // Files (/favicon.ico, /images/x.png) pass through. A dot inside a per-visitor address does not make it a file: the
+  // unsubscribe id of a review-request e-mail is `revreq_….<signature>`.
+  if (pathname.includes(".") && !isPerVisitor(pathname)) {
     return NextResponse.next()
   }
 
@@ -80,6 +82,13 @@ export async function proxy(request: NextRequest) {
 }
 
 const DYNAMIC_PREFIXES = ["/cart", "/checkout", "/account", "/order", "/track", "/verify-account", "/wishlist", "/review"]
+
+/** A per-visitor page (cart, account, review link …), with or without the market prefix */
+function isPerVisitor(path: string) {
+  const first = path.split("/")[1]?.toLowerCase() ?? ""
+  const marketless = isMarketCode(first) ? path.slice(first.length + 1) || "/" : path
+  return DYNAMIC_PREFIXES.some((p) => marketless === p || marketless.startsWith(`${p}/`))
+}
 
 /** Server actions (POST) and the per-visitor pages; never the static catalogue/info pages */
 function needsCacheId(request: NextRequest, path: string) {

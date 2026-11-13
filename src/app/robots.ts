@@ -5,7 +5,7 @@ import { SITE_LIVE } from "@lib/util/site-live"
 import type { MetadataRoute } from "next"
 
 /** Private or per-visitor pages, in every market (theme.config.ts markets) */
-const PRIVATE = ["/cart", "/checkout", "/account", "/order/", "/transfer/", "/verify-account", "/blog/pratinjau/", "/wishlist"]
+const PRIVATE = ["/cart", "/checkout", "/account", "/order/", "/transfer/", "/verify-account", "/blog/pratinjau/", "/wishlist", "/review/"]
 const DISALLOW = Array.from(new Set([...MARKET_CODES.flatMap((cc) => [...PRIVATE, "/track", trackingPath(cc)].map((p) => marketPath(cc, p))), "/api/", "/design"]))
 
 /**

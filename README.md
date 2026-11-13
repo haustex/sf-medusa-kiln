@@ -20,7 +20,8 @@ Demo: [kiln.hauskayu.com](https://kiln.hauskayu.com) (Stripe test mode, the data
   accordions, specifications from metadata, reviews, more from the maker), quick view, search.
 - **Shopping**: cart drawer and cart page, checkout in three steps (address, delivery, payment), Stripe's Payment
   Element (card, wallets, redirect methods), order confirmation, customer account (orders, addresses, profile,
-  reviews), wishlist for guests and customers.
+  reviews), wishlist for guests and customers. Reviews with photos from the account or from the review-request
+  e-mail's magic link (`/review/{token}`), one-click unsubscribe page (`/review/unsubscribe/{id}`).
 - **Content**: a journal with categories, pagination, table of contents, FAQ blocks, "from the shop" product
   cards, share row, author box, RSS feed and secret previews, through [medusa-blog-seo](https://www.npmjs.com/package/medusa-blog-seo).
   Information pages (shipping, returns, contact, privacy, terms, about) as markdown files per language, and
@@ -137,11 +138,11 @@ docs/customize.md "Shipping and tracking". `seed/enable-shipping.mjs` switches i
 ```
 theme.config.ts        brand, markets, colours, radii, font, features, listing, hero, contact
 src/app/[countryCode]  pages: (main) home, store, categories, collections, products, search, cart, wishlist,
-                       blog, account, order, design; (checkout)
+                       blog, account, order, review, track, transfer, design; (checkout)
 src/app/api            cart, health, payment-return, manual-transfer (proof/invoice relay), zone-rate (tracking relay), revalidate, reviews, wishlist
 src/app/og             generated share images
 src/modules/ds         the design system (cards, grids, sections, price, stars, sheet, carousel)
-src/modules/*          home, layout, products, store, cart, checkout (+ doit), manual-transfer, tracking, shipping, account, order, blog, wishlist, brand
+src/modules/*          home, layout, products, store, cart, checkout (+ doit), manual-transfer, tracking, shipping, account, order, reviews, blog, wishlist, brand
 src/lib                data (Medusa SDK), i18n, listing filters, seo, util, features.ts
 src/styles             globals.css (tokens, type scale, utilities), theme.css (HeroUI mapping), fonts
 seed                   demo catalogue, articles and generated images (CC0)

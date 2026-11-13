@@ -149,7 +149,7 @@ environment overrides the file: `KILN_FEATURE_BLOG=off`. What "off" means:
 
 | Feature | Backend | Off |
 | --- | --- | --- |
-| `reviews` | medusa-reviews-wishlist | No stars on cards or product pages, no reviews block, no "Reviews" tab in the account, `/api/reviews` 404 |
+| `reviews` | medusa-reviews-wishlist | No stars on cards or product pages, no reviews block, no "Reviews" tab in the account, `/review/…` pages and `/api/reviews/…` 404 |
 | `wishlist` | medusa-reviews-wishlist | No hearts, no wishlist icon in the header, `/wishlist` and `/api/wishlist` 404 |
 | `blog` | medusa-blog-seo | `/blog/…` and the feed 404, journal band and links hidden, sitemap without articles |
 | `search` | `/store/meilisearch/products` route | `/search` uses Medusa's own `/store/products?q=` |

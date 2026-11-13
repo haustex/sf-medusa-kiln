@@ -96,7 +96,7 @@ const nextConfig = {
       ...edgeCacheHeaders(),
       // Per-visitor pages of medusa-reviews-wishlist: the wishlist (cookie-bound) and the magic-link review pages
       // (the address holds the token): never cached at the edge or in the browser, never indexed
-      ...["/wishlist", "/us/wishlist", "/review/:path*", "/us/review/:path*"].map((source) => ({
+      ...["/wishlist", "/:market([a-z]{2})/wishlist", "/review/:path*", "/:market([a-z]{2})/review/:path*"].map((source) => ({
         source,
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
@@ -107,7 +107,7 @@ const nextConfig = {
       })),
       // Secret article previews (Admin "Pratinjau"): never cached, never indexed, and the address (it holds the
       // token) is not sent along when a link on the page is followed
-      ...["/blog/pratinjau/:token", "/us/blog/pratinjau/:token"].map((source) => ({
+      ...["/blog/pratinjau/:token", "/:market([a-z]{2})/blog/pratinjau/:token"].map((source) => ({
         source,
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
