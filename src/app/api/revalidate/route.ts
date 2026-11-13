@@ -13,8 +13,11 @@ import { MARKET_CODES, marketPath } from "@lib/util/market"
  *
  * POST { handles?: string[], all?: boolean }  header x-revalidate-secret
  *
- * Blog (backend src/subscribers/blog-revalidate.ts), when an article is published, changed or taken down:
- * POST { blog: { slugs?: string[], categories?: string[], all?: boolean } }
+ * Blog, when an article is published, changed or taken down:
+ * POST { blog: { slugs?: string[], categories?: string[], all?: boolean } }            (a subscriber of your own)
+ * POST { blog_seo: { posts: [{ slugs, previous_slugs, category_slugs, previous_category_slugs }], categories, all } }
+ *   (medusa-blog-seo's `revalidate` option: slugs per locale, the previous ones after a rename; `categories` are ids,
+ *   a renamed or removed category sets `all`)
  * Same three steps for the article pages, the blog listings, the RSS feeds, the sitemap and llms.txt. The catalogue
  * pages are left alone (their HTML does not change with an article).
  */
@@ -98,10 +101,22 @@ async function revalidateBlog(blog: { slugs?: unknown; categories?: unknown; all
   return NextResponse.json({ revalidated: paths, tags, cloudflare })
 }
 
+/** medusa-blog-seo's payload as { slugs, categories, all }: every locale's slug, old and new, of every post in the batch */
+function fromBlogSeo(b: Record<string, unknown>) {
+  const values = (o: unknown) => (o && typeof o === "object" ? Object.values(o as Record<string, unknown>) : [])
+  const posts = Array.isArray(b.posts) ? (b.posts as Record<string, unknown>[]) : []
+  return {
+    slugs: posts.flatMap((p) => [...values(p?.slugs), ...values(p?.previous_slugs)]),
+    categories: posts.flatMap((p) => [...values(p?.category_slugs), ...values(p?.previous_category_slugs)]),
+    all: b.all === true || (Array.isArray(b.categories) && b.categories.length > 0),
+  }
+}
+
 export async function POST(req: NextRequest) {
   if (!authorized(req)) return NextResponse.json({ message: "Not found" }, { status: 404 })
-  const body = (await req.json().catch(() => ({}))) as { handles?: unknown; all?: unknown; blog?: unknown }
+  const body = (await req.json().catch(() => ({}))) as { handles?: unknown; all?: unknown; blog?: unknown; blog_seo?: unknown }
   if (body.blog && typeof body.blog === "object") return revalidateBlog(body.blog as Record<string, unknown>)
+  if (body.blog_seo && typeof body.blog_seo === "object") return revalidateBlog(fromBlogSeo(body.blog_seo as Record<string, unknown>))
   const handles = Array.isArray(body.handles)
     ? Array.from(new Set(body.handles.filter((h): h is string => typeof h === "string" && HANDLE.test(h)))).slice(0, 25)
     : []

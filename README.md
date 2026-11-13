@@ -61,7 +61,8 @@ Demo: [kiln.hauskayu.com](https://kiln.hauskayu.com) (Stripe test mode, the data
 
 ```bash
 # 1. The backend (any Medusa 2.22+ project). Optional plugins in medusa-config.ts:
-#    { resolve: "medusa-blog-seo", options: { storefront_url: "http://localhost:9720" } },
+#    { resolve: "medusa-blog-seo", options: { storefront_url: "http://localhost:9720",
+#        routing: { category: "kategori", preview: "pratinjau" } } },   // Kiln's blog folders (docs/customize.md, blogPath)
 #    { resolve: "medusa-reviews-wishlist", options: { storefront_url: "http://localhost:9720" } },
 #    Demo catalogue (two regions, a sales channel + key, categories, 13 products):
 cp seed/seed-kiln.ts <backend>/src/scripts/ && mkdir -p <backend>/static/demo && cp seed/images/*.jpg <backend>/static/demo/

@@ -14,6 +14,8 @@ follow [Semantic Versioning](https://semver.org).
 - `home.promo`: an optional text banner on the home page between the featured products and the value props.
 - `brand.legal`: legal name, registration number, address, telephone and contact hours in the Organization schema.
 - `NEXT_WORKSPACE_ROOT`: build and trace from a monorepo root when Kiln is one workspace package.
+- `/api/revalidate` takes medusa-blog-seo's own `revalidate` payload (`blog_seo`), so the plugin option
+  `revalidate: { url, secret }` is enough; the old `{ blog: … }` shape still works.
 
 ## [0.2.0] — 2026-11-13
 

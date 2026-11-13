@@ -394,11 +394,14 @@ them by `Cache-Tag`:
 ```json
 { "handles": ["oak-serving-board"] }            // products (or { "all": true })
 { "blog": { "slugs": ["…"], "categories": ["…"] } }   // articles (or { "blog": { "all": true } })
+{ "blog_seo": { "posts": [{ "slugs": { "en": "…" } }], "all": false } }   // what medusa-blog-seo sends
 ```
 
-Call it from a Medusa subscriber on `product.updated`, `product.deleted`, `inventory-level.updated` and from
-medusa-blog-seo's publish events, or from a deploy script with `{ "all": true }`. Without it the pages still
-refresh within a minute at the origin.
+Call it from a Medusa subscriber on `product.updated`, `product.deleted`, `inventory-level.updated`, or from a
+deploy script with `{ "all": true }`. For articles, give medusa-blog-seo the route as its `revalidate` option
+(`{ url: "https://your-store.com/api/revalidate", secret: process.env.REVALIDATE_SECRET }` in medusa-config.ts):
+its batched payload is understood as is, previous slugs included. Without it the pages still refresh within a
+minute at the origin.
 
 ### Payment providers
 
