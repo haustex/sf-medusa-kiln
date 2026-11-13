@@ -22,7 +22,7 @@ export const PICKS_TAG = "pilihan"
 export type Lang = "id" | "en"
 export const blogLang = (countryCode: string): Lang => (getMarket(countryCode).htmlLang === "en" ? "en" : "id")
 
-export type BlogCategory = { id: string; slug: string; name: string; description: string | null }
+export type BlogCategory = { id: string; slug: string; name: string; description: string | null; post_count?: number }
 /** Who wrote it, as the lists carry it (the article adds photo, bio and profiles: {@link BlogAuthor}) */
 export type BlogAuthorRef = { id: string; slug: string; name: string; type: "person" | "organization" }
 export type BlogAuthor = BlogAuthorRef & {
@@ -153,11 +153,11 @@ export async function listJournalPicks(countryCode: string, n = 3): Promise<Blog
   }
 }
 
-/** Categories that have at least one public article */
+/** Categories that have at least one public article in this language (the plugin lists every category with its count) */
 export const listBlogCategories = (countryCode: string) =>
   sdk.client
     .fetch<{ categories: BlogCategory[] }>(`${BASE}/categories`, { query: { locale: blogLang(countryCode) }, ...cached })
-    .then((r) => r.categories)
+    .then((r) => r.categories.filter((c) => (c.post_count ?? 1) > 0))
 
 /** Every public article in both languages (sitemap, RSS, llms.txt) */
 export const listPostIndex = () =>

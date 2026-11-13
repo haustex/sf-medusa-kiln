@@ -17,6 +17,9 @@ follow [Semantic Versioning](https://semver.org).
 - `/api/revalidate` takes medusa-blog-seo's own `revalidate` payload (`blog_seo`), so the plugin option
   `revalidate: { url, secret }` is enough; the old `{ blog: … }` shape still works.
 
+### Fixed
+- Blog category chips no longer list categories without a public article (a chip led to an empty page).
+
 ## [0.2.0] — 2026-11-13
 
 ### Added
