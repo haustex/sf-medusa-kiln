@@ -5,6 +5,10 @@ follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.2.0] — 2026-11-13
+
 ### Added
 
 - `markets.suggest` in theme.config.ts: a dismissible pill on one market pointing to another ("Shopping from the
