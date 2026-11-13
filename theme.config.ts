@@ -23,6 +23,11 @@ export type HeroSlideConfig = {
   end?: string
 }
 
+import type { Dictionary } from "./src/lib/i18n/dictionaries"
+
+/** Every key optional, at any depth: `text` below overrides only what it names */
+export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] }
+
 export type MarketConfig = {
   /** Medusa region country code (lower case), e.g. "us" */
   countryCode: string
@@ -106,7 +111,26 @@ const config = {
       us: { countryCode: "us", locale: "en-US", htmlLang: "en", hreflang: "en-US", currency: "usd", dictionary: "en", label: "United States (USD)" },
       id: { countryCode: "id", locale: "id-ID", htmlLang: "id", hreflang: "id-ID", currency: "idr", dictionary: "id", label: "Indonesia (IDR)" },
     } satisfies Record<string, MarketConfig>,
+    /**
+     * A small dismissible pill on market `on` pointing visitors to market `to` ("Shopping from the US? → Go to
+     * the US store"), with no geo-IP: everyone sees it once until closed. Wording: dictionary `marketBanner`.
+     */
+    suggest: null as null | { on: string; to: string },
   },
+
+  /**
+   * Your own wording on top of the dictionaries (src/lib/i18n/dictionaries.ts), per language, only the keys you
+   * change: text: { en: { nav: { search: "Search the shop…" } }, id: { … } }. Keeps the dictionaries untouched,
+   * so a theme update never conflicts with your copy.
+   */
+  text: {} as Partial<Record<"en" | "id", DeepPartial<Dictionary>>>,
+
+  /**
+   * Permanent redirects (308) for addresses from before this theme, matched on the path without the market
+   * prefix and answered in the same market: { from: "/account/orders/details/:id", to: "/account/orders/:id" }.
+   * `:name` matches one segment, `:rest*` the remainder.
+   */
+  redirects: [] as { from: string; to: string }[],
 
   /** Colours: white page, ink text, neutral greys. Contrast on white: ink 19.6:1, muted 5.3:1, control 3.5:1. */
   colors: {

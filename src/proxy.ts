@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { ALWAYS_PREFIX, DEFAULT_MARKET, MARKETS, isMarketCode } from "@lib/util/market"
+import { redirectFor } from "@lib/util/redirects"
 
 /**
  * Market routing (theme.config.ts `markets.routing`; no geo-IP redirects):
@@ -35,6 +36,13 @@ export async function proxy(request: NextRequest) {
   }
 
   const market = hasPrefix ? first : DEFAULT_MARKET
+  // theme.config.ts `redirects`: old addresses, answered in the market they were asked in
+  const marketless = hasPrefix ? pathname.slice(market.length + 1) || "/" : pathname
+  const legacy = redirectFor(marketless)
+  if (legacy) {
+    const prefix = hasPrefix ? `/${market}` : ""
+    return NextResponse.redirect(new URL(`${prefix}${legacy === "/" && prefix ? "" : legacy}${search}`, request.url), 308)
+  }
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set("x-kiln-locale", MARKETS[market].locale)
   requestHeaders.set("x-kiln-market", market)
@@ -54,7 +62,6 @@ export async function proxy(request: NextRequest) {
 
   // Per-visitor fetch cache id (cart, customer, checkout), only where those are read: a Set-Cookie on static
   // pages would stop CDNs from caching the HTML.
-  const marketless = hasPrefix ? pathname.slice(market.length + 1) || "/" : pathname
   if (!cacheIdCookie && needsCacheId(request, marketless)) {
     response.cookies.set("_medusa_cache_id", cacheId, { maxAge: 60 * 60 * 24 })
   }

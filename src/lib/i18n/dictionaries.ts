@@ -6,6 +6,8 @@ import { getMarket } from "@lib/util/market"
  * Translation Module; this file only covers the storefront chrome.
  */
 const id = {
+  /** theme.config.ts markets.suggest: pill on one market pointing to another */
+  marketBanner: { text: "Belanja dari luar negeri?", cta: "Ke toko internasional", close: "Tutup" },
   nav: {
     search: "Cari produk…",
     searchLabel: "Cari produk",
@@ -571,6 +573,7 @@ const id = {
 export type Dictionary = typeof id
 
 const en: Dictionary = {
+  marketBanner: { text: "Shopping from the US?", cta: "Go to the US store", close: "Close" },
   account: {
     title: "Account",
     hello: "Hi, {name}",
@@ -1134,7 +1137,14 @@ const withBrand = <T,>(value: T): T => {
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, withBrand(v)])) as T
   return value
 }
-const dictionaries = { id: withBrand(id), en: withBrand(en) }
+/** theme.config.ts `text`: the shop's own wording merged over the dictionary, key by key, any depth */
+const overridden = <T,>(base: T, over: unknown): T => {
+  if (!over || typeof over !== "object" || Array.isArray(over) || !base || typeof base !== "object") return (over ?? base) as T
+  const out: Record<string, unknown> = { ...(base as Record<string, unknown>) }
+  for (const [k, v] of Object.entries(over as Record<string, unknown>)) if (v !== undefined) out[k] = overridden((base as Record<string, unknown>)[k], v)
+  return out as T
+}
+const dictionaries = { id: withBrand(overridden(id, config.text?.id)), en: withBrand(overridden(en, config.text?.en)) }
 
 /** Fills `{name}` placeholders: t("Sisa {n}", { n: 3 }). */
 export { fill } from "./fill"

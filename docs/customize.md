@@ -60,6 +60,36 @@ markets: {
   `/us/`, like the official Medusa starter. No geo-IP redirects in either mode (`src/proxy.ts`).
 - `next.config.js` cannot import the TypeScript config: when you change `default`, set
   `NEXT_PUBLIC_DEFAULT_REGION` to the same value for the rewrites it needs (feed, Markdown product pages).
+- `suggest: { on: "id", to: "us" }` shows a small dismissible pill at the bottom of every page of market `on`
+  pointing to market `to` ("Shopping from the US? → Go to the US store"), in the language of `to`. Still no
+  geo-IP: everyone sees it once, closing it is remembered in `localStorage`. Wording: dictionary key
+  `marketBanner`. Default `null` (no pill).
+
+## text
+
+```ts
+text: {
+  en: { nav: { search: "Search the shop…" }, marketBanner: { text: "Shopping from the US?" } },
+  id: { nav: { search: "Cari di toko…" } },
+},
+```
+
+Your own wording on top of the dictionaries, per language, only the keys you change (any depth; the type checks
+them against `Dictionary`). The dictionaries themselves stay untouched, so a theme update never conflicts with
+your copy. `{brand}` and `{location}` placeholders work here too.
+
+## redirects
+
+```ts
+redirects: [
+  { from: "/account/orders/details/:id", to: "/account/orders/:id" },
+  { from: "/produk/:rest*", to: "/products/:rest*" },
+],
+```
+
+Permanent redirects (308) for addresses from before this theme. Patterns are matched on the path without the
+market prefix and answered in the same market (`/us/produk/x` → `/us/products/x`); `:name` matches one segment,
+`:name*` everything that follows; the query string is kept. Handled in `src/proxy.ts`, so no page is rendered.
 
 ## colors, cardIconColor, radius, frost
 

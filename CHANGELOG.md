@@ -3,6 +3,16 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [Unreleased]
+
+### Added
+
+- `markets.suggest` in theme.config.ts: a dismissible pill on one market pointing to another ("Shopping from the
+  US? → Go to the US store"), no geo-IP, shown after the fonts load so it never shifts the layout.
+- `text` in theme.config.ts: your own wording on top of the dictionaries, per language, only the keys you change.
+- `redirects` in theme.config.ts: permanent redirects (308) for pre-theme addresses, matched without the market
+  prefix and answered in the same market, with `:name` and `:name*` parameters.
+
 ## [0.1.0] — 2026-11-13
 
 First public release.
