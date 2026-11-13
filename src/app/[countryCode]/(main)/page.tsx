@@ -15,6 +15,7 @@ import CatalogCard from "@modules/products/components/catalog-card"
 import CategoryCard from "@modules/home/components/category-card"
 import Hero from "@modules/home/components/hero"
 import Journal from "@modules/home/components/journal"
+import Promo from "@modules/home/components/promo"
 import ValueProps from "@modules/home/components/value-props"
 
 export const dynamic = "force-static"
@@ -94,6 +95,8 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
           </ProductGrid>
         </Section>
       )}
+
+      <Promo countryCode={countryCode} />
 
       <ValueProps t={t.home} />
 

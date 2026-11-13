@@ -8,7 +8,9 @@ import { listCategories } from "@lib/data/categories"
 import { listMakers, listMakerProducts, type Maker } from "@lib/data/makers"
 import { listProducts } from "@lib/data/products"
 import { feature } from "@lib/features"
+import { getDictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
+import { soldByQuote } from "@lib/quote"
 import { isHiddenProduct } from "@lib/util/hidden-products"
 import { MARKET_CODES, MARKETS, X_DEFAULT_MARKET, getMarket, marketPath } from "@lib/util/market"
 import { formatPrice } from "@modules/ds/price-tag"
@@ -57,7 +59,9 @@ async function allProducts(countryCode: string): Promise<Product[]> {
   return out
 }
 
-const priceRange = (p: Product) => {
+/** The price range in the market, or "price on request" for a product sold by quote (theme.config.ts product.quote) */
+const priceRange = (p: Product, countryCode: string) => {
+  if (soldByQuote(p, countryCode)) return getDictionary(countryCode).product.priceOnRequest
   const amounts = (p.variants ?? []).map((v) => v.calculated_price?.calculated_amount).filter((a): a is number => typeof a === "number")
   const currency = (p.variants ?? []).find((v) => v.calculated_price?.currency_code)?.calculated_price?.currency_code
   if (!amounts.length || !currency) return null
@@ -125,7 +129,7 @@ export async function llmsTxt(origin: string): Promise<string> {
   const { lines, ref } = await header(origin)
   const { out, url } = await sections(origin, ref)
   const products = await allProducts(ref)
-  const productLines = products.length ? ["", "## Products", "", ...products.map((p) => bullet(p.title, url(`/products/${p.handle}`), [p.collection?.title ? `by ${p.collection.title}` : null, priceRange(p)].filter(Boolean).join(", ")))] : []
+  const productLines = products.length ? ["", "## Products", "", ...products.map((p) => bullet(p.title, url(`/products/${p.handle}`), [p.collection?.title ? `by ${p.collection.title}` : null, priceRange(p, ref)].filter(Boolean).join(", ")))] : []
   return [...lines, ...out, ...productLines, "", `Full version with descriptions and prices in every market: ${origin}/llms-full.txt`, ""].join("\n")
 }
 
@@ -153,7 +157,7 @@ export async function llmsFullTxt(origin: string): Promise<string> {
     const options = (p.options ?? []).filter((o) => (o.values?.length ?? 0) > 1).map((o) => `- ${o.title}: ${o.values!.map((v) => v.value).join(", ")}`)
     const prices = MARKET_CODES.map((c) => {
       const m = byMarket.get(c)?.get(p.handle)
-      const range = m ? priceRange(m) : null
+      const range = m ? priceRange(m, c) : null
       return range ? `- Price (${countryName(c)}): ${range}` : null
     }).filter(Boolean) as string[]
     return ["", `### ${p.title}`, "", `URL: ${url(`/products/${p.handle}`)}`, ...(p.subtitle ? ["", oneLine(p.subtitle)] : []), ...(p.description ? ["", p.description.trim()] : []), "", ...specs, ...options, ...prices]

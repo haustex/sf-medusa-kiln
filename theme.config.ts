@@ -87,6 +87,18 @@ const config = {
         ],
       },
     ] as { title: Localized; links: { label: Localized; href: string }[] }[],
+    /**
+     * Legal identity, all optional: Organization JSON-LD (legalName, identifier, address, telephone, contact hours).
+     * `identifier` is a registration number (propertyID "NIB", "VAT", "EIN", …); `hours` in the shop's time zone,
+     * e.g. { opens: "08:00:00+07:00", closes: "21:00:00+07:00" } (every day unless `days` lists schema.org day names).
+     */
+    legal: null as null | {
+      legalName?: string
+      identifier?: { propertyID: string; value: string }
+      telephone?: string
+      address?: { streetAddress: string; addressLocality: string; addressRegion?: string; postalCode?: string; addressCountry: string }
+      hours?: { opens: string; closes: string; days?: string[] }
+    },
     /** "Theme Kiln by Haus Kayu" after the copyright line in the footer. Set to false to hide it. */
     credit: true,
   },
@@ -222,6 +234,27 @@ const config = {
       { en: "Free shipping over $120 · 30-day returns", id: "Gratis ongkir di atas Rp1.500.000 · retur 30 hari" },
       { en: "Custom sizes available on request", id: "Ukuran custom bisa dipesan" },
     ] as Localized[],
+    /**
+     * Products sold by quote instead of the cart: metadata `metadata` = true (or "true"), or a category whose handle
+     * contains `category`. The product page shows "Request a quote" (dictionary product.requestQuote) with the lowest
+     * price as "from"; structured data, llms.txt and the Markdown page say "price on request". `href` per market:
+     * where the button goes ("{handle}" = the product handle; absolute URLs open in a new tab); a market without one
+     * gets a WhatsApp message to contact.whatsapp (dictionary product.quoteWhatsapp), or the contact page without a
+     * number. `fixedSize` per market: a metadata key that lets that market sell the product normally despite the
+     * flag. null = every product has a cart.
+     */
+    quote: null as null | { metadata: string; category: string; href: Record<string, string>; fixedSize: Record<string, string> },
+  },
+
+  /** Account: extra navigation items after "Orders" (quotes, subscriptions, …); the page behind each is yours to add */
+  account: { links: [] as { label: Localized; href: string }[] },
+
+  /**
+   * Home: an optional text banner between the featured products and the value props (made-to-order furniture,
+   * wholesale, gift cards). Market-relative hrefs ("/custom") or absolute URLs. null hides it.
+   */
+  home: {
+    promo: null as null | { eyebrow?: Localized; title: Localized; body?: Localized; cta: { label: Localized; href: string }; secondary?: { label: Localized; href: string } },
   },
 
   /**

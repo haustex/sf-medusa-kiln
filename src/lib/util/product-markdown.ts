@@ -6,6 +6,7 @@ import { tx } from "@lib/i18n/localized"
 import { isVariantInStock } from "@lib/util/inventory"
 import { marketPath } from "@lib/util/market"
 import { getPricedVariants } from "@lib/util/product-structured-data"
+import { soldByQuote } from "@lib/quote"
 import { formatPrice } from "@modules/ds/price-tag"
 import { productFaq, specRows } from "@modules/products/pdp/product-details"
 
@@ -28,6 +29,8 @@ export function renderProductMarkdown({ product, currency, origin, countryCode, 
 
   const specs = specRows(product, t, lang, location)
   const faq = productFaq(product, t, lang)
+  // sold by quote (theme.config.ts product.quote): no price table, "price on request" instead
+  const byQuote = soldByQuote(product, countryCode)
   const rows = variants.map((v) => {
     const options = (v.options ?? []).map((o) => `${optionTitles.get(o.option_id ?? "") ?? m.options}: ${o.value}`).join(", ")
     const price = formatPrice(v.calculated_price!.calculated_amount!, currency)
@@ -39,11 +42,12 @@ export function renderProductMarkdown({ product, currency, origin, countryCode, 
   if (product.subtitle?.trim()) out.push(`*${product.subtitle.trim()}*`, "")
   if (product.description?.trim()) out.push(product.description.trim(), "")
   out.push(`- ${m.url}: ${productUrl}`, `- ${m.availability}: ${inStock ? t.inStock : t.soldOut}`)
+  if (byQuote) out.push(`- ${m.price}: ${t.priceOnRequest}`)
   if (estimateLine) out.push(`- ${estimateLine}`)
   if (product.collection?.title) out.push(`- ${t.maker}: ${product.collection.title}`)
   out.push("")
   if (specs.length) out.push(`## ${t.specsTitle}`, "", ...specs.map((r) => `- ${r.k}: ${r.v}`), "")
-  if (rows.length) out.push(`## ${m.variants}`, "", `| ${m.options} | ${t.sku} | ${m.price} | ${m.availability} | ${m.variantId} |`, "| --- | --- | --- | --- | --- |", ...rows, "")
+  if (rows.length && !byQuote) out.push(`## ${m.variants}`, "", `| ${m.options} | ${t.sku} | ${m.price} | ${m.availability} | ${m.variantId} |`, "| --- | --- | --- | --- | --- |", ...rows, "")
   if (faq.length) out.push(`## ${t.faqTitle}`, "", ...faq.flatMap((f) => [`**${f.q}**`, "", f.a, ""]))
   out.push(`## ${m.links}`, "", `- [${m.page}](${productUrl})`, ...links.map((l) => `- [${tx(l.label, lang)}](${base}${l.href})`), "")
   return out.join("\n")

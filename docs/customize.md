@@ -26,6 +26,7 @@ value given.
 | `logo` | `type: "text"` sets the name in the site font with a small ink mark; `type: "svg"` draws one path (`svgPath`, `svgViewBox`, fill `currentColor`) |
 | `navLinks` | Links after the categories in the header's category row (`/makers`, `/blog`, …); a link into the journal disappears when the blog is off |
 | `footerColumns` | Footer columns and their links; the "Shop" column (categories) is automatic |
+| `legal` | Optional legal identity for the Organization JSON-LD: `legalName`, `identifier` (`{ propertyID: "NIB", value }`), `telephone`, `address` (schema.org PostalAddress keys), `hours` (`{ opens, closes, days? }`, opens/closes as times with offset, e.g. `"08:00:00+07:00"`) |
 | `credit` | `false` hides "Theme Kiln by Haus Kayu" after the copyright line |
 
 Paths in `navLinks` and `footerColumns` are market-relative: `/blog` becomes `/id/blog` in the Indonesian market.
@@ -193,6 +194,56 @@ product: {
 
 Short promises under the add-to-cart button. `[]` hides the list. Specifications on the product page come from
 `product.metadata` (one row per key), the maker from the product's collection.
+
+### Products sold by quote
+
+```ts
+product: {
+  notes: [...],
+  quote: {
+    metadata: "made_to_order",
+    category: "custom",
+    href: { id: "/custom?produk={handle}" },
+    fixedSize: { us: "us_fixed_size" },
+  },
+},
+```
+
+A product with `metadata.made_to_order = true` (or `"true"`), or in a category whose handle contains `category`, is
+sold by quote: the product page shows "Request a quote" (dictionary `product.requestQuote`, note
+`product.requestQuoteNote`) where the buy box would be, with the lowest variant price as "from"; the quick view and
+the listing cards keep their price. Structured data carries no Product item (an offer without a price is invalid for
+Google); llms.txt and the Markdown product page say `product.priceOnRequest`. `href` per market is where the button
+goes (`{handle}` = the product handle; an absolute URL opens in a new tab). A market without an `href` gets a WhatsApp
+message to `contact.whatsapp` (`product.quoteWhatsapp`, with `{brand}`, `{title}` and `{url}`), or the contact page
+when there is no number. `fixedSize` names, per market, a metadata key that lets that market sell the product normally
+(`us_fixed_size: true` on a product that has a fixed US size). `quote: null` (the default) gives every product a cart.
+
+## account
+
+```ts
+account: { links: [{ label: { en: "Quotes", id: "Penawaran" }, href: "/account/penawaran" }] },
+```
+
+Extra items in the account navigation after "Orders" (and "Reviews" when the reviews plugin is installed). The page
+behind each link is yours: add it under `src/app/[countryCode]/(main)/account/`, the account layout wraps it.
+
+## home
+
+```ts
+home: {
+  promo: {
+    eyebrow: { en: "Made to order", id: "Furnitur custom" },
+    title: { en: "Tables, chairs and shelves sized for your room", id: "Meja, kursi, dan rak sesuai ukuran ruangan" },
+    body: { en: "Send us the measurements; we take it from sketch to finish.", id: "Kirim ukurannya; kami kerjakan dari sketsa sampai finishing." },
+    cta: { label: { en: "Request a quote", id: "Minta penawaran" }, href: "/custom" },
+    secondary: { label: { en: "See the furniture", id: "Lihat furnitur" }, href: "/categories/furniture" },
+  },
+},
+```
+
+A text banner between the featured products and the value props: eyebrow, title, body and one or two buttons, a
+photo slot (placeholder) on the right from `md`. `promo: null` (the default) hides it.
 
 ## hero
 

@@ -13,12 +13,14 @@ import { breadcrumbList, faqPage, JsonLd } from "@lib/seo/jsonld"
 import { isVariantInStock } from "@lib/util/inventory"
 import { getMarket, marketPath } from "@lib/util/market"
 import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
+import { quoteLink, soldByQuote } from "@lib/quote"
 import { buildProductStructuredData } from "@lib/util/product-structured-data"
 import { getSiteOrigin, STORE_NAME } from "@lib/util/site"
 import Link from "@modules/common/components/app-link"
 import { Breadcrumb, Carousel, Page, Stars } from "@modules/ds"
 import CatalogCard from "@modules/products/components/catalog-card"
 import BuyBox, { type BuyBoxVariant } from "@modules/products/pdp/buy-box"
+import QuoteCta from "@modules/products/pdp/quote-cta"
 import Gallery from "@modules/products/pdp/gallery"
 import { Accordion, meta, optionValues, productFaq, ProductSpecs, specRows } from "@modules/products/pdp/product-details"
 import ProductReviews, { formatAverage } from "@modules/products/pdp/reviews"
@@ -89,15 +91,23 @@ export default async function ProductTemplate({ product, region, countryCode }: 
   const care = meta(product, "care", lang)
   const faq = productFaq(product, t, lang)
   const specs = specRows(product, t, lang, location)
+  // Sold by quote (theme.config.ts product.quote): the quote button instead of the cart, and no Product item in the
+  // structured data (an item without a price is invalid for Google); breadcrumbs and FAQ stay
+  const byQuote = soldByQuote(product, countryCode)
+  const amounts = variants.map((v) => v.amount).filter((a): a is number => typeof a === "number")
 
   const abs = (path: string) => `${origin}${href(path)}`
   const productUrl = abs(`/products/${product.handle}`)
   const crumbs = [{ label: t.home, href: href("/") }, category ? { label: category.name, href: href(`/categories/${category.handle}`) } : { label: t.store, href: href("/store") }, { label: product.title ?? "" }]
   const structuredData = [
-    {
-      ...buildProductStructuredData({ product, currency: region.currency_code, productUrl }),
-      ...(hasReviews ? productReviews(rating, reviewPage.reviews, { storeName: STORE_NAME, limit: PDP_REVIEWS }) : {}),
-    },
+    ...(byQuote
+      ? []
+      : [
+          {
+            ...buildProductStructuredData({ product, currency: region.currency_code, productUrl }),
+            ...(hasReviews ? productReviews(rating, reviewPage.reviews, { storeName: STORE_NAME, limit: PDP_REVIEWS }) : {}),
+          },
+        ]),
     breadcrumbList(crumbs.map((c) => ({ name: c.label, url: c.href ? `${origin}${c.href}` : undefined }))),
     faqPage(faq, productUrl),
   ].filter(Boolean)
@@ -162,6 +172,10 @@ export default async function ProductTemplate({ product, region, countryCode }: 
               )}
             </div>
 
+            {byQuote ? (
+              <QuoteCta {...quoteLink(product, countryCode, productUrl, t)} fromAmount={amounts.length ? Math.min(...amounts) : null} currency={region.currency_code} notes={config.product.notes.map((n) => tx(n, lang))} labels={{ requestQuote: t.requestQuote, requestQuoteNote: t.requestQuoteNote, from: t.from }} />
+            ) : (
+
             <BuyBox
               productId={product.id}
               title={product.title ?? ""}
@@ -192,6 +206,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
                 from: t.from,
               }}
             />
+            )}
 
             {intro && (
               <p className="type-body text-muted" data-testid="product-description">

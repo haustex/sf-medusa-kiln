@@ -3,9 +3,11 @@
 import { cn } from "@heroui/styles"
 import { useParams, usePathname } from "next/navigation"
 
+import config from "@theme"
 import { signout } from "@lib/data/customer"
 import { type Dictionary } from "@lib/i18n/dictionaries"
-import { marketPath, stripMarketPrefix } from "@lib/util/market"
+import { tx } from "@lib/i18n/localized"
+import { getMarket, marketPath, stripMarketPrefix } from "@lib/util/market"
 import Link from "@modules/common/components/app-link"
 
 /** Account navigation: a scrolling pill row on phones, a sidebar list from lg. The current page has aria-current. */
@@ -16,6 +18,8 @@ export default function AccountNav({ email, reviews, labels: t }: { email: strin
     { href: "/account", label: t.overview, testId: "overview-link" },
     { href: "/account/orders", label: t.orders, testId: "orders-link" },
     ...(reviews ? [{ href: "/account/reviews", label: t.reviews, testId: "reviews-link" }] : []),
+    // theme.config.ts account.links (quotes, subscriptions, …)
+    ...config.account.links.map((l) => ({ href: l.href, label: tx(l.label, getMarket(countryCode).dictionary), testId: `${l.href.split("/").filter(Boolean).pop()}-link` })),
     { href: "/account/addresses", label: t.addresses, testId: "addresses-link" },
     { href: "/account/profile", label: t.profile, testId: "profile-link" },
   ]

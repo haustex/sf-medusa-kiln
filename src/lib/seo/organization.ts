@@ -15,18 +15,34 @@ export const ORG = {
 
 const marketBase = (origin: string, countryCode: string) => `${origin}${countryCode === "us" ? "/us" : ""}`
 
-/** Organization (same @id on every market). */
+const ALL_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+/** Organization (same @id on every market), with the legal identity from theme.config.ts brand.legal when given. */
 export function organizationSchema(origin: string, countryCode: string) {
+  const legal = config.brand.legal
+  const hours = legal?.hours
+  const contactPoint = {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    ...(ORG.email ? { email: ORG.email } : {}),
+    ...(legal?.telephone ? { telephone: legal.telephone } : {}),
+    ...(hours ? { hoursAvailable: { "@type": "OpeningHoursSpecification", dayOfWeek: (hours.days ?? ALL_DAYS).map((d) => `https://schema.org/${d}`), opens: hours.opens, closes: hours.closes } } : {}),
+  }
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${origin}/#organization`,
     name: ORG.name,
+    ...(legal?.legalName ? { legalName: legal.legalName } : {}),
     url: origin,
     logo: `${origin}/android-chrome-512x512.png`,
     ...(ORG.email ? { email: ORG.email } : {}),
+    ...(legal?.telephone ? { telephone: legal.telephone } : {}),
     description: tx(config.brand.tagline, getMarket(countryCode).dictionary),
+    ...(legal?.address ? { address: { "@type": "PostalAddress", ...legal.address } } : {}),
+    ...(legal?.identifier ? { identifier: { "@type": "PropertyValue", propertyID: legal.identifier.propertyID, value: legal.identifier.value } } : {}),
     ...(ORG.location ? { foundingLocation: { "@type": "Place", name: ORG.location } } : {}),
+    ...(ORG.email || legal?.telephone ? { contactPoint: [contactPoint] } : {}),
     sameAs: Object.values(config.social).filter(Boolean),
   }
 }

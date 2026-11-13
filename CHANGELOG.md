@@ -5,7 +5,14 @@ follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+- Products sold by quote (`product.quote`): "Request a quote" where the buy box would be, the lowest price as
+  "from", a per-market link or a WhatsApp message; no Product JSON-LD, "price on request" in llms.txt and the
+  Markdown product page. Dictionary keys `product.requestQuote`, `requestQuoteNote`, `priceOnRequest`,
+  `quoteWhatsapp`.
+- `account.links`: extra items in the account navigation, after "Orders".
+- `home.promo`: an optional text banner on the home page between the featured products and the value props.
+- `brand.legal`: legal name, registration number, address, telephone and contact hours in the Organization schema.
 
 ## [0.2.0] — 2026-11-13
 
