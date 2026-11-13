@@ -143,6 +143,21 @@ backend must be reachable then: `docker build --network host --build-arg NEXT_PU
 Run it with the same `MEDUSA_BACKEND_URL_INTERNAL` (and `REVALIDATE_SECRET`, `NEXT_PUBLIC_STRIPE_KEY` when used).
 `KILN_DEMO_NOTICE=true` shows a one-line "demo store" notice above the header.
 
+## Sponsors
+
+This theme is free and MIT licensed, maintained by a small furniture workshop in Jepara, Indonesia. If it saves you
+time, [sponsor Haus Kayu on GitHub](https://github.com/sponsors/haustex).
+<br>Theme ini gratis (MIT) dan dirawat oleh workshop furnitur kecil di Jepara. Kalau theme ini menghemat waktumu,
+[dukung Haus Kayu lewat GitHub Sponsors](https://github.com/sponsors/haustex).
+
+### Business sponsors
+
+_Your logo here. [Become a Business sponsor](https://github.com/sponsors/haustex) ($50/month)._
+
+### Backers
+
+_Your name here. [Become a Backer](https://github.com/sponsors/haustex) ($10/month)._
+
 ## Licence
 
 MIT. Fonts, icons and the Medusa starter this theme grew from are credited in
