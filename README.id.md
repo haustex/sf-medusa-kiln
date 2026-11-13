@@ -144,6 +144,19 @@ diakses saat itu: `docker build --network host --build-arg NEXT_PUBLIC_MEDUSA_PU
 Jalankan dengan `MEDUSA_BACKEND_URL_INTERNAL` yang sama (plus `REVALIDATE_SECRET`, `NEXT_PUBLIC_STRIPE_KEY` bila
 dipakai). `KILN_DEMO_NOTICE=true` menampilkan satu baris pemberitahuan "toko demo" di atas header.
 
+## Sponsor
+
+Tema ini gratis (MIT) dan dirawat oleh workshop furnitur kecil di Jepara. Kalau tema ini menghemat waktu kamu,
+[dukung Haus Kayu lewat GitHub Sponsors](https://github.com/sponsors/haustex).
+
+### Sponsor bisnis
+
+_Logo kamu di sini. [Jadi sponsor Business](https://github.com/sponsors/haustex) ($50/bulan)._
+
+### Backer
+
+_Nama kamu di sini. [Jadi Backer](https://github.com/sponsors/haustex) ($10/bulan)._
+
 ## Lisensi
 
 MIT. Font, ikon, dan starter Medusa yang jadi asal tema ini dicatat di
