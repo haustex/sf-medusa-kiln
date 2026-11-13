@@ -134,7 +134,9 @@ backend as they are) and a Google Merchant feed. The journal and the account's r
 test the storefront with the optional integrations switched off, and the checks before a commit
 (`pnpm typecheck`, `pnpm lint`).
 
-## Docker
+## Docker or Vercel
+
+On Vercel import the repository, set the environment variables and add the domain: [docs/deploy-vercel.md](docs/deploy-vercel.md).
 
 `Dockerfile` builds the standalone server (port 8000). The static pages are rendered during the build, so the
 backend must be reachable then: `docker build --network host --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_… 

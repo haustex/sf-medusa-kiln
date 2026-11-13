@@ -135,7 +135,9 @@ oleh backend), dan feed Google Merchant. Jurnal dan tab ulasan di akun butuh plu
 menguji storefront dengan integrasi opsional dimatikan, dan pemeriksaan sebelum commit (`pnpm typecheck`,
 `pnpm lint`).
 
-## Docker
+## Docker atau Vercel
+
+Di Vercel: impor repo, isi environment variable, tambah domain — lihat [docs/deploy-vercel.md](docs/deploy-vercel.md) (Inggris).
 
 `Dockerfile` membangun server standalone (port 8000). Halaman statis dirender saat build, jadi backend harus bisa
 diakses saat itu: `docker build --network host --build-arg NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_… 
