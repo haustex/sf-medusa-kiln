@@ -1,6 +1,6 @@
 {
   "name": "kiln",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "license": "MIT",
   "description": "Kiln: an open-source Medusa storefront theme (Next.js 16, Tailwind v4, HeroUI v3)",

@@ -6,6 +6,8 @@ ISR), Tailwind CSS v4, dan HeroUI v3. Hitam di atas putih, satu font, banyak rua
 Dibuat [Haus Kayu](https://hauskayu.com) untuk tokonya sendiri dan dibagikan sebagai template. MIT.
 English: [README.md](README.md).
 
+Demo: [kiln.hauskayu.com](https://kiln.hauskayu.com) (Stripe mode test, data direset tiap malam).
+
 | Beranda | Daftar produk | Produk | Jurnal |
 | --- | --- | --- | --- |
 | ![Beranda](docs/screenshots/readme/home-desktop.png) | ![Daftar produk](docs/screenshots/readme/store-desktop.png) | ![Produk](docs/screenshots/readme/product-desktop.png) | ![Jurnal](docs/screenshots/readme/blog-desktop.png) |

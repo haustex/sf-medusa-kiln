@@ -6,6 +6,8 @@ ISR), Tailwind CSS v4 and HeroUI v3. Black on white, one font, a lot of air: the
 Built by [Haus Kayu](https://hauskayu.com) for its own shop and shared as a template. MIT.
 Bahasa Indonesia: [README.id.md](README.id.md).
 
+Demo: [kiln.hauskayu.com](https://kiln.hauskayu.com) (Stripe test mode, the data is reset every night).
+
 | Home | Listing | Product | Journal |
 | --- | --- | --- | --- |
 | ![Home](docs/screenshots/readme/home-desktop.png) | ![Listing](docs/screenshots/readme/store-desktop.png) | ![Product](docs/screenshots/readme/product-desktop.png) | ![Journal](docs/screenshots/readme/blog-desktop.png) |
