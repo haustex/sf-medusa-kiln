@@ -378,6 +378,13 @@ and `/brand/logo.png` (1200×300 on white) are drawn from `brand.logo` for e-mai
 Organization.logo. Favicons and the web manifest are the files in `src/app` (`icon.png`, `apple-icon.png`,
 `favicon.ico`) and `public/site.webmanifest`.
 
+### Kiln inside a monorepo
+
+When the theme is one package of a pnpm/npm workspace (the lockfile sits above it, dependencies are hoisted), set
+`NEXT_WORKSPACE_ROOT=../..` (relative to the theme folder) for `next build` and `next dev`: it becomes
+`outputFileTracingRoot` and Turbopack's `root`, so the standalone output and the build resolve packages from the
+workspace. Unset, the theme folder itself is the root.
+
 ### Caching and the backend hooks
 
 Static pages (home, products, info, journal) are regenerated every 60 s. `POST /api/revalidate` with the header

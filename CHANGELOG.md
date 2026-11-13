@@ -13,6 +13,7 @@ follow [Semantic Versioning](https://semver.org).
 - `account.links`: extra items in the account navigation, after "Orders".
 - `home.promo`: an optional text banner on the home page between the featured products and the value props.
 - `brand.legal`: legal name, registration number, address, telephone and contact hours in the Organization schema.
+- `NEXT_WORKSPACE_ROOT`: build and trace from a monorepo root when Kiln is one workspace package.
 
 ## [0.2.0] — 2026-11-13
 

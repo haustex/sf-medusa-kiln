@@ -27,6 +27,8 @@ const IMAGES_ON_PRIVATE_HOST = [process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL, proc
  * at s-maxage=60 for browsers/other caches) and tags it, so a deploy or a product change purges exactly these
  * pages (src/app/api/revalidate). Harmless on any other CDN. Only routes that are force-static belong here.
  */
+const WORKSPACE_ROOT = process.env.NEXT_WORKSPACE_ROOT ? require("path").resolve(__dirname, process.env.NEXT_WORKSPACE_ROOT) : __dirname
+
 const EDGE_TTL = "max-age=3600, stale-while-revalidate=86400"
 const NOT_MARKDOWN = [{ type: "header", key: "accept", value: ".*text/markdown.*" }]
 function edgeCacheHeaders() {
@@ -67,7 +69,10 @@ const nextConfig = {
   agentRules: false,
   reactStrictMode: true,
   output: "standalone",
-  outputFileTracingRoot: __dirname,
+  // Kiln as one package of a monorepo (lockfile above it): NEXT_WORKSPACE_ROOT=../.. points file tracing and
+  // Turbopack's root at the workspace, so hoisted dependencies resolve; unset, the theme folder is the root
+  outputFileTracingRoot: WORKSPACE_ROOT,
+  turbopack: { root: WORKSPACE_ROOT },
   experimental: {
     // Root layout lives under app/[countryCode]; see app/global-not-found.tsx
     globalNotFound: true,
