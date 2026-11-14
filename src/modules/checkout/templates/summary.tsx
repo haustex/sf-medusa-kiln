@@ -1,10 +1,10 @@
 import { HttpTypes } from "@medusajs/types"
-import { ChevronDown } from "lucide-react"
+import { __iconData as chevronDown } from "lucide-react/icons/chevron-down"
 
 import { cleanSlug } from "@lib/util/image-name"
 import CartTotals from "@modules/common/components/cart-totals"
 import { ProductImage } from "@modules/ds"
-import { ICON } from "@modules/ds/icons"
+import { Icon } from "@modules/ds/icons"
 import { formatPrice } from "@modules/ds/price-tag"
 
 import PromoCode, { type PromoLabels } from "../components/promo-code"
@@ -59,7 +59,7 @@ export default function CheckoutSummary({ cart, labels: t }: { cart: HttpTypes.S
         <summary className="flex cursor-pointer list-none items-center justify-between gap-stack-md p-stack-md [&::-webkit-details-marker]:hidden">
           <span className="inline-flex items-center gap-stack-xs text-sm font-medium">
             {t.show}
-            <ChevronDown {...ICON} size={16} className="transition-transform group-open:rotate-180" />
+            <Icon icon={chevronDown} size={16} className="transition-transform group-open:rotate-180" />
           </span>
           <span className="text-lg font-medium tabular-nums" data-testid="summary-total">
             {formatPrice(cart.total ?? 0, cart.currency_code)}

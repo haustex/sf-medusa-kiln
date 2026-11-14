@@ -22,8 +22,11 @@ follow [Semantic Versioning](https://semver.org).
   (`/track`), like `/track` itself does in the Indonesian market.
 
 ### Changed
-- Less JavaScript hydrated with every page: the cart drawer and the phone menu drawer are fetched when the browser
-  is idle and mounted on their first open; a card's quick view is fetched when its "+" is first pressed.
+- Less JavaScript hydrated with every page: the cart drawer and the phone menu drawer are fetched on the visitor's
+  first input and mounted on their first open; a card's quick view is fetched when its "+" is first pressed.
+- Icons in server components (header, breadcrumbs, stars, value props, checkout steps, …) are drawn as plain SVG
+  (`Icon` in `modules/ds/icons`): lucide-react's components are client components, so each one rendered by a server
+  component was shipped and hydrated as its own island (seven on the home page, dozens of stars on a product page).
 
 ### Fixed
 - Blog category chips no longer list categories without a public article (a chip led to an empty page).

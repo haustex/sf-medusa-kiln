@@ -1,11 +1,11 @@
 import { HttpTypes } from "@medusajs/types"
-import { Check } from "lucide-react"
+import { __iconData as check } from "lucide-react/icons/check"
 
 import { retrieveCustomer } from "@lib/data/customer"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { getMarket, marketPath } from "@lib/util/market"
 import { ButtonLink, Page, Stack } from "@modules/ds"
-import { ICON } from "@modules/ds/icons"
+import { Icon } from "@modules/ds/icons"
 
 import { CARD, OrderLines, OrderMeta } from "./parts"
 
@@ -26,7 +26,7 @@ export default async function OrderConfirmed({ order, countryCode }: { order: Ht
       <Stack gap="section" className="content-container max-w-3xl" data-testid="order-complete-container">
         <Stack gap="md">
           <span aria-hidden="true" className="inline-flex size-12 items-center justify-center rounded-full bg-foreground text-background">
-            <Check {...ICON} size={24} strokeWidth={2} />
+            <Icon icon={check} size={24} strokeWidth={2} />
           </span>
           <Stack gap="xs">
             <h1 className="type-h1">{t.thanks}</h1>

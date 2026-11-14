@@ -1,8 +1,8 @@
 import { cn } from "@heroui/styles"
-import { Check } from "lucide-react"
+import { __iconData as check } from "lucide-react/icons/check"
 
 import Link from "@modules/common/components/app-link"
-import { ICON } from "@modules/ds/icons"
+import { Icon } from "@modules/ds/icons"
 
 export type StepState = "open" | "done" | "todo"
 
@@ -16,7 +16,7 @@ export default function Step({ index, title, state, editHref, editLabel, summary
       <div className="flex items-center justify-between gap-stack-md">
         <h2 id={`step-${index}`} className="flex items-center gap-stack-sm type-h3">
           <span aria-hidden="true" className={cn("inline-flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-medium", state === "todo" ? "ring-1 ring-separator" : "bg-foreground text-background")}>
-            {state === "done" ? <Check {...ICON} size={16} strokeWidth={2.25} /> : index}
+            {state === "done" ? <Icon icon={check} size={16} strokeWidth={2.25} /> : index}
           </span>
           {title}
         </h2>

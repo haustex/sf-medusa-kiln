@@ -4,7 +4,7 @@ import dynamic from "next/dynamic"
 import { useEffect, useState } from "react"
 
 import { CART_OPEN_EVENT } from "@lib/util/cart-events"
-import { onIdle } from "@lib/util/idle"
+import { onFirstInput } from "@lib/util/idle"
 import type { CartDrawerLabels } from "./drawer"
 
 export type { CartDrawerLabels } from "./drawer"
@@ -14,8 +14,9 @@ const load = () => void import("./drawer")
 
 /**
  * Cart drawer mount: nothing but a listener until the first CART_OPEN_EVENT (header cart button, any add to cart),
- * then the drawer (./drawer) is loaded and opened. Its code is fetched when the browser is idle, so the first open
- * does not wait for it; it is never part of the page's hydration (every page carries the header).
+ * then the drawer (./drawer) is loaded and opened. Its code is fetched on the visitor's first input (a tap on the
+ * page comes before a tap on the cart), so the first open hardly waits for it; it is never part of the page's
+ * hydration (every page carries the header) and nothing is fetched while the page only loads.
  */
 export default function CartDrawer({ labels }: { labels: CartDrawerLabels }) {
   const [armed, setArmed] = useState(false)
@@ -24,7 +25,7 @@ export default function CartDrawer({ labels }: { labels: CartDrawerLabels }) {
     if (armed) return
     const onOpen = () => setArmed(true)
     window.addEventListener(CART_OPEN_EVENT, onOpen)
-    const cancel = onIdle(load, 4000)
+    const cancel = onFirstInput(load)
     return () => {
       window.removeEventListener(CART_OPEN_EVENT, onOpen)
       cancel()

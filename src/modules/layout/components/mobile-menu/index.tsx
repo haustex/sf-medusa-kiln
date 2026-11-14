@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import { onIdle } from "@lib/util/idle"
+import { onFirstInput } from "@lib/util/idle"
 import type { SocialNetwork } from "@modules/brand/social"
 import { ICON } from "@modules/ds/icons"
 import type { MarketOption } from "../market-select"
@@ -24,8 +24,8 @@ export type MobileMenuProps = {
 /**
  * Phone menu: a hamburger left of the logo opens a left frost drawer with the categories and nav links, the market
  * list (flag, country, currency), the account link and the social icons (./panel). Closes on navigation. Only the
- * button is hydrated with the page; the drawer's code is fetched when the browser is idle and mounted on the first
- * open (it stays mounted, closed, afterwards).
+ * button is hydrated with the page; the drawer's code is fetched on the visitor's first input and mounted on the
+ * first open (it stays mounted, closed, afterwards).
  */
 export default function MobileMenu(props: MobileMenuProps) {
   const { labels } = props
@@ -34,7 +34,7 @@ export default function MobileMenu(props: MobileMenuProps) {
   const pathname = usePathname() ?? "/"
 
   useEffect(() => setOpen(false), [pathname])
-  useEffect(() => onIdle(load, 4000), [])
+  useEffect(() => onFirstInput(load), [])
 
   return (
     <>

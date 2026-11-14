@@ -1,4 +1,5 @@
-import { Search, User } from "lucide-react"
+import { __iconData as searchIcon } from "lucide-react/icons/search"
+import { __iconData as user } from "lucide-react/icons/user"
 import { Suspense } from "react"
 
 import { listCategories } from "@lib/data/categories"
@@ -20,7 +21,7 @@ import { marketOptions } from "@modules/layout/components/market-select/options"
 import MobileMenu from "@modules/layout/components/mobile-menu"
 import WishlistLink from "@modules/layout/components/wishlist-link"
 import Link from "@modules/common/components/app-link"
-import { ICON } from "@modules/ds/icons"
+import { Icon } from "@modules/ds/icons"
 
 /**
  * Header: logo left, search centred on the page (middle column of a 1fr/640px/1fr grid), market switch + wishlist +
@@ -91,7 +92,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
             data-search-toggle
             className="inline-flex size-11 items-center justify-center rounded-full hover:bg-default/60 md:hidden"
           >
-            <Search {...ICON} />
+            <Icon icon={searchIcon} />
           </Link>
           <MarketSelect options={markets} label={t.nav.market} className="hidden md:block" />
           {f.wishlist && <WishlistLink href={href("/wishlist")} label={t.nav.wishlist} />}
@@ -101,7 +102,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
             className="inline-flex size-11 items-center justify-center rounded-full hover:bg-default/60"
             data-testid="nav-account-link"
           >
-            <User {...ICON} />
+            <Icon icon={user} />
           </Link>
           <Suspense fallback={<CartLink initialCount={null} label={t.nav.cart} />}>
             <CartButton label={t.nav.cart} />

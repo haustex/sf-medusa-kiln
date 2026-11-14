@@ -1,5 +1,7 @@
 import { cn } from "@heroui/styles"
-import { ChevronLeft, ChevronRight, X } from "lucide-react"
+import { __iconData as chevronLeft } from "lucide-react/icons/chevron-left"
+import { __iconData as chevronRight } from "lucide-react/icons/chevron-right"
+import { __iconData as x } from "lucide-react/icons/x"
 
 import config from "@theme"
 import { listCategories } from "@lib/data/categories"
@@ -13,7 +15,7 @@ import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
 import { getSiteOrigin } from "@lib/util/site"
 import Link from "@modules/common/components/app-link"
 import { Breadcrumb, ButtonLink, type Crumb, formatPrice, Page, ProductGrid } from "@modules/ds"
-import { ICON } from "@modules/ds/icons"
+import { Icon } from "@modules/ds/icons"
 import CatalogCard from "@modules/products/components/catalog-card"
 import FilterForm, { type CategoryLink } from "@modules/store/components/filter-form"
 import FilterSheet from "@modules/store/components/filter-sheet"
@@ -196,7 +198,7 @@ export default async function ListingTemplate({
                   <li key={c.label}>
                     <Link href={link(c.query)} scroll={false} rel="nofollow" aria-label={fill(t.removeFilter, { f: c.label })} className="k-chip" data-active="true">
                       {c.label}
-                      <X {...ICON} size={14} />
+                      <Icon icon={x} size={14} />
                     </Link>
                   </li>
                 ))}
@@ -228,7 +230,7 @@ export default async function ListingTemplate({
             {totalPages > 1 && (
               <nav aria-label={t.pagination} className="flex items-center justify-center gap-stack-sm" data-testid="product-pagination">
                 <Link href={link({ ...query, page: page - 1 })} aria-label={t.prevPage} aria-disabled={page === 1 || undefined} tabIndex={page === 1 ? -1 : undefined} className={cn("k-chip w-9 justify-center px-0", page === 1 && "pointer-events-none opacity-40")}>
-                  <ChevronLeft {...ICON} size={16} />
+                  <Icon icon={chevronLeft} size={16} />
                 </Link>
                 {pageWindow(page, totalPages).map((n, i) =>
                   n === 0 ? (
@@ -242,7 +244,7 @@ export default async function ListingTemplate({
                   )
                 )}
                 <Link href={link({ ...query, page: page + 1 })} aria-label={t.nextPage} aria-disabled={page === totalPages || undefined} tabIndex={page === totalPages ? -1 : undefined} className={cn("k-chip w-9 justify-center px-0", page === totalPages && "pointer-events-none opacity-40")}>
-                  <ChevronRight {...ICON} size={16} />
+                  <Icon icon={chevronRight} size={16} />
                 </Link>
               </nav>
             )}

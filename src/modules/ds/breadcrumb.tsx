@@ -1,6 +1,8 @@
 import { breadcrumbsVariants, cn } from "@heroui/styles"
-import { ChevronRight } from "lucide-react"
+import { __iconData as chevronRight } from "lucide-react/icons/chevron-right"
+
 import Link from "@modules/common/components/app-link"
+import { Icon } from "@modules/ds/icons"
 
 export type Crumb = { label: string; href?: string }
 
@@ -24,7 +26,7 @@ export default function Breadcrumb({ items, label = "Breadcrumb", className }: {
                 </span>
               )}
               {!last && (
-                <ChevronRight aria-hidden="true" focusable={false} size={16} strokeWidth={1.5} className={s.separator()} />
+                <Icon icon={chevronRight} size={16} className={s.separator()} />
               )}
             </li>
           )

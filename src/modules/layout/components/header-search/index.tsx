@@ -1,7 +1,7 @@
 import { buttonVariants, cn, searchFieldVariants } from "@heroui/styles"
-import { Search } from "lucide-react"
+import { __iconData as search } from "lucide-react/icons/search"
 
-import { ICON } from "@modules/ds/icons"
+import { Icon } from "@modules/ds/icons"
 
 type HeaderSearchProps = {
   action: string
@@ -31,7 +31,7 @@ export default function HeaderSearch({ action, placeholder, label, formLabel, de
           )}
         >
           <span className="sr-only">{label}</span>
-          <Search {...ICON} size={18} strokeWidth={1.75} className={s.searchIcon()} />
+          <Icon icon={search} size={18} strokeWidth={1.75} className={s.searchIcon()} />
           <input
             type="search"
             name="q"

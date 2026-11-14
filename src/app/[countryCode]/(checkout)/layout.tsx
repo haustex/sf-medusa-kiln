@@ -1,4 +1,5 @@
-import { ChevronLeft, Lock } from "lucide-react"
+import { __iconData as chevronLeft } from "lucide-react/icons/chevron-left"
+import { __iconData as lock } from "lucide-react/icons/lock"
 
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
@@ -6,7 +7,7 @@ import { getMarket, marketPath } from "@lib/util/market"
 import config from "@theme"
 import Logo from "@modules/brand/logo"
 import Link from "@modules/common/components/app-link"
-import { ICON } from "@modules/ds/icons"
+import { Icon } from "@modules/ds/icons"
 
 /**
  * Checkout chrome: back to the cart, the logo, "secure checkout"; no navigation, no search, no footer columns, so
@@ -24,7 +25,7 @@ export default async function CheckoutLayout(props: { children: React.ReactNode;
     <div className="flex min-h-svh flex-col bg-background">
       <header className="content-container grid h-16 grid-cols-[1fr_auto_1fr] items-center">
         <Link href={href("/cart")} className="-ml-2 inline-flex h-11 w-fit items-center gap-stack-xs rounded-full px-2 text-sm text-muted hover:text-foreground" data-testid="back-to-cart-link">
-          <ChevronLeft {...ICON} />
+          <Icon icon={chevronLeft} />
           <span className="hidden sm:inline">{t.backToCart}</span>
           <span className="sm:hidden">{dict.cart.title}</span>
         </Link>
@@ -32,7 +33,7 @@ export default async function CheckoutLayout(props: { children: React.ReactNode;
           <Logo size="md" decorative />
         </Link>
         <span className="hidden items-center justify-end gap-stack-xs text-sm text-muted sm:inline-flex">
-          <Lock {...ICON} size={16} />
+          <Icon icon={lock} size={16} />
           {t.secure}
         </span>
       </header>

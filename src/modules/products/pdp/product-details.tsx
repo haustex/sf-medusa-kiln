@@ -1,8 +1,8 @@
-import { ChevronDown } from "lucide-react"
+import { __iconData as chevronDown } from "lucide-react/icons/chevron-down"
 import { HttpTypes } from "@medusajs/types"
 
 import { Dictionary } from "@lib/i18n/dictionaries"
-import { ICON } from "@modules/ds/icons"
+import { Icon } from "@modules/ds/icons"
 
 type T = Dictionary["product"]
 type Lang = "id" | "en"
@@ -78,7 +78,7 @@ export function Accordion({ items, className }: { items: { title: string; body: 
           <details key={item.title} className="group" open={item.open}>
             <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-stack-md py-stack-sm text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-focus [&::-webkit-details-marker]:hidden">
               {item.title}
-              <ChevronDown {...ICON} size={18} className="shrink-0 transition-transform group-open:rotate-180" />
+              <Icon icon={chevronDown} size={18} className="shrink-0 transition-transform group-open:rotate-180" />
             </summary>
             <div className="pb-stack-md text-sm leading-relaxed text-muted">{item.body}</div>
           </details>
