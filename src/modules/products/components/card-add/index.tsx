@@ -2,13 +2,18 @@
 
 import { cn } from "@heroui/styles"
 import { Check, LoaderCircle, Plus } from "lucide-react"
+import dynamic from "next/dynamic"
 import { useEffect, useRef, useState, useTransition } from "react"
 
 import { addToCart } from "@lib/data/cart"
 import { notifyCartUpdated, openCart } from "@lib/util/cart-events"
 import type { ProductCardData } from "@modules/ds"
 import { ICON } from "@modules/ds/icons"
-import QuickView, { type QuickViewLabels } from "./quick-view"
+import type { QuickViewLabels } from "./quick-view"
+
+// Fetched the first time a multi-variant "+" is pressed: the quick view (sheet, option radios) is not hydrated with
+// every card on a listing page.
+const QuickView = dynamic(() => import("./quick-view"), { ssr: false })
 
 export type CardAddLabels = QuickViewLabels & {
   /** "Add {title} to cart" */

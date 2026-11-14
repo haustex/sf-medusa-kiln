@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import type { ComponentProps } from "react"
 
 /**
@@ -13,6 +14,8 @@ import type { ComponentProps } from "react"
  *   which also drops the second prefetch of links that are in the header too.
  * - all off with Save-Data or a slow connection (effectiveType slow-2g/2g/3g, i.e. RTT ≥ 270 ms: Chrome's "3g"
  *   bucket is what DevTools' slow 3G lands in). Next only honors that in the pages router.
+ * - off for a link to the page it is on (the product's name in the cart drawer, the current crumb): nothing to gain,
+ *   and Next 16 answers that one with a per-segment prefetch that is 404 on a self-hosted dynamic page.
  *
  * `prefetch` does not render into the HTML, so deciding it during render on the client (navigator) cannot cause
  * a hydration mismatch.
@@ -28,7 +31,9 @@ export function lowData() {
 }
 
 export default function AppLink({ prefetch, ...props }: ComponentProps<typeof Link>) {
+  const pathname = usePathname()
   const href = typeof props.href === "string" ? props.href : (props.href.pathname ?? "")
-  const off = prefetch === false || NO_PREFETCH.test(href) || lowData()
+  const self = href.split(/[?#]/)[0] === pathname
+  const off = prefetch === false || self || NO_PREFETCH.test(href) || lowData()
   return <Link {...props} prefetch={off ? false : prefetch} />
 }

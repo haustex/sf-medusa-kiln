@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 
 import type { HeroSlide } from "@lib/hero"
 import { fill } from "@lib/i18n/fill"
+import { onIdle } from "@lib/util/idle"
 import Link from "@modules/common/components/app-link"
 import ImagePreload from "@modules/ds/image-preload"
 
@@ -67,13 +68,7 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
   const [rest, setRest] = useState(false)
   useEffect(() => {
     if (!many || rest) return
-    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void }
-    if (w.requestIdleCallback) {
-      const id = w.requestIdleCallback(() => setRest(true), { timeout: IDLE_TIMEOUT_MS })
-      return () => w.cancelIdleCallback?.(id)
-    }
-    const id = window.setTimeout(() => setRest(true), IDLE_TIMEOUT_MS)
-    return () => window.clearTimeout(id)
+    return onIdle(() => setRest(true), IDLE_TIMEOUT_MS)
   }, [many, rest])
 
   // Active slide follows the rail (swipe / scroll)

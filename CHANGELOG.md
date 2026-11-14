@@ -21,8 +21,14 @@ follow [Semantic Versioning](https://semver.org).
 - The tracking page: another language's address (`/lacak` asked in the US market) redirects to the market's own
   (`/track`), like `/track` itself does in the Indonesian market.
 
+### Changed
+- Less JavaScript hydrated with every page: the cart drawer and the phone menu drawer are fetched when the browser
+  is idle and mounted on their first open; a card's quick view is fetched when its "+" is first pressed.
+
 ### Fixed
 - Blog category chips no longer list categories without a public article (a chip led to an empty page).
+- A link to the page it is on no longer prefetches (Next 16 asked for a per-segment prefetch that answered 404 on
+  self-hosted dynamic pages and logged an error in the console, e.g. the product's name in the cart drawer).
 - The blog index shows the category chips when its only article is the featured one (they sat in the grid, which was empty).
 
 ## [0.2.0] — 2026-11-13

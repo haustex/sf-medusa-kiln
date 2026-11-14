@@ -1,16 +1,17 @@
 "use client"
 
-import { useParams, usePathname } from "next/navigation"
-import { Menu, User } from "lucide-react"
+import dynamic from "next/dynamic"
+import { usePathname } from "next/navigation"
+import { Menu } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import { marketPath, stripMarketPrefix } from "@lib/util/market"
-import Flag from "@modules/brand/flags"
-import { SocialIcon, type SocialNetwork } from "@modules/brand/social"
-import Link from "@modules/common/components/app-link"
-import { Sheet } from "@modules/ds"
+import { onIdle } from "@lib/util/idle"
+import type { SocialNetwork } from "@modules/brand/social"
 import { ICON } from "@modules/ds/icons"
 import type { MarketOption } from "../market-select"
+
+const Panel = dynamic(() => import("./panel"), { ssr: false })
+const load = () => void import("./panel")
 
 export type MobileMenuProps = {
   items: { href: string; label: string }[]
@@ -22,23 +23,27 @@ export type MobileMenuProps = {
 
 /**
  * Phone menu: a hamburger left of the logo opens a left frost drawer with the categories and nav links, the market
- * list (flag, country, currency), the account link and the social icons. Closes on navigation.
+ * list (flag, country, currency), the account link and the social icons (./panel). Closes on navigation. Only the
+ * button is hydrated with the page; the drawer's code is fetched when the browser is idle and mounted on the first
+ * open (it stays mounted, closed, afterwards).
  */
-export default function MobileMenu({ items, markets, account, social, labels }: MobileMenuProps) {
+export default function MobileMenu(props: MobileMenuProps) {
+  const { labels } = props
   const [open, setOpen] = useState(false)
+  const [loaded, setLoaded] = useState(false)
   const pathname = usePathname() ?? "/"
-  const params = useParams()
-  const countryCode = String(params.countryCode ?? "").toLowerCase()
-  const page = stripMarketPrefix(pathname)
 
   useEffect(() => setOpen(false), [pathname])
+  useEffect(() => onIdle(load, 4000), [])
 
-  const row = "flex h-11 items-center rounded-md px-2 text-base outline-none hover:bg-default/60 focus-visible:ring-2 focus-visible:ring-focus"
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setLoaded(true)
+          setOpen(true)
+        }}
         aria-label={labels.open}
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -47,57 +52,7 @@ export default function MobileMenu({ items, markets, account, social, labels }: 
       >
         <Menu {...ICON} />
       </button>
-      <Sheet open={open} onClose={() => setOpen(false)} side="left" label={labels.menu} closeLabel={labels.close}>
-        <nav aria-label={labels.menu} className="flex flex-col gap-stack-lg">
-          <ul className="-mx-2 flex flex-col">
-            {items.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className={row}>
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          {markets.length > 1 && (
-            <div className="flex flex-col gap-stack-xs">
-              <p className="type-label text-muted">{labels.market}</p>
-              <ul className="-mx-2 flex flex-col">
-                {markets.map((m) => {
-                  const current = m.code === countryCode
-                  return (
-                    <li key={m.code}>
-                      <a href={marketPath(m.code, page)} hrefLang={m.hrefLang} aria-current={current ? "true" : undefined} className={`${row} gap-stack-sm ${current ? "font-medium" : ""}`}>
-                        <Flag code={m.code} />
-                        <span className="flex-1">{m.country}</span>
-                        <span className="type-price text-sm text-muted">{m.currency.toUpperCase()}</span>
-                      </a>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          )}
-          <ul className="-mx-2 flex flex-col border-t border-separator pt-stack-sm">
-            <li>
-              <Link href={account.href} prefetch={false} className={`${row} gap-stack-sm`}>
-                <User {...ICON} />
-                {account.label}
-              </Link>
-            </li>
-          </ul>
-          {social.length > 0 && (
-            <ul className="-mx-2 flex items-center">
-              {social.map((n) => (
-                <li key={n.key}>
-                  <a href={n.href} aria-label={n.label} rel="noopener me" target="_blank" className="inline-flex size-11 items-center justify-center rounded-full outline-none hover:bg-default/60 focus-visible:ring-2 focus-visible:ring-focus">
-                    <SocialIcon network={n.key} />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </nav>
-      </Sheet>
+      {loaded && <Panel {...props} open={open} onClose={() => setOpen(false)} />}
     </>
   )
 }
