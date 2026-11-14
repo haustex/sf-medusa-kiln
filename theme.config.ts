@@ -133,6 +133,11 @@ const config = {
      * the US store"), with no geo-IP: everyone sees it once until closed. Wording: dictionary `marketBanner`.
      */
     suggest: null as null | { on: string; to: string },
+    /**
+     * Root-level paths served outside the markets: no prefix, no rewrite, no 308 (machine endpoints such as an
+     * agent/commerce API at `/ucp`, or `/buy` links). Paths with a dot (files, feeds, images) already pass through.
+     */
+    passthrough: [] as string[],
   },
 
   /**

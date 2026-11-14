@@ -1,5 +1,5 @@
 import { getDictionary } from "@lib/i18n/dictionaries"
-import { getMarket } from "./market"
+import { MARKET_CODES, getMarket } from "./market"
 
 /**
  * The tracking page (medusa-fulfillment-zone-rate) lives at /track inside the app; each language may show it at
@@ -18,11 +18,16 @@ export const trackingPath = (countryCode: string): string => {
 /** The plugin's two text languages; other dictionaries fall back to English */
 export const trackingLocale = (countryCode: string): "en" | "id" => (getMarket(countryCode).dictionary === "id" ? "id" : "en")
 
-/** What the proxy does with a market-relative path: rewrite the public address to /track, redirect /track to it */
+/**
+ * What the proxy does with a market-relative path: rewrite the market's public address to /track; redirect /track
+ * itself and the other languages' addresses (`/lacak` asked in the US market) to it, so one URL per market.
+ */
 export function trackingRoute(market: string, marketless: string): { rewrite: string } | { redirect: string } | null {
   const pub = trackingPath(market)
-  if (pub === TRACK) return null
-  if (marketless === pub || marketless.startsWith(`${pub}/`)) return { rewrite: `${TRACK}${marketless.slice(pub.length)}` }
-  if (marketless === TRACK || marketless.startsWith(`${TRACK}/`)) return { redirect: `${pub}${marketless.slice(TRACK.length)}` }
+  const hit = (p: string) => marketless === p || marketless.startsWith(`${p}/`)
+  if (pub !== TRACK && hit(pub)) return { rewrite: `${TRACK}${marketless.slice(pub.length)}` }
+  for (const alias of [TRACK, ...MARKET_CODES.map(trackingPath)].filter((a, i, all) => all.indexOf(a) === i)) {
+    if (alias !== pub && hit(alias)) return { redirect: `${pub}${marketless.slice(alias.length)}` }
+  }
   return null
 }

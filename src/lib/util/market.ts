@@ -29,6 +29,10 @@ export type MarketCode = keyof typeof MARKETS
 
 export const MARKET_CODES = Object.keys(MARKETS)
 
+/** theme.config.ts `markets.passthrough`: root-level paths the proxy leaves alone (`/ucp`, `/buy`, …) */
+const PASSTHROUGH: string[] = ((config.markets as { passthrough?: string[] }).passthrough ?? []).map((p) => `/${p.replace(/^\/+|\/+$/g, "")}`).filter((p) => p !== "/")
+export const isPassthrough = (pathname: string): boolean => PASSTHROUGH.some((p) => pathname === p || pathname.startsWith(`${p}/`))
+
 export const isMarketCode = (code: unknown): code is MarketCode =>
   typeof code === "string" && code.toLowerCase() in MARKETS
 

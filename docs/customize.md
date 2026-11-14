@@ -65,6 +65,9 @@ markets: {
   pointing to market `to` ("Shopping from the US? → Go to the US store"), in the language of `to`. Still no
   geo-IP: everyone sees it once, closing it is remembered in `localStorage`. Wording: dictionary key
   `marketBanner`. Default `null` (no pill).
+- `passthrough: ["/ucp", "/buy"]`: root-level paths the proxy leaves alone — no market prefix, no rewrite, no
+  308 — for machine endpoints you add under `src/app/` (an agent/commerce API, deep links). Paths with a dot
+  (files, feeds, images) already pass. Default `[]`.
 
 ## text
 

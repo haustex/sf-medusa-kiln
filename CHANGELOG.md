@@ -16,6 +16,10 @@ follow [Semantic Versioning](https://semver.org).
 - `NEXT_WORKSPACE_ROOT`: build and trace from a monorepo root when Kiln is one workspace package.
 - `/api/revalidate` takes medusa-blog-seo's own `revalidate` payload (`blog_seo`), so the plugin option
   `revalidate: { url, secret }` is enough; the old `{ blog: … }` shape still works.
+- `markets.passthrough`: root-level paths served outside the markets (`/ucp`, `/buy`, …); without it the proxy
+  rewrote them into the default market and they answered 404.
+- The tracking page: another language's address (`/lacak` asked in the US market) redirects to the market's own
+  (`/track`), like `/track` itself does in the Indonesian market.
 
 ### Fixed
 - Blog category chips no longer list categories without a public article (a chip led to an empty page).

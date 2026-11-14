@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { ALWAYS_PREFIX, DEFAULT_MARKET, MARKETS, isMarketCode } from "@lib/util/market"
+import { ALWAYS_PREFIX, DEFAULT_MARKET, MARKETS, isMarketCode, isPassthrough } from "@lib/util/market"
 import { redirectFor } from "@lib/util/redirects"
 import { trackingRoute } from "@lib/util/tracking-path"
 
@@ -18,6 +18,10 @@ export async function proxy(request: NextRequest) {
   // Files (/favicon.ico, /images/x.png) pass through. A dot inside a per-visitor address does not make it a file: the
   // unsubscribe id of a review-request e-mail is `revreq_….<signature>`.
   if (pathname.includes(".") && !isPerVisitor(pathname)) {
+    return NextResponse.next()
+  }
+  // theme.config.ts `markets.passthrough`: root-level endpoints outside the markets (/ucp, /buy, …)
+  if (isPassthrough(pathname)) {
     return NextResponse.next()
   }
 
