@@ -26,6 +26,8 @@ export const linksPath = (handle: string) => (handle === MAIN_HANDLE ? "/links" 
 
 export type LinksSocial = { network: string; url: string }
 export type LinksTheme = { background: string; text: string; accent: string; radius: "none" | "sm" | "md" | "full"; button: "solid" | "outline" | "soft" }
+/** Focal point of an image in percent of width and height */
+export type LinksFocus = { x: number; y: number }
 export type LinksProduct = { id: string; handle: string; title: string; thumbnail: string | null; price: { amount: number; currency_code: string; original_amount: number | null } | null; in_stock: boolean; stock: number | null }
 export type LinksEntity = { id: string; handle: string; title: string; thumbnail: string | null }
 export type LinksPost = { id: string; slug: string; title: string; excerpt: string; cover: string | null; published_at: string | null }
@@ -61,6 +63,14 @@ export type LinksPage = {
   seo_title: string
   seo_description: string | null
   avatar: string | null
+  avatar_alt: string | null
+  /** "circle": round avatar above the name. "hero": `hero` full width at the top, fading into the background */
+  profile_style: "circle" | "hero"
+  hero: string | null
+  hero_alt: string | null
+  /** Space reserved for the hero before it loads (no layout shift) */
+  hero_ratio: "16:9" | "3:2"
+  focus: { avatar: LinksFocus | null; hero: LinksFocus | null }
   og_image: string | null
   noindex: boolean
   socials: LinksSocial[]

@@ -87,32 +87,68 @@ function brand(countryCode: string) {
   )
 }
 
-/** A link-in-bio page's avatar (fetched and resized here, so satori gets a data URL) or initials, name, bio, wordmark */
-async function links(page: { title: string; bio: string | null; avatar: string | null }) {
-  let avatar: string | null = null
-  if (page.avatar && /^https?:\/\//.test(page.avatar)) {
-    try {
-      const res = await fetch(page.avatar, { signal: AbortSignal.timeout(4000), cache: "no-store" })
-      const len = Number(res.headers.get("content-length") || 0)
-      if (res.ok && len <= MAX_INPUT) {
-        const buf = Buffer.from(await res.arrayBuffer())
-        if (buf.length <= MAX_INPUT) avatar = `data:image/png;base64,${(await sharp(buf).resize(320, 320, { fit: "cover" }).png().toBuffer()).toString("base64")}`
-      }
-    } catch {}
+/** A remote picture cropped to `w`×`h` around a focal point (percent), as a PNG data URL for satori; null on any problem */
+async function cropped(url: string | null, w: number, h: number, focus: { x: number; y: number } | null): Promise<string | null> {
+  if (!url || !/^https?:\/\//.test(url)) return null
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(4000), cache: "no-store" })
+    if (!res.ok || Number(res.headers.get("content-length") || 0) > MAX_INPUT) return null
+    const buf = Buffer.from(await res.arrayBuffer())
+    if (buf.length > MAX_INPUT) return null
+    const img = sharp(buf, { limitInputPixels: 40_000_000 }).rotate()
+    const meta = await img.metadata()
+    if (!meta.width || !meta.height) return null
+    const scale = Math.max(w / meta.width, h / meta.height)
+    const rw = Math.max(w, Math.round(meta.width * scale)), rh = Math.max(h, Math.round(meta.height * scale))
+    const fx = (focus?.x ?? 50) / 100, fy = (focus?.y ?? 50) / 100
+    const left = Math.min(rw - w, Math.max(0, Math.round(rw * fx - w / 2))), top = Math.min(rh - h, Math.max(0, Math.round(rh * fy - h / 2)))
+    const out = await img.resize(rw, rh).extract({ left, top, width: w, height: h }).png().toBuffer()
+    return `data:image/png;base64,${out.toString("base64")}`
+  } catch {
+    return null
   }
+}
+
+type LinksCard = { title: string; bio: string | null; avatar: string | null; profile_style: "circle" | "hero"; hero: string | null; focus: { avatar: { x: number; y: number } | null; hero: { x: number; y: number } | null } }
+
+/**
+ * A link-in-bio page: the avatar (or initials), name, bio and wordmark. With the "hero" style the header image fills
+ * the card, fading to white over its lower half, the avatar small and the text on the white part.
+ */
+async function links(page: LinksCard) {
+  const hero = page.profile_style === "hero" ? await cropped(page.hero, OG_SIZE.width, OG_SIZE.height, page.focus.hero) : null
+  const avatar = await cropped(page.avatar, 320, 320, page.focus.avatar)
   const initials = page.title.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("")
+  const bio = page.bio ? (page.bio.length > 120 ? `${page.bio.slice(0, 117).trimEnd()}…` : page.bio) : null
+  const ring = hero ? { border: "6px solid #ffffff" } : {} // satori rejects `border: undefined`
+  const face = (size: number) =>
+    avatar ? (
+      // eslint-disable-next-line @next/next/no-img-element -- satori draws plain <img>
+      <img src={avatar} width={size} height={size} alt="" style={{ borderRadius: size / 2, objectFit: "cover", ...ring }} />
+    ) : (
+      <div style={{ width: size, height: size, borderRadius: size / 2, background: INK, color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: Math.round(size * 0.4), fontWeight: 600, ...ring }}>{initials || "·"}</div>
+    )
+  if (hero) {
+    // satori has no `inset` shorthand: every layer gets explicit top/left/width/height
+    return card(
+      <div style={{ position: "relative", width: OG_SIZE.width, height: OG_SIZE.height, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- satori draws plain <img> */}
+        <img src={hero} width={OG_SIZE.width} height={OG_SIZE.height} alt="" style={{ position: "absolute", top: 0, left: 0, width: OG_SIZE.width, height: OG_SIZE.height, objectFit: "cover" }} />
+        <div style={{ position: "absolute", top: 0, left: 0, width: OG_SIZE.width, height: OG_SIZE.height, backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0) 30%, rgba(255,255,255,0.92) 62%, #ffffff 80%)" }} />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 1000, paddingBottom: 40 }}>
+          {face(128)}
+          <div style={{ marginTop: 14, fontSize: 52, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.1, textAlign: "center", display: "flex" }}>{page.title}</div>
+          {bio && <div style={{ marginTop: 10, fontSize: 26, lineHeight: 1.35, color: MUTED, textAlign: "center", display: "flex", maxWidth: 820 }}>{bio}</div>}
+          <div style={{ marginTop: 22, display: "flex" }}>{wordmark(170)}</div>
+        </div>
+      </div>
+    )
+  }
   return card(
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 900 }}>
-      {avatar ? (
-        // eslint-disable-next-line @next/next/no-img-element -- satori draws plain <img>
-        <img src={avatar} width={160} height={160} alt="" style={{ borderRadius: 80, objectFit: "cover" }} />
-      ) : (
-        <div style={{ width: 160, height: 160, borderRadius: 80, background: INK, color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 64, fontWeight: 600 }}>{initials || "·"}</div>
-      )}
+      {face(160)}
       <div style={{ marginTop: 32, fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.1, textAlign: "center", display: "flex" }}>{page.title}</div>
-      {page.bio && (
-        <div style={{ marginTop: 16, fontSize: 28, lineHeight: 1.35, color: MUTED, textAlign: "center", display: "flex", maxWidth: 820 }}>{page.bio.length > 120 ? `${page.bio.slice(0, 117).trimEnd()}…` : page.bio}</div>
-      )}
+      {bio && <div style={{ marginTop: 16, fontSize: 28, lineHeight: 1.35, color: MUTED, textAlign: "center", display: "flex", maxWidth: 820 }}>{bio}</div>}
       <div style={{ marginTop: 40, display: "flex" }}>{wordmark(200)}</div>
     </div>
   )

@@ -288,11 +288,22 @@ The link-in-bio pages of [medusa-link-in-bio](https://www.npmjs.com/package/medu
 The page with this handle is served at `/links` in every market (`/links`, `/us/links`, …), every other page at
 `/links/{handle}`; set the plugin's `storefront.main_handle` to the same value and its `storefront.url` and
 `storefront.locales` to this storefront so the plugin's own links (QR codes, the Admin's "open page") point here.
-The page is drawn by `src/modules/links/template.tsx` in the market's language with the market's prices: avatar,
+The page is drawn by `src/modules/links/template.tsx` in the market's language with the market's prices: profile,
 name, bio, social icons, then the items in the admin's order (links, products with price and stock, collections,
 categories, promo codes with a copy button, journal articles, WhatsApp, contact, headings, dividers). No shop
-header or footer, no script except the copy button: the page is meant to score 100 on PageSpeed. The page's colours
-and shape from the plugin ("theme") are applied as CSS variables; Kiln's font and type scale stay.
+header or footer, no script except the copy button (and the one-line preload of the hero): the page is meant to
+score 100 on PageSpeed. The page's colours and shape from the plugin ("theme") are applied as CSS variables; Kiln's
+font and type scale stay.
+
+Two profile styles, chosen per page in the Admin (plugin 0.2): **circle** — the avatar in a circle above the name
+(initials when there is none) — and **hero** — the page's header image full width at the top of the 600 px column
+(edge to edge on phones, rounded corners from `sm`), its aspect ratio reserved from the plugin's `hero_ratio`
+(16:9 or 3:2) so nothing shifts while it loads, fetched eagerly and preloaded as the LCP, AVIF/WebP via next/image
+when its host is in `IMAGE_HOSTS` (the backend, `NEXT_PUBLIC_MEDIA_URL`), cropped around the focal point set in the
+Admin (`object-position`), and fading into the page background over its lower third with a CSS mask, so it works on
+any theme colour; the avatar, when set, sits small over the hero's lower edge with a ring in the page colour. Alt
+texts come from the plugin per language. The share image `/og/{market}/links/{handle}.png` follows the style: the
+hero behind the name, fading to white, or the avatar/initials in the centre; both crop around the same focal points.
 
 Every item points at `/l/{key}?l={lang}` (root level, outside the markets, `src/app/l/[key]/route.ts`): Kiln relays
 the plugin's redirect, the plugin counts the click and sends the visitor to the stored destination. Unknown or

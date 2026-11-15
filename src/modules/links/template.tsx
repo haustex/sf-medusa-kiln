@@ -9,7 +9,7 @@ import { __iconData as ticketPercent } from "lucide-react/icons/ticket-percent"
 import { getImageProps } from "next/image"
 import type { CSSProperties } from "react"
 
-import { type LinksItem, type LinksPage, type LinksTheme, itemHref } from "@lib/data/links"
+import { type LinksFocus, type LinksItem, type LinksPage, type LinksTheme, itemHref } from "@lib/data/links"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { fill } from "@lib/i18n/fill"
 import { marketPath } from "@lib/util/market"
@@ -18,15 +18,18 @@ import { Glyph, GLYPH_LABELS, type GlyphName } from "@modules/brand/glyphs"
 import Logo from "@modules/brand/logo"
 import { formatPrice } from "@modules/ds"
 import { Icon, type IconData } from "@modules/ds/icons"
+import ImagePreload from "@modules/ds/image-preload"
 
 import CopyCode, { CopyCodeScript } from "./copy-code"
 
 /**
- * One link-in-bio page (medusa-link-in-bio): avatar, name, bio, social icons, the items in the admin's order.
- * Server component with no client component at all: the promo-code copy button is a 300-byte inline script (only
- * when the page has a promo code), the footer links are plain <a>. Every item is a plain <a> to /l/{key} (the plugin
- * counts the click and redirects), so the destination never has to be known here. The page's own colours and shape
- * (plugin "theme") come in as CSS variables; Kiln's typography stays.
+ * One link-in-bio page (medusa-link-in-bio): profile (round avatar, or the "hero" style: a wide header image fading
+ * into the page colour with the avatar small over its edge), name, bio, social icons, the items in the admin's order.
+ * Server component without client components, except the one-line <link rel="preload"> helper for the hero (the
+ * page's LCP; see ds/image-preload.tsx for why that has to be a client component): the promo-code copy button is a
+ * 300-byte inline script (only when the page has a promo code), the footer links are plain <a>. Every item is a
+ * plain <a> to /l/{key} (the plugin counts the click and redirects), so the destination never has to be known here.
+ * The page's own colours and shape (plugin "theme") come in as CSS variables; Kiln's typography stays.
  */
 
 /** Plugin social networks → brand glyphs (modules/brand/glyphs.tsx); marketplaces and unknown ones get the link glyph */
@@ -69,24 +72,54 @@ function onColor(hex: string): string {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.4 ? "#0c0c0c" : "#ffffff"
 }
 
-/** A square picture at `size` CSS px (2× pixels), lazy unless `eager`; empty when the URL is not http(s) */
-function Picture({ src, alt, size, eager, className }: { src: string; alt: string; size: number; eager?: boolean; className?: string }) {
-  let host = ""
+const httpHost = (src: string): string | null => {
   try {
     const u = new URL(src)
-    if (u.protocol !== "https:" && u.protocol !== "http:") return null
-    host = u.hostname
+    return u.protocol === "https:" || u.protocol === "http:" ? u.hostname : null
   } catch {
     return null
   }
+}
+const position = (f: LinksFocus | null | undefined): CSSProperties => (f ? { objectPosition: `${f.x}% ${f.y}%` } : {})
+
+/** A square picture at `size` CSS px (2× pixels), lazy unless `eager`; empty when the URL is not http(s) */
+function Picture({ src, alt, size, eager, className, focus }: { src: string; alt: string; size: number; eager?: boolean; className?: string; focus?: LinksFocus | null }) {
+  const host = httpHost(src)
+  if (!host) return null
   const loading = { loading: eager ? ("eager" as const) : ("lazy" as const), fetchPriority: eager ? ("high" as const) : undefined, decoding: "async" as const }
   if (!IMAGE_HOSTS.has(host)) {
     // eslint-disable-next-line @next/next/no-img-element -- a host next/image is not configured for
-    return <img src={src} alt={alt} width={size} height={size} {...loading} className={className} />
+    return <img src={src} alt={alt} width={size} height={size} {...loading} className={className} style={position(focus)} />
   }
   const { props } = getImageProps({ src, alt, width: size * 2, height: size * 2, sizes: `${size}px`, quality: 80 })
   // eslint-disable-next-line @next/next/no-img-element -- next/image's own props, rendered without its client wrapper
-  return <img {...props} alt={alt} width={size} height={size} {...loading} className={className} />
+  return <img {...props} alt={alt} width={size} height={size} {...loading} className={className} style={position(focus)} />
+}
+
+const HERO_WIDTH = 600 // = the column's max-w-[600px]
+const RATIO: Record<LinksPage["hero_ratio"], number> = { "16:9": 16 / 9, "3:2": 3 / 2 }
+const HERO_SIZES = `(min-width: ${HERO_WIDTH}px) ${HERO_WIDTH}px, 100vw`
+
+/**
+ * The hero of the "hero" profile style: full column width, its aspect ratio reserved (no layout shift), eager and
+ * preloaded (it is the LCP), AVIF/WebP through next/image when the host allows, cropped around the focal point,
+ * fading into the page background over its lower third (mask, so it follows whatever colour the theme sets).
+ */
+function Hero({ page, alt }: { page: LinksPage; alt: string }) {
+  const src = page.hero as string
+  const host = httpHost(src)
+  if (!host) return null
+  const ratio = RATIO[page.hero_ratio] ?? RATIO["16:9"]
+  const width = HERO_WIDTH * 2, height = Math.round(width / ratio)
+  const fade: CSSProperties = { maskImage: "linear-gradient(to bottom, #000 58%, transparent 100%)", WebkitMaskImage: "linear-gradient(to bottom, #000 58%, transparent 100%)", ...position(page.focus.hero) }
+  const img = IMAGE_HOSTS.has(host) ? getImageProps({ src, alt, width, height, sizes: HERO_SIZES, quality: 78, priority: true }).props : { src, srcSet: undefined }
+  return (
+    <div className="relative w-full overflow-hidden sm:rounded-2xl" style={{ aspectRatio: `${ratio}` }} data-testid="links-hero">
+      {img.srcSet && <ImagePreload href={img.src} srcSet={img.srcSet} sizes={HERO_SIZES} type={null} />}
+      {/* eslint-disable-next-line @next/next/no-img-element -- next/image's props without its client wrapper */}
+      <img src={img.src} srcSet={img.srcSet} sizes={img.srcSet ? HERO_SIZES : undefined} alt={alt} width={width} height={height} loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 size-full object-cover" style={fade} />
+    </div>
+  )
 }
 
 const initials = (name: string) =>
@@ -109,23 +142,36 @@ export default function LinksTemplate({ countryCode, page }: { countryCode: stri
   const hasPromo = items.some((i) => i.type === "promo" && i.promo)
   const shop = marketPath(countryCode, "/")
 
+  const hero = page.profile_style === "hero" && page.hero ? page.hero : null
+  const avatarAlt = page.avatar_alt || fill(t.avatarAlt, { name: page.title })
+  const monogram = (
+    <span aria-hidden="true" className="flex size-24 items-center justify-center rounded-full bg-(--lib-accent) text-2xl font-semibold text-(--lib-on-accent)">
+      {initials(page.title) || "·"}
+    </span>
+  )
+
   return (
-    <div style={vars} className="min-h-svh bg-(--lib-bg) text-(--lib-fg)" data-testid="links-page">
-      <div className="mx-auto flex w-full max-w-[600px] flex-col items-center px-4 pb-10 pt-10 sm:pt-16">
-        <header className="flex flex-col items-center text-center">
-          {page.avatar ? (
-            <Picture src={page.avatar} alt={fill(t.avatarAlt, { name: page.title })} size={96} eager className="size-24 rounded-full object-cover" />
-          ) : (
-            <span aria-hidden="true" className="flex size-24 items-center justify-center rounded-full bg-(--lib-accent) text-2xl font-semibold text-(--lib-on-accent)">
-              {initials(page.title) || "·"}
-            </span>
-          )}
-          <h1 className="mt-4 text-xl font-semibold tracking-[-0.01em]">{page.title}</h1>
-          {page.bio && <p className="mt-1.5 max-w-[32em] text-balance text-sm leading-6 opacity-75">{page.bio}</p>}
-        </header>
+    <div style={vars} className="min-h-svh bg-(--lib-bg) text-(--lib-fg)" data-testid="links-page" data-profile={hero ? "hero" : "circle"}>
+      <div className={`mx-auto flex w-full max-w-[600px] flex-col items-center pb-10 ${hero ? "sm:pt-6" : "px-4 pt-10 sm:pt-16"}`}>
+        {hero ? (
+          <header className="flex w-full flex-col items-center text-center">
+            <Hero page={page} alt={page.hero_alt ?? ""} />
+            <div className={`flex flex-col items-center px-4 ${page.avatar ? "-mt-10" : "-mt-2"}`}>
+              {page.avatar && <Picture src={page.avatar} alt={avatarAlt} size={80} eager focus={page.focus.avatar} className="size-20 rounded-full object-cover ring-4 ring-(--lib-bg)" />}
+              <h1 className="mt-3 text-xl font-semibold tracking-[-0.01em]">{page.title}</h1>
+              {page.bio && <p className="mt-1.5 max-w-[32em] text-balance text-sm leading-6 opacity-75">{page.bio}</p>}
+            </div>
+          </header>
+        ) : (
+          <header className="flex flex-col items-center text-center">
+            {page.avatar ? <Picture src={page.avatar} alt={avatarAlt} size={96} eager focus={page.focus.avatar} className="size-24 rounded-full object-cover" /> : monogram}
+            <h1 className="mt-4 text-xl font-semibold tracking-[-0.01em]">{page.title}</h1>
+            {page.bio && <p className="mt-1.5 max-w-[32em] text-balance text-sm leading-6 opacity-75">{page.bio}</p>}
+          </header>
+        )}
 
         {page.socials.length > 0 && (
-          <ul aria-label={t.socials} className="mt-4 flex flex-wrap justify-center" data-testid="links-socials">
+          <ul aria-label={t.socials} className="mt-4 flex flex-wrap justify-center px-4" data-testid="links-socials">
             {page.socials.map((s) => {
               const glyph = SOCIAL_GLYPH[s.network] ?? "link"
               const label = GLYPH_LABELS[glyph] && SOCIAL_GLYPH[s.network] ? GLYPH_LABELS[glyph]! : SOCIAL_LABEL[s.network] ?? s.network
@@ -141,7 +187,7 @@ export default function LinksTemplate({ countryCode, page }: { countryCode: stri
         )}
 
         {items.length > 0 && (
-          <ul aria-label={t.items} className="mt-8 flex w-full flex-col gap-3" data-testid="links-items">
+          <ul aria-label={t.items} className="mt-8 flex w-full flex-col gap-3 px-4" data-testid="links-items">
             {items.map((item) => {
               if (item.type === "header") {
                 return (

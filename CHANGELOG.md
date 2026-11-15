@@ -5,6 +5,14 @@ follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added
+- Link-in-bio pages (medusa-link-in-bio 0.2): the "hero" profile style — the page's header image full width at the
+  top, its aspect ratio reserved (16:9 or 3:2, no layout shift), preloaded as the LCP and served as AVIF/WebP through
+  next/image when the host is allowed, cropped around the focal point set in the Admin, fading into the page colour
+  over its lower third (CSS mask, so it follows the theme's background); the avatar sits small over its edge. Alt
+  texts per language and the avatar's focal point from the plugin. The share image `/og/{market}/links/{handle}.png`
+  draws the hero behind the name with the same focal point.
+
 ## [0.3.1] — 2026-11-15
 
 ### Fixed
