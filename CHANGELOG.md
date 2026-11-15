@@ -3,7 +3,7 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
-## [Unreleased]
+## [0.4.1] — 2026-11-15
 
 ### Added
 - `linkInBio.path` in theme.config.ts: the link-in-bio pages under another segment than `/links` (`"link"` →
@@ -159,6 +159,7 @@ First public release.
   decline) or the development provider, against a local or hosted storefront.
 - `Dockerfile` for the standalone server; `docs/deploy-vercel.md` for Vercel.
 
+[0.4.1]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.4.1
 [0.4.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.4.0
 [0.3.1]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.3.1
 [0.3.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.3.0
