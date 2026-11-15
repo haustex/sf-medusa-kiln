@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { ALWAYS_PREFIX, DEFAULT_MARKET, MARKETS, isMarketCode, isPassthrough } from "@lib/util/market"
+import { linksRedirect, linksRewrite } from "@lib/links-path"
 import { redirectFor } from "@lib/util/redirects"
 import { trackingRoute } from "@lib/util/tracking-path"
 
@@ -50,13 +51,21 @@ export async function proxy(request: NextRequest) {
     const prefix = hasPrefix ? `/${market}` : ""
     return NextResponse.redirect(new URL(`${prefix}${legacy === "/" && prefix ? "" : legacy}${search}`, request.url), 308)
   }
+  // theme.config.ts `linkInBio.path`: the link-in-bio pages under another segment than the /links they are built
+  // under; the old /links addresses redirect to the new ones
+  const linksOld = linksRedirect(marketless)
+  if (linksOld) {
+    const prefix = hasPrefix ? `/${market}` : ""
+    return NextResponse.redirect(new URL(`${prefix}${linksOld}${search}`, request.url), 308)
+  }
+  const links = linksRewrite(marketless)
   // The tracking page: the language's public address (/lacak) is served by /track; /track itself redirects to it
   const tracking = trackingRoute(market, marketless)
   if (tracking && "redirect" in tracking) {
     const prefix = hasPrefix ? `/${market}` : ""
     return NextResponse.redirect(new URL(`${prefix}${tracking.redirect}${search}`, request.url), 308)
   }
-  const internal = tracking && "rewrite" in tracking ? tracking.rewrite : marketless
+  const internal = tracking && "rewrite" in tracking ? tracking.rewrite : (links ?? marketless)
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set("x-kiln-locale", MARKETS[market].locale)
   requestHeaders.set("x-kiln-market", market)

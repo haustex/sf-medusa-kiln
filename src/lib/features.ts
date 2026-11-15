@@ -1,6 +1,7 @@
 import "server-only"
 
 import config from "@theme"
+import { LINKS_PATH } from "@lib/links-path"
 
 /**
  * Optional integrations (docs/rencana.md §5): reviews + wishlist (medusa-reviews-wishlist), blog (medusa-blog-seo),
@@ -68,4 +69,4 @@ export async function features(): Promise<Record<Feature, boolean>> {
 
 /** Config links that belong to a feature that is off (the blog's "Journal" in the nav and footer) */
 export const linkEnabled = (href: string, f: Record<Feature, boolean>) =>
-  href.startsWith("/blog") ? f.blog : href.startsWith("/wishlist") ? f.wishlist : href === "/track" || href.startsWith("/track/") ? f.tracking : href === "/links" || href.startsWith("/links/") ? f.links : true
+  href.startsWith("/blog") ? f.blog : href.startsWith("/wishlist") ? f.wishlist : href === "/track" || href.startsWith("/track/") ? f.tracking : href === LINKS_PATH || href.startsWith(`${LINKS_PATH}/`) ? f.links : true

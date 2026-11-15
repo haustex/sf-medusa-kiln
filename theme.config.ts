@@ -309,9 +309,11 @@ const config = {
 
   /**
    * medusa-link-in-bio (features.links): the page with this handle is served at /links (and /us/links, …), every
-   * other page at /links/{handle}. Set the plugin's `storefront.main_handle` to the same value.
+   * other page at /links/{handle}. `path` changes the segment ("link" → /link and /link/{handle}; the /links
+   * addresses then redirect to it; also set LINKS_PATH in next.config.js). Give the plugin the same values:
+   * `storefront.main_handle` and `storefront.paths: { main: "/link", page: "/link/{handle}" }`.
    */
-  linkInBio: { handle: "links" },
+  linkInBio: { handle: "links", path: "links" },
 
   /** Pages that show the "ships worldwide" line etc. are plain config, not secrets */
   contact: { email: "hello@example.com", whatsapp: "" },

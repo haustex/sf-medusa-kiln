@@ -3,26 +3,24 @@ import "server-only"
 import { sdk } from "@lib/config"
 import { getRegion } from "@lib/data/regions"
 import { getMarket } from "@lib/util/market"
-import config from "@theme"
 
 /**
  * Link-in-bio pages from medusa-link-in-bio (/store/link-in-bio/…): one page = avatar, name, bio, social icons
  * and an ordered list of items (links, products with live price and stock, collections, promo codes, articles,
  * WhatsApp, …) in the market's language. The page's handle `linkInBio.handle` (theme.config.ts) is served at
- * /links, any other at /links/{handle}. Cached like the catalogue (force-cache) and tagged "links": the plugin's
+ * /links, any other at /links/{handle} (another segment with `linkInBio.path`, see lib/links-path.ts). Cached like
+ * the catalogue (force-cache) and tagged "links": the plugin's
  * `revalidate` option calls /api/revalidate on every change, and the pages re-render every 60 s on top.
  *
  * Clicks are counted by the backend: every item points at /l/{key} (src/app/l/[key]/route.ts relays the plugin's
  * 302), never at the destination itself, so no script runs on the page.
  */
 export const LINKS_TAG = "links"
-export const MAIN_HANDLE = (config as { linkInBio?: { handle?: string } }).linkInBio?.handle?.toLowerCase() || "links"
+export { LINKS_PATH, linksPath, MAIN_HANDLE } from "@lib/links-path"
 const BASE = "/store/link-in-bio"
 const HANDLE_RE = /^[a-z0-9][a-z0-9-]{0,62}$/
 
 export const isLinksHandle = (h: string): boolean => HANDLE_RE.test(h)
-/** Public path of a page in a market-independent form (`/links` for the main handle) */
-export const linksPath = (handle: string) => (handle === MAIN_HANDLE ? "/links" : `/links/${handle}`)
 
 export type LinksSocial = { network: string; url: string }
 export type LinksTheme = { background: string; text: string; accent: string; radius: "none" | "sm" | "md" | "full"; button: "solid" | "outline" | "soft" }

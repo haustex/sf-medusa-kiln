@@ -57,13 +57,15 @@ function edgeCacheHeaders() {
       rule(`${m}/blog/:slug([^/.]+)`, "html,blog,blog-post-:slug"),
     ]),
     // Link-in-bio pages (medusa-link-in-bio; api/revalidate purges "links" on every change)
-    ...["", "/:market([a-z]{2})"].flatMap((m) => [rule(`${m}/links`, "html,links"), rule(`${m}/links/:handle([^/.]+)`, "html,links")]),
+    ...["", "/:market([a-z]{2})"].flatMap((m) => [rule(`${m}${LINKS_PATH}`, "html,links"), rule(`${m}${LINKS_PATH}/:handle([^/.]+)`, "html,links")]),
     // Not pages, but they list the articles: tagged so the same purge reaches them (no edge TTL of their own here)
     { source: "/sitemap.xml", headers: [{ key: "Cache-Tag", value: "sitemap" }] },
     { source: "/:file(llms.txt|llms-full.txt)", headers: [{ key: "Cache-Tag", value: "llms" }] },
   ]
 }
 
+/** Same value as theme.config.ts linkInBio.path, with a leading slash (next.config.js cannot import the TypeScript config). */
+const LINKS_PATH = "/links"
 /** Same value as theme.config.ts markets.default (next.config.js cannot import the TypeScript config). */
 const DEFAULT_MARKET = process.env.NEXT_PUBLIC_DEFAULT_REGION || "us"
 

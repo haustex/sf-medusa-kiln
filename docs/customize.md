@@ -307,6 +307,12 @@ edge above them, with a ring in the page colour. Alt texts come from the plugin 
 `/og/{market}/links/{handle}.png` follows the style: the hero behind the name, fading to white, the avatar only when
 the switch is on, or the avatar/initials in the centre; both crop around the same focal points.
 
+`linkInBio.path` moves the pages to another segment, e.g. `path: "link"` → `/link`, `/us/link`, `/link/{handle}`:
+the proxy serves them from the same route, the old `/links…` addresses answer 308 to the new ones, and canonical,
+hreflang, sitemap, the `/l/{key}` fallback and `/api/revalidate` follow. Set the same segment in next.config.js
+(`LINKS_PATH`, the edge-cache rule) and in the plugin (`storefront.paths: { main: "/link", page: "/link/{handle}" }`,
+so its QR codes and page URLs match). The share images keep their own namespace, `/og/{market}/links/{handle}.png`.
+
 Every item points at `/l/{key}?l={lang}` (root level, outside the markets, `src/app/l/[key]/route.ts`): Kiln relays
 the plugin's redirect, the plugin counts the click and sends the visitor to the stored destination. Unknown or
 expired links land on `/links`. Set the plugin's `revalidate: { url: "https://your-store.com/api/revalidate", secret }`

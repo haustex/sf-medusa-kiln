@@ -5,6 +5,11 @@ follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Added
+- `linkInBio.path` in theme.config.ts: the link-in-bio pages under another segment than `/links` (`"link"` →
+  `/link`, `/us/link`, `/link/{handle}`); the `/links…` addresses redirect (308) to the new ones, and canonical,
+  hreflang, sitemap, `/l/{key}` and `/api/revalidate` follow. `LINKS_PATH` in next.config.js for the edge-cache rule.
+
 ### Fixed
 - The share image of a link-in-bio page (`/og/{market}/links/{handle}.png`) stayed in Cloudflare's cache for up to
   seven days after the page changed in the Admin (new avatar, hero or name): it carries the tag `og-links` now and

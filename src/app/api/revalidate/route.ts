@@ -2,7 +2,7 @@ import { revalidatePath, revalidateTag } from "next/cache"
 import { timingSafeEqual } from "node:crypto"
 import { after, NextRequest, NextResponse } from "next/server"
 
-import { linksPath } from "@lib/data/links"
+import { linksPath, linksRoutePath } from "@lib/links-path"
 import { MARKET_CODES, marketPath } from "@lib/util/market"
 
 /**
@@ -108,8 +108,8 @@ async function revalidateBlog(blog: { slugs?: unknown; categories?: unknown; all
 async function revalidateLinks(body: { handles?: unknown; all?: unknown }) {
   const handles = slugs(body.handles, 25)
   revalidateTag("links", { expire: 0 })
-  const paths = Array.from(new Set(handles.flatMap((h) => everyMarket(linksPath(h)))))
-  for (const p of paths) revalidatePath(p)
+  const paths = Array.from(new Set(handles.flatMap((h) => everyMarket(linksPath(h))))) // public addresses (warm-up, answer)
+  for (const p of Array.from(new Set(handles.flatMap((h) => everyMarket(linksRoutePath(h)))))) revalidatePath(p) // the routes behind them
   await warm(paths)
   const tags = ["links", "sitemap", "og-links"] // og-links: the pages' share images (og/[...path]), tagged on top of "og"
   const cloudflare = await purge(tags)

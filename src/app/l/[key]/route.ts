@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 
+import { linksPath, MAIN_HANDLE } from "@lib/links-path"
 import { DEFAULT_MARKET, MARKET_CODES, MARKETS, marketPath } from "@lib/util/market"
 import { getRequestOrigin } from "@lib/util/site"
 
@@ -19,7 +20,7 @@ const FORWARD = ["user-agent", "dnt", "sec-gpc", "accept-language"]
 const NO_STORE = { "Cache-Control": "no-store, max-age=0", "X-Robots-Tag": "noindex", "Referrer-Policy": "no-referrer-when-downgrade" }
 
 /** The /links page of the market that speaks `lang` (the default market otherwise) */
-const linksPage = (lang: string) => marketPath(MARKET_CODES.find((c) => MARKETS[c].htmlLang === lang) ?? DEFAULT_MARKET, "/links")
+const linksPage = (lang: string) => marketPath(MARKET_CODES.find((c) => MARKETS[c].htmlLang === lang) ?? DEFAULT_MARKET, linksPath(MAIN_HANDLE))
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ key: string }> }) {
   const { key } = await params
