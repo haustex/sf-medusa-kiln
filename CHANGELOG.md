@@ -5,6 +5,10 @@ follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+### Fixed
+- `/l/{key}` sent an unknown or expired link to the market's `/links` page on the server's own address
+  (`http://localhost:8000/links` behind a reverse proxy); it uses the public origin now.
+
 ## [0.3.0] — 2026-11-15
 
 ### Added

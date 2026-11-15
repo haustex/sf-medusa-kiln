@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
 import { DEFAULT_MARKET, MARKET_CODES, MARKETS, marketPath } from "@lib/util/market"
+import { getRequestOrigin } from "@lib/util/site"
 
 /**
  * GET /l/{key}?l={lang}: the counted link of a link-in-bio item (medusa-link-in-bio). Relays the plugin's own
@@ -24,7 +25,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ key:
   const { key } = await params
   const l = req.nextUrl.searchParams.get("l") ?? ""
   const lang = LANG.test(l) ? l : ""
-  const home = new URL(linksPage(lang), req.url)
+  // the public origin (NEXT_PUBLIC_BASE_URL or the forwarded host), not req.url: behind a proxy that is the container's own address
+  const home = new URL(linksPage(lang), getRequestOrigin(req))
   if (!KEY.test(key)) return NextResponse.redirect(home, { status: 302, headers: NO_STORE })
 
   const headers = new Headers({ "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ?? "" })
