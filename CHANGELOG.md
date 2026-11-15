@@ -5,6 +5,8 @@ follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-11-15
+
 ### Fixed
 - `/l/{key}` sent an unknown or expired link to the market's `/links` page on the server's own address
   (`http://localhost:8000/links` behind a reverse proxy); it uses the public origin now.
@@ -136,6 +138,7 @@ First public release.
   decline) or the development provider, against a local or hosted storefront.
 - `Dockerfile` for the standalone server; `docs/deploy-vercel.md` for Vercel.
 
+[0.3.1]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.3.1
 [0.3.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.3.0
 [0.2.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.2.0
 [0.1.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.1.0
