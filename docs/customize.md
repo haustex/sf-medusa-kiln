@@ -301,9 +301,11 @@ Two profile styles, chosen per page in the Admin (plugin 0.2): **circle** — th
 (16:9 or 3:2) so nothing shifts while it loads, fetched eagerly and preloaded as the LCP, AVIF/WebP via next/image
 when its host is in `IMAGE_HOSTS` (the backend, `NEXT_PUBLIC_MEDIA_URL`), cropped around the focal point set in the
 Admin (`object-position`), and fading into the page background over its lower third with a CSS mask, so it works on
-any theme colour; the avatar, when set, sits small over the hero's lower edge with a ring in the page colour. Alt
-texts come from the plugin per language. The share image `/og/{market}/links/{handle}.png` follows the style: the
-hero behind the name, fading to white, or the avatar/initials in the centre; both crop around the same focal points.
+any theme colour. The name and bio sit right under the hero, rising into its faded edge; when the page's
+`hero_avatar` switch is on (Admin: "Show the avatar over the header"), the avatar sits small over the hero's lower
+edge above them, with a ring in the page colour. Alt texts come from the plugin per language. The share image
+`/og/{market}/links/{handle}.png` follows the style: the hero behind the name, fading to white, the avatar only when
+the switch is on, or the avatar/initials in the centre; both crop around the same focal points.
 
 Every item points at `/l/{key}?l={lang}` (root level, outside the markets, `src/app/l/[key]/route.ts`): Kiln relays
 the plugin's redirect, the plugin counts the click and sends the visitor to the stored destination. Unknown or

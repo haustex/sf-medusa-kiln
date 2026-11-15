@@ -24,7 +24,8 @@ import CopyCode, { CopyCodeScript } from "./copy-code"
 
 /**
  * One link-in-bio page (medusa-link-in-bio): profile (round avatar, or the "hero" style: a wide header image fading
- * into the page colour with the avatar small over its edge), name, bio, social icons, the items in the admin's order.
+ * into the page colour, the name and bio right under it or, with `hero_avatar`, the avatar small over its edge), name,
+ * bio, social icons, the items in the admin's order.
  * Server component without client components, except the one-line <link rel="preload"> helper for the hero (the
  * page's LCP; see ds/image-preload.tsx for why that has to be a client component): the promo-code copy button is a
  * 300-byte inline script (only when the page has a promo code), the footer links are plain <a>. Every item is a
@@ -143,6 +144,8 @@ export default function LinksTemplate({ countryCode, page }: { countryCode: stri
   const shop = marketPath(countryCode, "/")
 
   const hero = page.profile_style === "hero" && page.hero ? page.hero : null
+  // hero without avatar: the name rises into the hero's faded lower edge (no blank band where the avatar would be)
+  const heroAvatar = hero ? page.hero_avatar && !!page.avatar : false
   const avatarAlt = page.avatar_alt || fill(t.avatarAlt, { name: page.title })
   const monogram = (
     <span aria-hidden="true" className="flex size-24 items-center justify-center rounded-full bg-(--lib-accent) text-2xl font-semibold text-(--lib-on-accent)">
@@ -156,10 +159,10 @@ export default function LinksTemplate({ countryCode, page }: { countryCode: stri
         {hero ? (
           <header className="flex w-full flex-col items-center text-center">
             <Hero page={page} alt={page.hero_alt ?? ""} />
-            <div className={`flex flex-col items-center px-4 ${page.avatar ? "-mt-10" : "-mt-2"}`}>
-              {page.avatar && <Picture src={page.avatar} alt={avatarAlt} size={80} eager focus={page.focus.avatar} className="size-20 rounded-full object-cover ring-4 ring-(--lib-bg)" />}
-              <h1 className="mt-3 text-xl font-semibold tracking-[-0.01em]">{page.title}</h1>
-              {page.bio && <p className="mt-1.5 max-w-[32em] text-balance text-sm leading-6 opacity-75">{page.bio}</p>}
+            <div className={`flex flex-col items-center px-4 ${heroAvatar ? "-mt-10" : "-mt-6 sm:-mt-8"}`} data-testid="links-profile" data-avatar={heroAvatar ? "true" : "false"}>
+              {heroAvatar && <Picture src={page.avatar as string} alt={avatarAlt} size={80} eager focus={page.focus.avatar} className="size-20 rounded-full object-cover ring-4 ring-(--lib-bg)" />}
+              <h1 className={heroAvatar ? "mt-3 text-xl font-semibold tracking-[-0.01em]" : "text-2xl font-semibold tracking-[-0.015em]"}>{page.title}</h1>
+              {page.bio && <p className={`max-w-[32em] text-balance text-sm leading-6 opacity-75 ${heroAvatar ? "mt-1.5" : "mt-2"}`}>{page.bio}</p>}
             </div>
           </header>
         ) : (

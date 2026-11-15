@@ -109,15 +109,16 @@ async function cropped(url: string | null, w: number, h: number, focus: { x: num
   }
 }
 
-type LinksCard = { title: string; bio: string | null; avatar: string | null; profile_style: "circle" | "hero"; hero: string | null; focus: { avatar: { x: number; y: number } | null; hero: { x: number; y: number } | null } }
+type LinksCard = { title: string; bio: string | null; avatar: string | null; profile_style: "circle" | "hero"; hero: string | null; hero_avatar: boolean; focus: { avatar: { x: number; y: number } | null; hero: { x: number; y: number } | null } }
 
 /**
  * A link-in-bio page: the avatar (or initials), name, bio and wordmark. With the "hero" style the header image fills
- * the card, fading to white over its lower half, the avatar small and the text on the white part.
+ * the card, fading to white over its lower half, the text on the white part (the avatar small above it only when the
+ * page asks for it, `hero_avatar`).
  */
 async function links(page: LinksCard) {
   const hero = page.profile_style === "hero" ? await cropped(page.hero, OG_SIZE.width, OG_SIZE.height, page.focus.hero) : null
-  const avatar = await cropped(page.avatar, 320, 320, page.focus.avatar)
+  const avatar = page.profile_style === "hero" && !page.hero_avatar ? null : await cropped(page.avatar, 320, 320, page.focus.avatar)
   const initials = page.title.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("")
   const bio = page.bio ? (page.bio.length > 120 ? `${page.bio.slice(0, 117).trimEnd()}…` : page.bio) : null
   const ring = hero ? { border: "6px solid #ffffff" } : {} // satori rejects `border: undefined`
@@ -135,11 +136,11 @@ async function links(page: LinksCard) {
         {/* eslint-disable-next-line @next/next/no-img-element -- satori draws plain <img> */}
         <img src={hero} width={OG_SIZE.width} height={OG_SIZE.height} alt="" style={{ position: "absolute", top: 0, left: 0, width: OG_SIZE.width, height: OG_SIZE.height, objectFit: "cover" }} />
         <div style={{ position: "absolute", top: 0, left: 0, width: OG_SIZE.width, height: OG_SIZE.height, backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0) 30%, rgba(255,255,255,0.92) 62%, #ffffff 80%)" }} />
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 1000, paddingBottom: 40 }}>
-          {face(128)}
-          <div style={{ marginTop: 14, fontSize: 52, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.1, textAlign: "center", display: "flex" }}>{page.title}</div>
-          {bio && <div style={{ marginTop: 10, fontSize: 26, lineHeight: 1.35, color: MUTED, textAlign: "center", display: "flex", maxWidth: 820 }}>{bio}</div>}
-          <div style={{ marginTop: 22, display: "flex" }}>{wordmark(170)}</div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 1000, paddingBottom: page.hero_avatar ? 40 : 52 }}>
+          {page.hero_avatar && face(128)}
+          <div style={{ marginTop: page.hero_avatar ? 14 : 0, fontSize: page.hero_avatar ? 52 : 58, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.1, textAlign: "center", display: "flex" }}>{page.title}</div>
+          {bio && <div style={{ marginTop: page.hero_avatar ? 10 : 14, fontSize: page.hero_avatar ? 26 : 28, lineHeight: 1.35, color: MUTED, textAlign: "center", display: "flex", maxWidth: 820 }}>{bio}</div>}
+          <div style={{ marginTop: page.hero_avatar ? 22 : 28, display: "flex" }}>{wordmark(170)}</div>
         </div>
       </div>
     )

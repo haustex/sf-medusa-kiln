@@ -70,6 +70,8 @@ export type LinksPage = {
   hero_alt: string | null
   /** Space reserved for the hero before it loads (no layout shift) */
   hero_ratio: "16:9" | "3:2"
+  /** "hero" style: the avatar small over the hero's lower edge; false (default) = name and bio right under the hero */
+  hero_avatar: boolean
   focus: { avatar: LinksFocus | null; hero: LinksFocus | null }
   og_image: string | null
   noindex: boolean
