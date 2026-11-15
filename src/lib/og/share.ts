@@ -39,6 +39,10 @@ export const brandAlt = (countryCode: string) => `${STORE_NAME}: ${getDictionary
 export const brandShareImage = (origin: string, countryCode: string) =>
   img(`${origin}/og/${countryCode}/brand.png`, brandAlt(countryCode), "image/png")
 
+/** /og/{market}/links/{handle}.png: a link-in-bio page's avatar or initials, name and bio */
+export const linksShareImage = (origin: string, countryCode: string, handle: string, title: string) =>
+  img(`${origin}/og/${countryCode}/links/${encodeURIComponent(handle)}.png`, `${title} · ${STORE_NAME}`, "image/png")
+
 export const categoryShareImage = (origin: string, countryCode: string, handle: string[], name: string) =>
   img(`${origin}/og/${countryCode}/c/${handle.map(encodeURIComponent).join("/")}.png`, `${name} · ${STORE_NAME}`, "image/png")
 

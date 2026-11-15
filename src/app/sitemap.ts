@@ -1,6 +1,7 @@
 import { MARKET_CODES, MARKETS, marketAlternates, marketPath, X_DEFAULT_MARKET } from "@lib/util/market"
 import { sdk } from "@lib/config"
 import { type BlogIndexRow, categoryPath, indexLocale, listPostIndex, postPath } from "@lib/data/blog"
+import { linksPath, listLinksPages } from "@lib/data/links"
 import { feature } from "@lib/features"
 import { listRegions } from "@lib/data/regions"
 import { getSiteOrigin, listCountryCodes } from "@lib/util/site"
@@ -42,7 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Products also list their photos (image sitemap)
   const productQuery = { ...query, fields: "handle,updated_at,thumbnail,*images" }
 
-  const [origin, regions, products, categories, collections, posts] = await Promise.all([
+  const [origin, regions, products, categories, collections, posts, linkPages] = await Promise.all([
     getSiteOrigin(),
     listRegions(),
     listAll<Entry>((offset) =>
@@ -62,6 +63,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
     // Blog: public articles (same slug in both markets); a failing blog API must not empty the sitemap
     feature("blog").then((on) => (on ? listPostIndex() : [])).catch(() => []),
+    // Link-in-bio pages (medusa-link-in-bio), without the ones marked noindex
+    feature("links").then((on) => (on ? listLinksPages() : [])).catch(() => []),
   ])
 
   // One entry per market URL, each listing all language versions (hreflang)
@@ -141,6 +144,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...STATIC_PATHS.flatMap((path) => entry(path)),
+    ...linkPages.filter((p) => !p.noindex).flatMap((p) => entry(linksPath(p.handle), new Date(p.updated_at))),
     ...toEntries("products", products, productImages),
     ...toEntries("categories", categories),
     ...toEntries("collections", collections),

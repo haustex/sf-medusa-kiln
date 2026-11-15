@@ -144,7 +144,7 @@ headings get the display cut (`src/styles/fonts-files`, 40 KB). To use another f
 ## features
 
 ```ts
-features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto" },
+features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto", links: "auto" },
 ```
 
 `"auto"` probes one store route per integration when the server starts (`src/lib/features.ts`): a 404 switches
@@ -158,6 +158,7 @@ environment overrides the file: `KILN_FEATURE_BLOG=off`. What "off" means:
 | `blog` | medusa-blog-seo | `/blog/…` and the feed 404, journal band and links hidden, sitemap without articles |
 | `search` | `/store/meilisearch/products` route | `/search` uses Medusa's own `/store/products?q=` |
 | `tracking` | medusa-fulfillment-zone-rate | No delivery estimates, `{{rates}}` empty, `/track` (and its language address) and `/api/zone-rate/…` 404, footer link hidden, no shipments on the order page |
+| `links` | medusa-link-in-bio | `/links` and `/links/{handle}` 404, `/l/{key}` sends visitors to `/links`, footer link to `/links` hidden, sitemap without the pages |
 
 ## listing
 
@@ -276,6 +277,31 @@ slider with dots, swipe and arrow keys. The home page is static and re-rendered 
 appears or disappears within a minute. `src/lib/hero.ts` is the one place the components read slides from: a
 Medusa Admin source only has to return the same shape there. `node seed/demo-hero.mjs` regenerates the demo
 banners.
+
+## linkInBio
+
+```ts
+linkInBio: { handle: "links" },
+```
+
+The link-in-bio pages of [medusa-link-in-bio](https://www.npmjs.com/package/medusa-link-in-bio) (`features.links`).
+The page with this handle is served at `/links` in every market (`/links`, `/us/links`, …), every other page at
+`/links/{handle}`; set the plugin's `storefront.main_handle` to the same value and its `storefront.url` and
+`storefront.locales` to this storefront so the plugin's own links (QR codes, the Admin's "open page") point here.
+The page is drawn by `src/modules/links/template.tsx` in the market's language with the market's prices: avatar,
+name, bio, social icons, then the items in the admin's order (links, products with price and stock, collections,
+categories, promo codes with a copy button, journal articles, WhatsApp, contact, headings, dividers). No shop
+header or footer, no script except the copy button: the page is meant to score 100 on PageSpeed. The page's colours
+and shape from the plugin ("theme") are applied as CSS variables; Kiln's font and type scale stay.
+
+Every item points at `/l/{key}?l={lang}` (root level, outside the markets, `src/app/l/[key]/route.ts`): Kiln relays
+the plugin's redirect, the plugin counts the click and sends the visitor to the stored destination. Unknown or
+expired links land on `/links`. Set the plugin's `revalidate: { url: "https://your-store.com/api/revalidate", secret }`
+(same secret as `REVALIDATE_SECRET`) so a change in the Admin re-renders the pages at once; without it they refresh
+within 60 s. `noindex` on a page is honoured; pages without it are in the sitemap. Share image:
+`/og/{market}/links/{handle}.png` (avatar or initials, name, bio) unless the page has its own.
+
+`seed/enable-links.mjs` creates a demo page on the dev backend.
 
 ## blogPath, contact, analytics
 

@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og"
 import sharp from "sharp"
 
 import { getCategoryByHandle } from "@lib/data/categories"
+import { getLinksPage } from "@lib/data/links"
 import { locateFile, resolveImage, sourceUrl, type ImageEntry } from "@lib/data/image-lookup"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { INTER_400, INTER_600 } from "@lib/og/inter-fonts"
@@ -13,7 +14,8 @@ import config from "@theme"
 
 /**
  * Share images, see lib/og/share.ts for the layout rules.
- *   GET /og/{id|us}/brand.png · /og/{id|us}/c/{handle…}.png · /og/{id|us}/{products|blog}/{name}-{hash}.jpg
+ *   GET /og/{id|us}/brand.png · /og/{id|us}/c/{handle…}.png · /og/{id|us}/links/{handle}.png
+ *       /og/{id|us}/{products|blog}/{name}-{hash}.jpg
  *   old /og/{id|us}/p/{file}.jpg and /og/{id|us}/w/{file}.jpg -> 301 to the clean URL
  * Only our own categories and photos our backend knows (no remote URLs, no text from the URL is drawn).
  */
@@ -81,6 +83,37 @@ function brand(countryCode: string) {
       <div style={{ marginTop: 40, fontSize: 30, lineHeight: 1.35, color: MUTED, textAlign: "center", display: "flex" }}>
         {t.footer.tagline}
       </div>
+    </div>
+  )
+}
+
+/** A link-in-bio page's avatar (fetched and resized here, so satori gets a data URL) or initials, name, bio, wordmark */
+async function links(page: { title: string; bio: string | null; avatar: string | null }) {
+  let avatar: string | null = null
+  if (page.avatar && /^https?:\/\//.test(page.avatar)) {
+    try {
+      const res = await fetch(page.avatar, { signal: AbortSignal.timeout(4000), cache: "no-store" })
+      const len = Number(res.headers.get("content-length") || 0)
+      if (res.ok && len <= MAX_INPUT) {
+        const buf = Buffer.from(await res.arrayBuffer())
+        if (buf.length <= MAX_INPUT) avatar = `data:image/png;base64,${(await sharp(buf).resize(320, 320, { fit: "cover" }).png().toBuffer()).toString("base64")}`
+      }
+    } catch {}
+  }
+  const initials = page.title.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("")
+  return card(
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 900 }}>
+      {avatar ? (
+        // eslint-disable-next-line @next/next/no-img-element -- satori draws plain <img>
+        <img src={avatar} width={160} height={160} alt="" style={{ borderRadius: 80, objectFit: "cover" }} />
+      ) : (
+        <div style={{ width: 160, height: 160, borderRadius: 80, background: INK, color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 64, fontWeight: 600 }}>{initials || "·"}</div>
+      )}
+      <div style={{ marginTop: 32, fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.1, textAlign: "center", display: "flex" }}>{page.title}</div>
+      {page.bio && (
+        <div style={{ marginTop: 16, fontSize: 28, lineHeight: 1.35, color: MUTED, textAlign: "center", display: "flex", maxWidth: 820 }}>{page.bio.length > 120 ? `${page.bio.slice(0, 117).trimEnd()}…` : page.bio}</div>
+      )}
+      <div style={{ marginTop: 40, display: "flex" }}>{wordmark(200)}</div>
     </div>
   )
 }
@@ -173,6 +206,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ path: st
     const c = await getCategoryByHandle(handle, cc).catch(() => null)
     if (!c) return notFound()
     return category(c.name, INK)
+  }
+
+  if (kind === "links" && rest.length === 1 && rest[0].endsWith(".png")) {
+    const handle = decodeURIComponent(rest[0].slice(0, -4))
+    if (!SAFE.test(handle)) return notFound()
+    const page = await getLinksPage(cc, handle).catch(() => null)
+    return page ? links(page) : brand(cc)
   }
 
   // photo: the wide layout for an article's wide cover ({slug}-lebar), the square one for everything else

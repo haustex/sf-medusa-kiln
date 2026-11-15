@@ -2,6 +2,7 @@ import { revalidatePath, revalidateTag } from "next/cache"
 import { timingSafeEqual } from "node:crypto"
 import { after, NextRequest, NextResponse } from "next/server"
 
+import { linksPath } from "@lib/data/links"
 import { MARKET_CODES, marketPath } from "@lib/util/market"
 
 /**
@@ -18,6 +19,8 @@ import { MARKET_CODES, marketPath } from "@lib/util/market"
  * POST { blog_seo: { posts: [{ slugs, previous_slugs, category_slugs, previous_category_slugs }], categories, all } }
  *   (medusa-blog-seo's `revalidate` option: slugs per locale, the previous ones after a rename; `categories` are ids,
  *   a renamed or removed category sets `all`)
+ * POST { link_in_bio: { handles?: string[], all?: boolean } }  (medusa-link-in-bio's `revalidate` option: the pages
+ *   that changed; `all` after a deleted page)
  * Same three steps for the article pages, the blog listings, the RSS feeds, the sitemap and llms.txt. The catalogue
  * pages are left alone (their HTML does not change with an article).
  */
@@ -101,6 +104,18 @@ async function revalidateBlog(blog: { slugs?: unknown; categories?: unknown; all
   return NextResponse.json({ revalidated: paths, tags, cloudflare })
 }
 
+/** Link-in-bio pages: /links (the main handle, theme.config.ts linkInBio.handle) and /links/{handle} in every market */
+async function revalidateLinks(body: { handles?: unknown; all?: unknown }) {
+  const handles = slugs(body.handles, 25)
+  revalidateTag("links", { expire: 0 })
+  const paths = Array.from(new Set(handles.flatMap((h) => everyMarket(linksPath(h)))))
+  for (const p of paths) revalidatePath(p)
+  await warm(paths)
+  const tags = ["links", "sitemap"]
+  const cloudflare = await purge(tags)
+  return NextResponse.json({ revalidated: paths, tags, cloudflare, all: body.all === true })
+}
+
 /** medusa-blog-seo's payload as { slugs, categories, all }: every locale's slug, old and new, of every post in the batch */
 function fromBlogSeo(b: Record<string, unknown>) {
   const values = (o: unknown) => (o && typeof o === "object" ? Object.values(o as Record<string, unknown>) : [])
@@ -114,7 +129,8 @@ function fromBlogSeo(b: Record<string, unknown>) {
 
 export async function POST(req: NextRequest) {
   if (!authorized(req)) return NextResponse.json({ message: "Not found" }, { status: 404 })
-  const body = (await req.json().catch(() => ({}))) as { handles?: unknown; all?: unknown; blog?: unknown; blog_seo?: unknown }
+  const body = (await req.json().catch(() => ({}))) as { handles?: unknown; all?: unknown; blog?: unknown; blog_seo?: unknown; link_in_bio?: unknown }
+  if (body.link_in_bio && typeof body.link_in_bio === "object") return revalidateLinks(body.link_in_bio as Record<string, unknown>)
   if (body.blog && typeof body.blog === "object") return revalidateBlog(body.blog as Record<string, unknown>)
   if (body.blog_seo && typeof body.blog_seo === "object") return revalidateBlog(fromBlogSeo(body.blog_seo as Record<string, unknown>))
   const handles = Array.isArray(body.handles)

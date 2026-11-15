@@ -56,6 +56,8 @@ function edgeCacheHeaders() {
       rule(`${m}/blog/kategori/:slug([^/.]+)/page/:n(\\d+)`, "html,blog,blog-list,blog-cat-:slug"),
       rule(`${m}/blog/:slug([^/.]+)`, "html,blog,blog-post-:slug"),
     ]),
+    // Link-in-bio pages (medusa-link-in-bio; api/revalidate purges "links" on every change)
+    ...["", "/:market([a-z]{2})"].flatMap((m) => [rule(`${m}/links`, "html,links"), rule(`${m}/links/:handle([^/.]+)`, "html,links")]),
     // Not pages, but they list the articles: tagged so the same purge reaches them (no edge TTL of their own here)
     { source: "/sitemap.xml", headers: [{ key: "Cache-Tag", value: "sitemap" }] },
     { source: "/:file(llms.txt|llms-full.txt)", headers: [{ key: "Cache-Tag", value: "llms" }] },

@@ -29,8 +29,11 @@ export type MarketCode = keyof typeof MARKETS
 
 export const MARKET_CODES = Object.keys(MARKETS)
 
-/** theme.config.ts `markets.passthrough`: root-level paths the proxy leaves alone (`/ucp`, `/buy`, …) */
-const PASSTHROUGH: string[] = ((config.markets as { passthrough?: string[] }).passthrough ?? []).map((p) => `/${p.replace(/^\/+|\/+$/g, "")}`).filter((p) => p !== "/")
+/**
+ * theme.config.ts `markets.passthrough`: root-level paths the proxy leaves alone (`/ucp`, `/buy`, …). `/l` is built
+ * in: the counted links of medusa-link-in-bio (src/app/l/[key]/route.ts) carry the language as a query, not a prefix.
+ */
+const PASSTHROUGH: string[] = [...((config.markets as { passthrough?: string[] }).passthrough ?? []), "/l"].map((p) => `/${p.replace(/^\/+|\/+$/g, "")}`).filter((p) => p !== "/")
 export const isPassthrough = (pathname: string): boolean => PASSTHROUGH.some((p) => pathname === p || pathname.startsWith(`${p}/`))
 
 export const isMarketCode = (code: unknown): code is MarketCode =>

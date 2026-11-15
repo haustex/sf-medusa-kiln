@@ -208,6 +208,8 @@ const config = {
     search: "auto" as "auto" | "on" | "off",
     /** medusa-fulfillment-zone-rate: delivery estimates, the tracking page, shipments in the account */
     tracking: "auto" as "auto" | "on" | "off",
+    /** medusa-link-in-bio: the /links pages and the /l/{key} counted links */
+    links: "auto" as "auto" | "on" | "off",
   },
 
   /**
@@ -304,6 +306,12 @@ const config = {
 
   /** Blog URL segment when medusa-blog-seo is installed */
   blogPath: "/blog",
+
+  /**
+   * medusa-link-in-bio (features.links): the page with this handle is served at /links (and /us/links, …), every
+   * other page at /links/{handle}. Set the plugin's `storefront.main_handle` to the same value.
+   */
+  linkInBio: { handle: "links" },
 
   /** Pages that show the "ships worldwide" line etc. are plain config, not secrets */
   contact: { email: "hello@example.com", whatsapp: "" },

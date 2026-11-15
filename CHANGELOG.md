@@ -6,6 +6,11 @@ follow [Semantic Versioning](https://semver.org).
 ## [Unreleased]
 
 ### Added
+- Link-in-bio pages with [medusa-link-in-bio](https://www.npmjs.com/package/medusa-link-in-bio) (`features.links`,
+  `linkInBio.handle`): `/links` (and `/links/{handle}`) in every market, drawn by the storefront in the market's
+  language with live prices and stock, no shop chrome and no script except the promo-code copy button; `/l/{key}`
+  relays the plugin's counted redirect; share image `/og/{market}/links/{handle}.png`; `/api/revalidate` takes the
+  plugin's `link_in_bio` payload; pages without `noindex` in the sitemap; `seed/enable-links.mjs` for the demo backend.
 - Products sold by quote (`product.quote`): "Request a quote" where the buy box would be, the lowest price as
   "from", a per-market link or a WhatsApp message; no Product JSON-LD, "price on request" in llms.txt and the
   Markdown product page. Dictionary keys `product.requestQuote`, `requestQuoteNote`, `priceOnRequest`,

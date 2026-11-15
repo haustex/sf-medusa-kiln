@@ -55,6 +55,17 @@ const id = {
     preview: "Pratinjau: artikel ini belum tentu sudah terbit. Link ini rahasia dan tidak diindeks mesin pencari.",
     feedTitle: "Blog {brand}",
   },
+  /** Link-in-bio pages (/links, medusa-link-in-bio) */
+  links: {
+    meta: "Semua link {brand}: media sosial, produk pilihan, dan kontak.",
+    socials: "Media sosial",
+    items: "Daftar link",
+    copy: "Salin",
+    copied: "Tersalin",
+    outOfStock: "Stok habis",
+    visitShop: "Kunjungi toko",
+    avatarAlt: "Foto {name}",
+  },
   /** Rate-card tables on the shipping page ({{rates}} in content/pages, medusa-fulfillment-zone-rate) */
   shippingRates: {
     zone: "Zona",
@@ -1072,6 +1083,16 @@ const en: Dictionary = {
     pagination: { nav: "Pages", prev: "Previous", next: "Next", page: "Page" },
     preview: "Preview: this article may not be published yet. This link is private and is not indexed by search engines.",
     feedTitle: "{brand} Blog",
+  },
+  links: {
+    meta: "All {brand} links: social media, featured products and contact.",
+    socials: "Social media",
+    items: "Links",
+    copy: "Copy",
+    copied: "Copied",
+    outOfStock: "Out of stock",
+    visitShop: "Visit the shop",
+    avatarAlt: "Photo of {name}",
   },
   shippingRates: {
     zone: "Zone",
