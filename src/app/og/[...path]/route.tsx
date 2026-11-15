@@ -249,7 +249,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ path: st
     const handle = decodeURIComponent(rest[0].slice(0, -4))
     if (!SAFE.test(handle)) return notFound()
     const page = await getLinksPage(cc, handle).catch(() => null)
-    return page ? links(page) : brand(cc)
+    // "og-links" on top of "og": /api/revalidate purges it when a page changes in the Admin (new avatar, hero, name)
+    const res = await (page ? links(page) : brand(cc))
+    res.headers.set("Cache-Tag", "og, og-links")
+    return res
   }
 
   // photo: the wide layout for an article's wide cover ({slug}-lebar), the square one for everything else

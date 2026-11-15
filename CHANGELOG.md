@@ -3,6 +3,13 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [Unreleased]
+
+### Fixed
+- The share image of a link-in-bio page (`/og/{market}/links/{handle}.png`) stayed in Cloudflare's cache for up to
+  seven days after the page changed in the Admin (new avatar, hero or name): it carries the tag `og-links` now and
+  `/api/revalidate` purges it with the page.
+
 ## [0.4.0] — 2026-11-15
 
 ### Added

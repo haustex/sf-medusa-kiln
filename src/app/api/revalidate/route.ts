@@ -111,7 +111,7 @@ async function revalidateLinks(body: { handles?: unknown; all?: unknown }) {
   const paths = Array.from(new Set(handles.flatMap((h) => everyMarket(linksPath(h)))))
   for (const p of paths) revalidatePath(p)
   await warm(paths)
-  const tags = ["links", "sitemap"]
+  const tags = ["links", "sitemap", "og-links"] // og-links: the pages' share images (og/[...path]), tagged on top of "og"
   const cloudflare = await purge(tags)
   return NextResponse.json({ revalidated: paths, tags, cloudflare, all: body.all === true })
 }
