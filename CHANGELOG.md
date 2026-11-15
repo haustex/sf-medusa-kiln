@@ -5,6 +5,8 @@ follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-11-15
+
 ### Added
 - Link-in-bio pages with [medusa-link-in-bio](https://www.npmjs.com/package/medusa-link-in-bio) (`features.links`,
   `linkInBio.handle`): `/links` (and `/links/{handle}`) in every market, drawn by the storefront in the market's
@@ -130,4 +132,6 @@ First public release.
   decline) or the development provider, against a local or hosted storefront.
 - `Dockerfile` for the standalone server; `docs/deploy-vercel.md` for Vercel.
 
+[0.3.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.3.0
+[0.2.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.2.0
 [0.1.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.1.0
