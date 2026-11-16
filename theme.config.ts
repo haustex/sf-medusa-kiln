@@ -15,8 +15,10 @@ export type HeroSlideConfig = {
   cta: Localized
   /** Market-relative path ("/store") or absolute URL */
   href: string
-  /** Desktop (12:5, e.g. 1920×800) and phone (4:5, e.g. 840×1050) images, from /public or any URL */
-  image: { desktop: string; mobile: string }
+  /** Optional second, outlined button */
+  secondary?: { cta: Localized; href: string }
+  /** Desktop (12:5, e.g. 1920×800) and phone (4:5, e.g. 840×1050) images, from /public or any URL; none = a text panel */
+  image?: { desktop: string; mobile: string }
   alt?: Localized
   /** Optional schedule, ISO 8601 (e.g. "2026-12-01" or "2026-12-01T00:00:00+07:00") */
   start?: string
@@ -63,6 +65,12 @@ const config = {
       { label: { en: "Makers", id: "Pembuat" } as Localized, href: "/makers" },
       { label: { en: "Journal", id: "Jurnal" } as Localized, href: "/blog" },
     ],
+    /**
+     * Top-level categories (handles) left out of the header's category row, the footer's "Shop" column, the home
+     * cards, the listing filters and llms.txt, e.g. one whose products are sold by quote through a page of your own.
+     * The category's own page stays reachable.
+     */
+    hideCategories: [] as string[],
     /** Footer columns (the "Shop" column lists categories automatically) */
     footerColumns: [
       {
@@ -210,6 +218,8 @@ const config = {
     tracking: "auto" as "auto" | "on" | "off",
     /** medusa-link-in-bio: the /links pages and the /l/{key} counted links */
     links: "auto" as "auto" | "on" | "off",
+    /** medusa-hero-banners: the home hero's slides from the Admin (hero.slides below is the fallback) */
+    banners: "auto" as "auto" | "on" | "off",
   },
 
   /**
@@ -258,21 +268,25 @@ const config = {
 
   /**
    * Home: an optional text banner between the featured products and the value props (made-to-order furniture,
-   * wholesale, gift cards). Market-relative hrefs ("/custom") or absolute URLs. null hides it.
+   * wholesale, gift cards). Market-relative hrefs ("/custom") or absolute URLs. null hides it. `image` (4:3, from
+   * /public or an allowed host) fills the right half from md; without it the copy takes the whole card.
    */
   home: {
-    promo: null as null | { eyebrow?: Localized; title: Localized; body?: Localized; cta: { label: Localized; href: string }; secondary?: { label: Localized; href: string } },
+    promo: null as null | { eyebrow?: Localized; title: Localized; body?: Localized; cta: { label: Localized; href: string }; secondary?: { label: Localized; href: string }; image?: { src: string; alt?: Localized } },
   },
 
   /**
    * Home hero: promo banners (Faire-style). Each slide has a desktop and a phone image (fixed ratios 12:5 and 4:5,
-   * so nothing shifts while loading), a title, an optional subtitle and one call to action. `start` / `end`
-   * (ISO dates, optional) schedule a slide. One slide renders as a static banner; several as a slider with dots,
-   * swipe, arrow keys and optional autoplay (ms; false = off; never with prefers-reduced-motion). The components
-   * read slides through src/lib/hero.ts, so a Medusa Admin source can replace this list without touching them.
+   * so nothing shifts while loading) or none (a dark text panel), a title, an optional subtitle and one call to
+   * action. `start` / `end` (ISO dates, optional) schedule a slide. One slide renders as a static banner; several
+   * as a slider with dots, swipe, arrow keys and optional autoplay (ms; false = off; never with
+   * prefers-reduced-motion). With medusa-hero-banners installed (features.banners) the slides come from the Admin
+   * instead (placement `placement`), and `slides` is only the fallback; src/lib/hero.ts is the one place the
+   * components read them from. No slides at all: the text hero from the dictionary.
    */
   hero: {
     autoplay: 6000 as number | false,
+    placement: "home",
     slides: [
       {
         id: "new-season",

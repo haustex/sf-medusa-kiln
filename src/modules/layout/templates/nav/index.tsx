@@ -3,6 +3,7 @@ import { __iconData as user } from "lucide-react/icons/user"
 import { Suspense } from "react"
 
 import { listCategories } from "@lib/data/categories"
+import { shownCategories } from "@lib/util/categories"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
 import { getMarket, marketPath } from "@lib/util/market"
@@ -46,7 +47,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
     marketOptions(market.locale),
     features(),
   ])
-  const topLevel = categories.filter((c) => !c.parent_category_id).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+  const topLevel = shownCategories(categories.filter((c) => !c.parent_category_id)).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
   const menuItems = [
     { href: href("/store"), label: t.nav.allProducts },
     ...topLevel.map((c) => ({ href: href(`/categories/${c.handle}`), label: c.name })),

@@ -5,6 +5,7 @@ import { __iconData as x } from "lucide-react/icons/x"
 
 import config from "@theme"
 import { listCategories } from "@lib/data/categories"
+import { shownCategories } from "@lib/util/categories"
 import { listProducts } from "@lib/data/products"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
@@ -94,7 +95,7 @@ export default async function ListingTemplate({
 
   // Category rows: the children of this category when it has any, otherwise the top level (with counts from the scan)
   const byRank = (a: { rank?: number | null }, b: { rank?: number | null }) => (a.rank ?? 0) - (b.rank ?? 0)
-  const topLevel = categories.filter((c) => !c.parent_category_id).sort(byRank)
+  const topLevel = shownCategories(categories.filter((c) => !c.parent_category_id)).sort(byRank)
   const children = categoryId ? categories.filter((c) => c.parent_category_id === categoryId).sort(byRank) : []
   const inCategory = (id: string) => scanned.filter((p) => p.categories?.some((c) => c.id === id)).length
   const categoryRows: CategoryLink[] = (children.length ? children : topLevel).map((c) => ({

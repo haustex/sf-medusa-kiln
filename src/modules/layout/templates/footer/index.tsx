@@ -1,5 +1,6 @@
 import config from "@theme"
 import { listCategories } from "@lib/data/categories"
+import { shownCategories } from "@lib/util/categories"
 import { features, linkEnabled } from "@lib/features"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
@@ -18,7 +19,7 @@ export default async function Footer({ countryCode }: { countryCode: string }) {
   const lang = getMarket(countryCode).dictionary
   const f = await features()
   const categories = await listCategories({ fields: "id,name,handle,parent_category_id", limit: 20 }, countryCode).catch(() => [])
-  const topLevel = categories.filter((c) => !c.parent_category_id).slice(0, 6)
+  const topLevel = shownCategories(categories.filter((c) => !c.parent_category_id)).slice(0, 6)
 
   return (
     <footer className="mt-section bg-surface">

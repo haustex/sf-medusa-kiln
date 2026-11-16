@@ -25,6 +25,7 @@ value given.
 | `location` | Organization `foundingLocation` |
 | `logo` | `type: "text"` sets the name in the site font with a small ink mark; `type: "svg"` draws one path (`svgPath`, `svgViewBox`, fill `currentColor`) |
 | `navLinks` | Links after the categories in the header's category row (`/makers`, `/blog`, …); a link into the journal disappears when the blog is off |
+| `hideCategories` | Handles of top-level categories left out of the header row, the footer's "Shop" column, the home cards, the listing filters and llms.txt (their own pages stay reachable), e.g. `["furniture-custom"]` for a category sold by quote through a page of your own |
 | `footerColumns` | Footer columns and their links; the "Shop" column (categories) is automatic |
 | `legal` | Optional legal identity for the Organization JSON-LD: `legalName`, `identifier` (`{ propertyID: "NIB", value }`), `telephone`, `address` (schema.org PostalAddress keys), `hours` (`{ opens, closes, days? }`, opens/closes as times with offset, e.g. `"08:00:00+07:00"`) |
 | `credit` | `false` hides "Theme Kiln by Haus Kayu" after the copyright line |
@@ -144,7 +145,7 @@ headings get the display cut (`src/styles/fonts-files`, 40 KB). To use another f
 ## features
 
 ```ts
-features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto", links: "auto" },
+features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto", links: "auto", banners: "auto" },
 ```
 
 `"auto"` probes one store route per integration when the server starts (`src/lib/features.ts`): a 404 switches
@@ -159,6 +160,7 @@ environment overrides the file: `KILN_FEATURE_BLOG=off`. What "off" means:
 | `search` | `/store/meilisearch/products` route | `/search` uses Medusa's own `/store/products?q=` |
 | `tracking` | medusa-fulfillment-zone-rate | No delivery estimates, `{{rates}}` empty, `/track` (and its language address) and `/api/zone-rate/…` 404, footer link hidden, no shipments on the order page |
 | `links` | medusa-link-in-bio | `/links` and `/links/{handle}` 404, `/l/{key}` sends visitors to `/links`, footer link to `/links` hidden, sitemap without the pages |
+| `banners` | medusa-hero-banners | The home hero shows `hero.slides` from theme.config.ts (or the text hero when that list is empty) instead of the Admin's banners |
 
 ## listing
 
@@ -246,14 +248,16 @@ home: {
 },
 ```
 
-A text banner between the featured products and the value props: eyebrow, title, body and one or two buttons, a
-photo slot (placeholder) on the right from `md`. `promo: null` (the default) hides it.
+A text banner between the featured products and the value props: eyebrow, title, body and one or two buttons;
+with `image: { src: "/promo.jpg", alt: { en: "…", id: "…" } }` (4:3) a photo on the right from `md`, without it the
+copy takes the whole card. `promo: null` (the default) hides it.
 
 ## hero
 
 ```ts
 hero: {
   autoplay: 6000,          // ms; false = off (never with prefers-reduced-motion)
+  placement: "home",       // which medusa-hero-banners placement feeds the hero
   slides: [
     {
       id: "new-season",
@@ -261,6 +265,7 @@ hero: {
       subtitle: { en: "…", id: "…" },     // optional
       cta: { en: "Shop now", id: "Belanja sekarang" },
       href: "/store",                     // market-relative, or an absolute URL
+      secondary: { cta: { en: "Custom furniture", id: "Furniture custom" }, href: "/custom" },   // optional outlined button
       image: { desktop: "/hero/new-season-wide.jpg", mobile: "/hero/new-season-tall.jpg" },
       alt: { en: "…", id: "…" },
       start: "2026-12-01",                // optional schedule, ISO 8601
@@ -270,13 +275,23 @@ hero: {
 },
 ```
 
-Two images per slide with fixed ratios, 12:5 for desktops (e.g. 1920×800) and 4:5 for phones (e.g. 840×1050), so
-nothing moves while they load. Put them in `public/hero` or use any URL whose host is allowed in
-`next.config.js` (the backend and `NEXT_PUBLIC_MEDIA_URL` are). One slide renders as a static banner, several as a
-slider with dots, swipe and arrow keys. The home page is static and re-rendered every 60 s, so a scheduled slide
-appears or disappears within a minute. `src/lib/hero.ts` is the one place the components read slides from: a
-Medusa Admin source only has to return the same shape there. `node seed/demo-hero.mjs` regenerates the demo
-banners.
+**From the Admin.** With [medusa-hero-banners](https://www.npmjs.com/package/medusa-hero-banners) installed
+(`features.banners`, probed at start) the slides are the banners an admin switched on in Medusa's Admin → Banners
+(placement `hero.placement`): images uploaded there with a focal point, texts per language, order, schedule. The
+list above is then only the fallback. Give the plugin `storefront.url` + `storefront.locales` (for its "leads to"
+links) and `revalidate: { url: "https://your-store.com/api/revalidate", secret }`, so a change in the Admin
+re-renders the home page at once (the page also re-renders every 60 s). A banner's link is a market-relative path
+(`/store`, `/custom`) or an absolute URL; a banner without text in the market's language shows its default
+language.
+
+**Images.** Two per slide with fixed ratios, 12:5 for desktops (e.g. 1920×800) and 4:5 for phones (e.g. 840×1050),
+so nothing moves while they load. Put them in `public/hero` or use any URL whose host is allowed in
+`next.config.js` (the backend and `NEXT_PUBLIC_MEDIA_URL` are; another host is embedded as it is). A slide
+**without images is a text panel**: the ink colour as background, the copy centred, the button white; when no slide
+has an image the phone box is square instead of 4:5. One slide renders as a static banner, several as a slider with
+dots, swipe and arrow keys. No slide at all (no banners, empty list): the text hero from the dictionary
+(`home.heroEyebrow`, `heroTitle`, `heroBody`, the two buttons), with no photo slot. `src/lib/hero.ts` is the one
+place the components read slides from. `node seed/demo-hero.mjs` regenerates the demo banners.
 
 ## linkInBio
 

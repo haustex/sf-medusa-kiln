@@ -7,6 +7,7 @@ import { __iconData as shoppingBag } from "lucide-react/icons/shopping-bag"
 import { __iconData as tag } from "lucide-react/icons/tag"
 import { __iconData as ticketPercent } from "lucide-react/icons/ticket-percent"
 import { getImageProps } from "next/image"
+import { IMAGE_HOSTS } from "@lib/util/image-hosts"
 import type { CSSProperties } from "react"
 
 import { type LinksFocus, type LinksItem, type LinksPage, type LinksTheme, itemHref } from "@lib/data/links"
@@ -48,19 +49,6 @@ const BUTTON: Record<LinksTheme["button"], string> = {
   soft: "border-transparent bg-(--lib-accent)/8 hover:bg-(--lib-accent)/14",
 }
 
-/** Hosts next/image may optimise (next.config.js IMAGE_HOSTS); anything else is embedded as it is */
-const IMAGE_HOSTS = new Set(
-  [process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL, process.env.MEDUSA_BACKEND_URL_INTERNAL, process.env.NEXT_PUBLIC_MEDIA_URL]
-    .map((u) => {
-      try {
-        return u ? new URL(u).hostname : ""
-      } catch {
-        return ""
-      }
-    })
-    .concat(["localhost", "127.0.0.1"])
-    .filter(Boolean)
-)
 
 /** Readable text colour on the accent (WCAG relative luminance of the hex) */
 function onColor(hex: string): string {

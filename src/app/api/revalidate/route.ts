@@ -21,6 +21,7 @@ import { MARKET_CODES, marketPath } from "@lib/util/market"
  *   a renamed or removed category sets `all`)
  * POST { link_in_bio: { handles?: string[], all?: boolean } }  (medusa-link-in-bio's `revalidate` option: the pages
  *   that changed; `all` after a deleted page)
+ * POST { hero_banners: { placements?: string[] } }  (medusa-hero-banners' `revalidate` option: the home hero changed)
  * Same three steps for the article pages, the blog listings, the RSS feeds, the sitemap and llms.txt. The catalogue
  * pages are left alone (their HTML does not change with an article).
  */
@@ -116,6 +117,17 @@ async function revalidateLinks(body: { handles?: unknown; all?: unknown }) {
   return NextResponse.json({ revalidated: paths, tags, cloudflare, all: body.all === true })
 }
 
+/** Hero banners (medusa-hero-banners): the slides are fetched with the tag "hero" (lib/hero.ts); the home page shows them in every market */
+async function revalidateHero() {
+  revalidateTag("hero", { expire: 0 })
+  const paths = everyMarket("")
+  for (const p of MARKET_CODES.map((code) => `/${code}`)) revalidatePath(p)
+  await warm(paths)
+  const tags = ["home"]
+  const cloudflare = await purge(tags)
+  return NextResponse.json({ revalidated: paths, tags, cloudflare })
+}
+
 /** medusa-blog-seo's payload as { slugs, categories, all }: every locale's slug, old and new, of every post in the batch */
 function fromBlogSeo(b: Record<string, unknown>) {
   const values = (o: unknown) => (o && typeof o === "object" ? Object.values(o as Record<string, unknown>) : [])
@@ -129,7 +141,8 @@ function fromBlogSeo(b: Record<string, unknown>) {
 
 export async function POST(req: NextRequest) {
   if (!authorized(req)) return NextResponse.json({ message: "Not found" }, { status: 404 })
-  const body = (await req.json().catch(() => ({}))) as { handles?: unknown; all?: unknown; blog?: unknown; blog_seo?: unknown; link_in_bio?: unknown }
+  const body = (await req.json().catch(() => ({}))) as { handles?: unknown; all?: unknown; blog?: unknown; blog_seo?: unknown; link_in_bio?: unknown; hero_banners?: unknown }
+  if (body.hero_banners && typeof body.hero_banners === "object") return revalidateHero()
   if (body.link_in_bio && typeof body.link_in_bio === "object") return revalidateLinks(body.link_in_bio as Record<string, unknown>)
   if (body.blog && typeof body.blog === "object") return revalidateBlog(body.blog as Record<string, unknown>)
   if (body.blog_seo && typeof body.blog_seo === "object") return revalidateBlog(fromBlogSeo(body.blog_seo as Record<string, unknown>))

@@ -5,8 +5,8 @@ import { LINKS_PATH } from "@lib/links-path"
 
 /**
  * Optional integrations (docs/rencana.md §5): reviews + wishlist (medusa-reviews-wishlist), blog (medusa-blog-seo),
- * Meilisearch (the `/store/meilisearch/products` route), tracking (medusa-fulfillment-zone-rate) and links
- * (medusa-link-in-bio). Each one is probed once per server process: a 404
+ * Meilisearch (the `/store/meilisearch/products` route), tracking (medusa-fulfillment-zone-rate), links
+ * (medusa-link-in-bio) and banners (medusa-hero-banners). Each one is probed once per server process: a 404
  * from the backend means the plugin is not installed and the feature switches off cleanly (no links, no sections,
  * the routes answer 404). Anything else, including a backend that is down for a moment, keeps it on — the data
  * functions already degrade on their own — and a failed probe is retried on the next call.
@@ -23,6 +23,7 @@ const PROBES: Record<Feature, string> = {
   search: "/store/meilisearch/products?query=kiln&limit=1",
   tracking: "/store/zone-rate/services?currency=usd",
   links: "/store/link-in-bio/pages",
+  banners: "/store/hero-banners",
 }
 
 const BACKEND = (process.env.MEDUSA_BACKEND_URL_INTERNAL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000").replace(/\/$/, "")

@@ -5,6 +5,7 @@ import config from "@theme"
 import { getPageText, listPageSlugs } from "@lib/content/pages"
 import { listPostIndex, postPath, indexLocale } from "@lib/data/blog"
 import { listCategories } from "@lib/data/categories"
+import { shownCategories } from "@lib/util/categories"
 import { listMakers, listMakerProducts, type Maker } from "@lib/data/makers"
 import { listProducts } from "@lib/data/products"
 import { feature } from "@lib/features"
@@ -104,7 +105,7 @@ async function sections(origin: string, ref: string) {
   const posts = blogOn ? await listPostIndex().catch(() => []) : []
 
   const out: string[] = ["", "## Shop", "", bullet("All products", url("/store"))]
-  for (const c of categories.filter((c) => !c.parent_category_id)) out.push(bullet(c.name, url(`/categories/${c.handle}`), c.description))
+  for (const c of shownCategories(categories.filter((c) => !c.parent_category_id))) out.push(bullet(c.name, url(`/categories/${c.handle}`), c.description))
   if (makers.length) {
     out.push("", "## Makers", "")
     makers.forEach((m, i) => {

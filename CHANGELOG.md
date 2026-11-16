@@ -3,6 +3,24 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.5.0] — 2026-11-16
+
+### Added
+- The home hero's slides from the Admin with [medusa-hero-banners](https://www.npmjs.com/package/medusa-hero-banners)
+  (`features.banners`, `hero.placement`): images with their focal points, texts per language, order and schedule as
+  set in Admin → Banners; the plugin's `revalidate` hook (`POST /api/revalidate { hero_banners }`) re-renders the home
+  page at once. `hero.slides` in theme.config.ts stays the fallback.
+- An optional second, outlined button per slide (`secondary` in `hero.slides`, the plugin's "second button").
+- Slides without images: a text panel (ink background, copy centred, white button) instead of a photo; a slide's
+  `image` is optional now. When no slide has an image the phone box is square.
+- `brand.hideCategories`: top-level categories (handles) left out of the header row, the footer's "Shop" column,
+  the home cards, the listing filters and llms.txt; their pages stay reachable.
+- `home.promo.image`: an optional 4:3 photo for the promo card.
+
+### Changed
+- The text hero (no slides) and the promo card no longer draw an empty grey placeholder where a photo could be: the
+  copy takes the space.
+
 ## [0.4.1] — 2026-11-15
 
 ### Added
@@ -159,6 +177,7 @@ First public release.
   decline) or the development provider, against a local or hosted storefront.
 - `Dockerfile` for the standalone server; `docs/deploy-vercel.md` for Vercel.
 
+[0.5.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.5.0
 [0.4.1]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.4.1
 [0.4.0]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.4.0
 [0.3.1]: https://github.com/haustex/sf-medusa-kiln/releases/tag/v0.3.1

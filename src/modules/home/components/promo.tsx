@@ -1,11 +1,13 @@
 import config from "@theme"
 import { tx } from "@lib/i18n/localized"
 import { getMarket, marketPath } from "@lib/util/market"
-import { ButtonLink, ImagePlaceholder, Stack } from "@modules/ds"
+import { ButtonLink, Stack } from "@modules/ds"
+import Image from "next/image"
 
 /**
  * Optional banner from theme.config.ts (`home.promo`): a white card with a hairline, ink copy and one or two
- * buttons on the left, a photo slot on the right from md. Server component, no JavaScript.
+ * buttons; with `image` a 4:3 photo on the right from md, without it the copy takes the whole card (no empty
+ * placeholder). Server component, no JavaScript.
  */
 export default function Promo({ countryCode }: { countryCode: string }) {
   const promo = config.home.promo
@@ -14,7 +16,7 @@ export default function Promo({ countryCode }: { countryCode: string }) {
   const link = (href: string) => (/^https?:\/\//.test(href) ? href : marketPath(countryCode, href))
   return (
     <section aria-labelledby="promo-title" className="content-container" data-testid="home-promo">
-      <div className="grid overflow-hidden rounded-media border border-separator bg-background md:grid-cols-2">
+      <div className={`grid overflow-hidden rounded-media border border-separator bg-background ${promo.image ? "md:grid-cols-2" : ""}`}>
         <Stack gap="lg" className="justify-center p-stack-lg lg:p-section">
           <Stack gap="md">
             <Stack gap="sm">
@@ -36,9 +38,11 @@ export default function Promo({ countryCode }: { countryCode: string }) {
             )}
           </Stack>
         </Stack>
-        <div className="hidden p-stack-lg pl-0 md:block lg:p-section lg:pl-0">
-          <ImagePlaceholder className="aspect-[4/3] rounded-media" />
-        </div>
+        {promo.image && (
+          <div className="hidden p-stack-lg pl-0 md:block lg:p-section lg:pl-0">
+            <Image src={promo.image.src} alt={promo.image.alt ? tx(promo.image.alt, lang) : ""} width={1200} height={900} sizes="(min-width: 768px) 50vw, 100vw" className="aspect-[4/3] w-full rounded-media object-cover" />
+          </div>
+        )}
       </div>
     </section>
   )

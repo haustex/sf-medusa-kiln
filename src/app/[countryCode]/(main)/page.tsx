@@ -9,6 +9,7 @@ import { organizationSchema, websiteSchema } from "@lib/seo/organization"
 import { JsonLd } from "@lib/seo/jsonld"
 import { getMarket, marketAlternates, marketPath } from "@lib/util/market"
 import { getSiteOrigin } from "@lib/util/site"
+import { shownCategories } from "@lib/util/categories"
 import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
 import { Page, ProductGrid, Section } from "@modules/ds"
 import CatalogCard from "@modules/products/components/catalog-card"
@@ -54,7 +55,7 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
     listCategories({ fields: "id,name,handle,rank,parent_category_id,metadata", limit: 20 }, countryCode).catch(() => []),
   ])
   const products = response.products.map((p) => toProductCard(p, countryCode))
-  const topCategories = categories.filter((c) => !c.parent_category_id).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).slice(0, CATEGORY_CARDS)
+  const topCategories = shownCategories(categories.filter((c) => !c.parent_category_id)).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).slice(0, CATEGORY_CARDS)
   const thumbnails = await Promise.all(topCategories.map((c) => newestThumbnails(countryCode, c.id)))
   // two newest products; one product = one photo; none = the category's own image (metadata.image); nothing = no card
   const categoryCards = topCategories

@@ -49,10 +49,15 @@ const useTabHidden = () => useSyncExternalStore(typeof document === "undefined" 
  * is over the slider, while anything inside has focus, while dragging and while the tab is hidden, and resumes
  * afterwards. Slides that are not shown are `inert`, so Tab never lands on an off-screen CTA. One slide: a static
  * banner, no dots.
+ *
+ * A slide without images is a text panel: the page's ink colour as background, the copy centred, no scrim. When no
+ * slide has an image the phone box is square instead of 4:5 (the desktop box stays 12:5), so a text-only slider
+ * does not tower over the page.
  */
 export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroSlide[]; autoplay: number | false; labels: HeroLabels }) {
   const count = slides.length
   const many = count > 1
+  const textOnly = !slides.some((s) => s.image)
   const railRef = useRef<HTMLUListElement>(null)
   const settleUntil = useRef(0)
   const drag = useRef<{ id: number; x: number; left: number; moved: boolean } | null>(null)
@@ -204,30 +209,47 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
           {slides.map((s, i) => {
             const first = i === 0
             const Title = first ? "h1" : "h2"
+            const text = !s.image
             return (
-              <li key={s.id} inert={many && i !== active ? true : undefined} className="relative w-full shrink-0 snap-center" data-active={i === active ? "true" : undefined}>
+              <li key={s.id} inert={many && i !== active ? true : undefined} className="relative w-full shrink-0 snap-center" data-active={i === active ? "true" : undefined} data-text={text ? "true" : undefined}>
                 <div
                   role={many ? "group" : undefined}
                   aria-roledescription={many ? "slide" : undefined}
                   aria-label={many ? fill(labels.slideOf, { n: i + 1, total: count }) : undefined}
-                  className="relative aspect-[4/5] overflow-hidden md:aspect-[12/5]"
+                  className={cn("relative overflow-hidden md:aspect-[12/5]", textOnly ? "aspect-square" : "aspect-[4/5]", text && "bg-foreground")}
                 >
-                  <SlideImage slide={s} first={first} load={first || rest} />
+                  {!text && <SlideImage slide={s} first={first} load={first || rest} />}
                   {/* scrim: white copy stays AA on any photo */}
-                  <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
-                  <div className="absolute inset-0 flex flex-col justify-end gap-stack-md p-6 pb-14 text-white sm:p-8 sm:pb-14 md:p-12 md:pb-16 lg:p-16 lg:pb-20">
+                  {!text && <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />}
+                  <div className={cn("absolute inset-0 flex flex-col gap-stack-md p-6 pb-14 text-white sm:p-8 sm:pb-14 md:p-12 md:pb-16 lg:p-16 lg:pb-20", text ? "justify-center" : "justify-end")}>
                     <div className="flex max-w-xl flex-col gap-stack-sm">
                       <Title className="type-hero text-balance text-white">{s.title}</Title>
                       {s.subtitle && <p className="max-w-md text-base leading-relaxed text-white/90 sm:text-lg">{s.subtitle}</p>}
                     </div>
-                    <Link
-                      href={s.href}
-                      draggable={false}
-                      className="inline-flex h-12 w-fit items-center rounded-control bg-white px-6 text-sm font-medium text-foreground outline-none hover:bg-white/90 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
-                      data-testid={first ? "hero-cta" : undefined}
-                    >
-                      {s.cta}
-                    </Link>
+                    {(s.href || s.secondary) && (
+                      <div className="flex flex-wrap gap-stack-sm">
+                        {s.href && (
+                          <Link
+                            href={s.href}
+                            draggable={false}
+                            className="inline-flex h-12 w-fit items-center rounded-control bg-white px-6 text-sm font-medium text-foreground outline-none hover:bg-white/90 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
+                            data-testid={first ? "hero-cta" : undefined}
+                          >
+                            {s.cta}
+                          </Link>
+                        )}
+                        {s.secondary && (
+                          <Link
+                            href={s.secondary.href}
+                            draggable={false}
+                            className="inline-flex h-12 w-fit items-center rounded-control border border-white/70 px-6 text-sm font-medium text-white outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
+                            data-testid={first ? "hero-cta-secondary" : undefined}
+                          >
+                            {s.secondary.label}
+                          </Link>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </li>
@@ -265,11 +287,13 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
  * <noscript> copy loads them lazily, so the rail still works.
  */
 function SlideImage({ slide: s, first, load }: { slide: HeroSlide; first: boolean; load: boolean }) {
+  if (!s.picture) return null
   const { desktop, mobile } = s.picture
+  const pos = (f: { x: number; y: number } | null) => (f ? `${f.x}% ${f.y}%` : "50% 50%")
   const picture = (
     <picture>
-      <source media={DESKTOP} srcSet={desktop.srcSet} sizes="100vw" />
-      {/* next/image's own srcset, computed in lib/hero.ts */}
+      <source media={DESKTOP} srcSet={desktop.srcSet ?? desktop.src} sizes="100vw" />
+      {/* next/image's own srcset, computed in lib/hero.ts; the focal point per viewport through two CSS variables */}
       <img
         src={mobile.src}
         srcSet={mobile.srcSet}
@@ -281,7 +305,8 @@ function SlideImage({ slide: s, first, load }: { slide: HeroSlide; first: boolea
         fetchPriority={first ? "high" : undefined}
         decoding="async"
         draggable={false}
-        className="pointer-events-none absolute inset-0 size-full object-cover"
+        style={{ "--hero-focus-m": pos(s.focus.mobile), "--hero-focus-d": pos(s.focus.desktop) } as React.CSSProperties}
+        className="pointer-events-none absolute inset-0 size-full object-cover [object-position:var(--hero-focus-m)] md:[object-position:var(--hero-focus-d)]"
       />
     </picture>
   )
