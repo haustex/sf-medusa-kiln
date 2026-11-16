@@ -50,6 +50,9 @@ const useTabHidden = () => useSyncExternalStore(typeof document === "undefined" 
  * afterwards. Slides that are not shown are `inert`, so Tab never lands on an off-screen CTA. One slide: a static
  * banner, no dots.
  *
+ * Buttons under 640px: 44px high, 15px text, 18px side padding drawn by two ::before/::after spacers that shrink
+ * to 8px when two buttons would not fit one row (below 375px the text drops to 14px too); the buttons never wrap.
+ *
  * A slide without images is a text panel: the page's ink colour as background, the copy centred, no scrim. When no
  * slide has an image the phone box is square instead of 4:5 (the desktop box stays 12:5), so a text-only slider
  * does not tower over the page.
@@ -227,12 +230,12 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
                       {s.subtitle && <p className="max-w-md text-base leading-relaxed text-white/90 sm:text-lg">{s.subtitle}</p>}
                     </div>
                     {(s.href || s.secondary) && (
-                      <div className="flex flex-wrap gap-stack-sm">
+                      <div className="flex flex-nowrap gap-2 sm:flex-wrap sm:gap-stack-sm">
                         {s.href && (
                           <Link
                             href={s.href}
                             draggable={false}
-                            className="inline-flex h-12 w-fit items-center rounded-control bg-white px-6 text-sm font-medium text-foreground outline-none hover:bg-white/90 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
+                            className="inline-flex h-11 min-w-0 shrink items-center whitespace-nowrap rounded-control before:block before:h-px before:w-[18px] before:min-w-2 before:shrink after:block after:h-px after:w-[18px] after:min-w-2 after:shrink max-[374px]:text-sm sm:w-fit sm:shrink-0 sm:before:hidden sm:after:hidden bg-white text-[15px] font-medium text-foreground outline-none hover:bg-white/90 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 sm:h-12 sm:px-6 sm:text-sm"
                             data-testid={first ? "hero-cta" : undefined}
                           >
                             {s.cta}
@@ -242,7 +245,7 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
                           <Link
                             href={s.secondary.href}
                             draggable={false}
-                            className="inline-flex h-12 w-fit items-center rounded-control border border-white/70 px-6 text-sm font-medium text-white outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
+                            className="inline-flex h-11 min-w-0 shrink items-center whitespace-nowrap rounded-control before:block before:h-px before:w-[18px] before:min-w-2 before:shrink after:block after:h-px after:w-[18px] after:min-w-2 after:shrink max-[374px]:text-sm sm:w-fit sm:shrink-0 sm:before:hidden sm:after:hidden border border-white/70 text-[15px] font-medium text-white outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 sm:h-12 sm:px-6 sm:text-sm"
                             data-testid={first ? "hero-cta-secondary" : undefined}
                           >
                             {s.secondary.label}
