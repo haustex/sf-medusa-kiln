@@ -69,6 +69,16 @@ markets: {
 - `passthrough: ["/ucp", "/buy"]`: root-level paths the proxy leaves alone — no market prefix, no rewrite, no
   308 — for machine endpoints you add under `src/app/` (an agent/commerce API, deep links). Paths with a dot
   (files, feeds, images) already pass. Default `[]`.
+- **hreflang** (`src/lib/util/market.ts` `marketAlternates`, from `SITE_LIVE=true` on): every indexable page lists
+  each market's URL under its `hreflang` plus `x-default` = the `xDefault` market's URL, absolute, the same set on
+  every version (self-referencing and reciprocal), each equal to that page's canonical; the home page is the bare
+  origin. A page a market does not have is left out: an article is listed under the slug of each language it can
+  be read in (medusa-blog-seo `alternates`, never the same slug), a blog category by its slug per language, a
+  listing page only where it has articles, a route of your own layer only in the markets you name
+  (`sitemap.paths`). Pages kept out of the index (filtered listings, empty listings, `noindex` link pages, search,
+  account, cart) carry no hreflang and nothing points at them. `sitemap.xml` repeats the same set as
+  `xhtml:link`. Audit a running store with `node scripts/seo/check-hreflang.mjs https://your-store.com
+  --x-default en-US` (crawls the sitemap and the pages linked from the home pages, checks every pair both ways).
 
 ## text
 
@@ -336,6 +346,18 @@ within 60 s. `noindex` on a page is honoured; pages without it are in the sitema
 `/og/{market}/links/{handle}.png` (avatar or initials, name, bio) unless the page has its own.
 
 `seed/enable-links.mjs` creates a demo page on the dev backend.
+
+## sitemap
+
+```ts
+sitemap: { paths: [{ path: "/custom", markets: ["id"] }] },
+```
+
+`sitemap.xml` lists by itself: the home page, `/store`, `/makers`, every information page in `content/pages`,
+products (with their photos), categories, collections, the blog (listing, categories, articles, each language by
+its own slug) and the link-in-bio pages, one entry per market URL with the hreflang set above. `paths` adds routes
+of your own layer under `src/app/[countryCode]/`; `markets` limits one to the markets that have it (its hreflang
+then names only those). Nothing is listed before `SITE_LIVE=true`.
 
 ## blogPath, contact, analytics
 

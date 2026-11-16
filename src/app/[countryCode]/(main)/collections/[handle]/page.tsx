@@ -25,7 +25,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     title: collection.title,
     description: descriptionOf(collection) || collection.title,
-    alternates: { canonical: `${origin}${marketPath(params.countryCode, path)}`, languages: marketAlternates(origin, path) },
+    alternates: { canonical: `${origin}${marketPath(params.countryCode, path)}`, languages: marketAlternates(origin, path, { noindex: activeFilterCount(query) > 0 }) },
     ...(activeFilterCount(query) ? { robots: { index: false, follow: true } } : {}),
   }
 }

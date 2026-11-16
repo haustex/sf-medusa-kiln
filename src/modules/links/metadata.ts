@@ -19,7 +19,7 @@ export async function linksMetadata(countryCode: string, page: LinksPage): Promi
   return {
     title: { absolute: title },
     description,
-    alternates: { canonical: url, languages: marketAlternates(origin, path) },
+    alternates: { canonical: url, languages: marketAlternates(origin, path, { noindex: page.noindex }) },
     openGraph: { ...ogBase(countryCode), type: "profile", title, description, url, images: [image] },
     twitter: { card: "summary_large_image", title, description, images: [image.url] },
     ...(page.noindex ? { robots: { index: false, follow: true } } : {}),

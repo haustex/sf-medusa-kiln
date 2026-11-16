@@ -21,7 +21,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     title: t.allProducts,
     description: t.allDescription,
-    alternates: { canonical: `${origin}${marketPath(countryCode, "/store")}`, languages: marketAlternates(origin, "/store") },
+    alternates: { canonical: `${origin}${marketPath(countryCode, "/store")}`, languages: marketAlternates(origin, "/store", { noindex: activeFilterCount(query) > 0 }) },
     // Filtered views are for people, not the index; the canonical listing stays indexable
     ...(activeFilterCount(query) ? { robots: { index: false, follow: true } } : {}),
   }

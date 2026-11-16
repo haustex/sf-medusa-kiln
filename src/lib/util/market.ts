@@ -64,13 +64,33 @@ export const stripMarketPrefix = (pathname: string): string => {
   return pathname || "/"
 }
 
-/** hreflang alternates for a market-independent path (for the Metadata API). Empty before launch (SITE_LIVE). */
-export const marketAlternates = (origin: string, path = "") => {
+/** Absolute URL of a market path. The home page is the bare origin, the form its canonical takes. */
+export const marketUrl = (origin: string, countryCode: string | string[] | null | undefined, path = ""): string => {
+  const p = marketPath(countryCode, path)
+  return p === "/" ? origin : `${origin}${p}`
+}
+
+/**
+ * The market-less path of a page per market: one string = the same path in every market; a record = the path per
+ * market code, a market left out or `null` has no version of the page (an untranslated article, a page one market
+ * does not have).
+ */
+export type MarketPaths = string | Partial<Record<string, string | null>>
+
+/**
+ * hreflang alternates for the Metadata API (`alternates.languages`) and the sitemap: every market that has the
+ * page, each by its own URL, plus `x-default` = the `markets.xDefault` market's URL (the first listed market's when
+ * that one has no version). The set is the same on every version, so the links are reciprocal and self-referencing.
+ * Empty before launch (SITE_LIVE) and for a page kept out of the index (`noindex`): a page that is not indexed must
+ * not be an alternate, and must not point at any.
+ */
+export const marketAlternates = (origin: string, paths: MarketPaths = "", opts: { noindex?: boolean } = {}) => {
   const languages: Record<string, string> = {}
-  if (process.env.SITE_LIVE !== "true") return languages
-  for (const code of MARKET_CODES) {
-    languages[MARKETS[code].hreflang] = `${origin}${marketPath(code, path)}`
-  }
-  languages["x-default"] = `${origin}${marketPath(X_DEFAULT_MARKET, path)}`
+  if (process.env.SITE_LIVE !== "true" || opts.noindex) return languages
+  const pathOf = (code: string): string | null => (typeof paths === "string" ? paths : (paths[code] ?? null))
+  const codes = MARKET_CODES.filter((code) => pathOf(code) !== null)
+  for (const code of codes) languages[MARKETS[code].hreflang] = marketUrl(origin, code, pathOf(code) as string)
+  const xDefault = codes.includes(X_DEFAULT_MARKET) ? X_DEFAULT_MARKET : codes[0]
+  if (xDefault) languages["x-default"] = marketUrl(origin, xDefault, pathOf(xDefault) as string)
   return languages
 }

@@ -1,7 +1,7 @@
 import "server-only"
 
 import { sdk } from "@lib/config"
-import { getMarket, marketPath } from "@lib/util/market"
+import { getMarket, MARKET_CODES, marketPath } from "@lib/util/market"
 import { STORE_NAME } from "@lib/util/site"
 import { formatPostDate, readingTimeLabel } from "@modules/blog/format"
 import type { PostCardData, TocItem } from "@modules/blog/types"
@@ -22,7 +22,16 @@ export const PICKS_TAG = "pilihan"
 export type Lang = "id" | "en"
 export const blogLang = (countryCode: string): Lang => (getMarket(countryCode).htmlLang === "en" ? "en" : "id")
 
-export type BlogCategory = { id: string; slug: string; name: string; description: string | null; post_count?: number }
+/**
+ * Market-less path per market of something that has a slug per blog locale (`alternates` of an article or a
+ * category, `locales` of an index row): a market whose language has no slug is left out, so hreflang and the
+ * sitemap never point at a page that does not exist in that market.
+ */
+export const blogMarketPaths = (slugByLocale: Record<string, string | undefined> | undefined, toPath: (slug: string) => string): Partial<Record<string, string>> =>
+  Object.fromEntries(MARKET_CODES.flatMap((code) => (slugByLocale?.[blogLang(code)] ? [[code, toPath(slugByLocale[blogLang(code)] as string)]] : [])))
+
+/** `alternates`: the category's slug per blog locale (its address in every language) */
+export type BlogCategory = { id: string; slug: string; name: string; description: string | null; post_count?: number; alternates?: Record<string, string> }
 /** Who wrote it, as the lists carry it (the article adds photo, bio and profiles: {@link BlogAuthor}) */
 export type BlogAuthorRef = { id: string; slug: string; name: string; type: "person" | "organization" }
 export type BlogAuthor = BlogAuthorRef & {
@@ -50,6 +59,8 @@ export type BlogCard = {
   cover_wide: string | null
   cover_alt: string
   featured: boolean
+  /** Slug per blog locale where the article can be read (own translation or the plugin's fallback): hreflang */
+  alternates?: Record<string, string>
 }
 export type BlogBlock =
   | { type: "html"; html: string }

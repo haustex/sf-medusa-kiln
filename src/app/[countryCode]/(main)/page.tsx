@@ -7,7 +7,7 @@ import { getDictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
 import { organizationSchema, websiteSchema } from "@lib/seo/organization"
 import { JsonLd } from "@lib/seo/jsonld"
-import { getMarket, marketAlternates, marketPath } from "@lib/util/market"
+import { getMarket, marketAlternates, marketPath, marketUrl } from "@lib/util/market"
 import { getSiteOrigin } from "@lib/util/site"
 import { shownCategories } from "@lib/util/categories"
 import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
@@ -32,7 +32,7 @@ export async function generateMetadata(props: { params: Promise<{ countryCode: s
   return {
     title: { absolute: `${config.brand.name} · ${tx(config.brand.tagline, lang)}` },
     description: `${tx(config.brand.tagline, lang)} ${tx(config.brand.footerText, lang)}`,
-    alternates: { canonical: `${origin}${marketPath(countryCode)}`, languages: marketAlternates(origin) },
+    alternates: { canonical: marketUrl(origin, countryCode), languages: marketAlternates(origin) },
   }
 }
 

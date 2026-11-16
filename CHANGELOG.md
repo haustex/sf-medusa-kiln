@@ -3,6 +3,24 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.5.1] — 2026-11-16
+
+### Fixed
+- hreflang: an article's alternates name each language's own slug (medusa-blog-seo `alternates`) instead of
+  repeating the current slug; a blog category and its pages likewise; a market whose language has no version of
+  the page is left out instead of linked to a 404 or a redirect. Pages kept out of the index (filtered or empty
+  listings, `noindex` link-in-bio pages) no longer carry hreflang. The home page's alternates are the bare origin,
+  like its canonical. `sitemap.xml` uses the same sets, lists every page of `content/pages` (not a fixed list) and
+  omits a market's blog listing when it has no articles.
+
+### Added
+- `sitemap.paths` in theme.config.ts: routes of the shop's own layer, optionally in some markets only
+  (`{ path: "/custom", markets: ["id"] }`), in the sitemap and with matching hreflang.
+- `scripts/seo/check-hreflang.mjs`: audits a running store (sitemap + crawl from the home pages): 200, canonical,
+  self-reference, reciprocity, x-default, sitemap parity, and that noindex/redirect/404 pages are never alternates.
+- `marketUrl(origin, market, path)` and `MarketPaths` in `src/lib/util/market.ts`; `blogMarketPaths` in
+  `src/lib/data/blog.ts`.
+
 ## [0.5.0] — 2026-11-16
 
 ### Added

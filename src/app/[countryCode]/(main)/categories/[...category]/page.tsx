@@ -24,7 +24,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     title: category.name,
     description: category.description || category.name,
-    alternates: { canonical: `${origin}${marketPath(params.countryCode, path)}`, languages: marketAlternates(origin, path) },
+    alternates: { canonical: `${origin}${marketPath(params.countryCode, path)}`, languages: marketAlternates(origin, path, { noindex: activeFilterCount(query) > 0 }) },
     openGraph: { ...ogBase(params.countryCode), type: "website", images: [categoryShareImage(origin, params.countryCode, params.category, category.name)] },
     ...(activeFilterCount(query) ? { robots: { index: false, follow: true } } : {}),
   }

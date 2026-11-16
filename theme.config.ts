@@ -329,6 +329,13 @@ const config = {
    */
   linkInBio: { handle: "links", path: "links" },
 
+  /**
+   * sitemap.xml: the theme lists the home page, /store, /makers, the information pages (content/pages), products,
+   * categories, collections, the blog and the link-in-bio pages by itself. `paths` adds routes of your own layer
+   * (`{ path: "/custom", markets: ["id"] }`; without `markets` every market); their hreflang follows the same rule.
+   */
+  sitemap: { paths: [] as { path: string; markets?: string[] }[] },
+
   /** Pages that show the "ships worldwide" line etc. are plain config, not secrets */
   contact: { email: "hello@example.com", whatsapp: "" },
 

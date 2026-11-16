@@ -1,6 +1,8 @@
-import { MARKET_CODES, MARKETS, marketAlternates, marketPath, X_DEFAULT_MARKET } from "@lib/util/market"
+import config from "@theme"
+import { marketAlternates, type MarketPaths, marketUrl } from "@lib/util/market"
 import { sdk } from "@lib/config"
-import { type BlogIndexRow, categoryPath, indexLocale, listPostIndex, postPath } from "@lib/data/blog"
+import { type BlogIndexRow, blogLang, blogMarketPaths, categoryPath, listPostIndex, postPath } from "@lib/data/blog"
+import { listPageSlugs } from "@lib/content/pages"
 import { linksPath, listLinksPages } from "@lib/data/links"
 import { feature } from "@lib/features"
 import { listRegions } from "@lib/data/regions"
@@ -11,7 +13,9 @@ import { isHiddenProduct } from "@lib/util/hidden-products"
 import { productImageName, blogImageNames } from "@lib/util/image-name"
 import { imageJpeg, imageRef } from "@lib/util/image-url"
 
-const STATIC_PATHS = ["", "/store", "/makers", "/shipping", "/returns", "/terms", "/privacy", "/contact", "/about"]
+const STATIC_PATHS = ["", "/store", "/makers"]
+/** Routes of the shop's own layer (theme.config.ts `sitemap.paths`) */
+const EXTRA_PATHS: { path: string; markets?: string[] }[] = (config as { sitemap?: { paths?: { path: string; markets?: string[] }[] } }).sitemap?.paths ?? []
 const PAGE_SIZE = 200
 
 type Page<T> = { items: T[]; count: number }
@@ -43,9 +47,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Products also list their photos (image sitemap)
   const productQuery = { ...query, fields: "handle,updated_at,thumbnail,*images" }
 
-  const [origin, regions, products, categories, collections, posts, linkPages] = await Promise.all([
+  const [origin, regions, pages, products, categories, collections, posts, linkPages] = await Promise.all([
     getSiteOrigin(),
     listRegions(),
+    listPageSlugs(),
     listAll<Entry>((offset) =>
       sdk.store.product
         .list({ ...productQuery, offset })
@@ -67,15 +72,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     feature("links").then((on) => (on ? listLinksPages() : [])).catch(() => []),
   ])
 
-  // One entry per market URL, each listing all language versions (hreflang)
+  // One entry per market URL that exists, each listing every language version (hreflang, the same set as the
+  // page's <head>: lib/util/market.ts marketAlternates)
   const markets = listCountryCodes(regions)
-  const entry = (path: string, lastModified?: Date, images?: string[]) =>
-    markets.map((countryCode) => ({
-      url: `${origin}${path ? marketPath(countryCode, path) : marketPath(countryCode).replace(/^\/$/, "")}`,
-      ...(lastModified ? { lastModified } : {}),
-      alternates: { languages: marketAlternates(origin, path) },
-      ...(images?.length ? { images } : {}),
-    }))
+  const localized = (paths: MarketPaths, lastModified?: Date, images?: (countryCode: string) => string[] | undefined) => {
+    const pathOf = (code: string) => (typeof paths === "string" ? paths : (paths[code] ?? null))
+    const languages = marketAlternates(origin, paths)
+    return markets.flatMap((countryCode) => {
+      const path = pathOf(countryCode)
+      if (path === null) return []
+      const imgs = images?.(countryCode)
+      return [{ url: marketUrl(origin, countryCode, path), ...(lastModified ? { lastModified } : {}), alternates: { languages }, ...(imgs?.length ? { images: imgs } : {}) }]
+    })
+  }
+  const entry = (path: string, lastModified?: Date, images?: string[]) => localized(path, lastModified, () => images)
   // Clean JPEG URLs of our photos (/img/produk/{handle}-{n}-1280-{hash}.jpg); others are left out
   const productImages = (p: Entry) => {
     const urls = [...(p.images ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).map((i) => i.url)
@@ -95,22 +105,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       return ref ? [imageJpeg(origin, ref)] : []
     })
 
-  // Articles and their categories have a slug per language: one entry per market, each listing every language's URL
-  const localized = (pathFor: (countryCode: string) => string | null, lastModified?: Date, images?: (countryCode: string) => string[]) => {
-    const languages: Record<string, string> = {}
-    for (const code of MARKET_CODES) {
-      const path = pathFor(code)
-      if (path) languages[MARKETS[code].hreflang] = `${origin}${marketPath(code, path)}`
-    }
-    const xDefault = pathFor(X_DEFAULT_MARKET)
-    if (xDefault) languages["x-default"] = `${origin}${marketPath(X_DEFAULT_MARKET, xDefault)}`
-    return markets.flatMap((countryCode) => {
-      const path = pathFor(countryCode)
-      if (!path) return []
-      const imgs = images?.(countryCode)
-      return [{ url: `${origin}${marketPath(countryCode, path)}`, ...(lastModified ? { lastModified } : {}), alternates: { languages }, ...(imgs?.length ? { images: imgs } : {}) }]
-    })
-  }
+  // Articles and their categories have a slug per language (`locales` of the index row): a market whose language
+  // has no readable version is left out, like the page's hreflang
+  const slugs = (p: BlogIndexRow) => Object.fromEntries(Object.entries(p.locales).map(([lang, l]) => [lang, l.slug]))
+  const categorySlugs = (p: BlogIndexRow) => Object.fromEntries(Object.entries(p.locales).flatMap(([lang, l]) => (l.category_slug ? [[lang, l.category_slug]] : [])))
+  const hasPosts = (countryCode: string) => posts.some((p) => p.locales[blogLang(countryCode)])
+  const listingPaths = Object.fromEntries(markets.map((countryCode) => [countryCode, hasPosts(countryCode) ? "/blog" : null]))
 
   // Blog listing + category pages carry the date of their newest article
   const newest = (rows: BlogIndexRow[]) => (rows.length ? new Date(rows.reduce((max, p) => (p.updated_at > max ? p.updated_at : max), rows[0].updated_at)) : undefined)
@@ -122,28 +122,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   const blog = posts.length
     ? [
-        ...entry("/blog", newest(posts)),
-        ...Array.from(byCategory.values()).flatMap((group) =>
-          localized((cc) => {
-            const slug = indexLocale(group[0], cc)?.category_slug
-            return slug ? categoryPath(slug) : null
-          }, newest(group))
-        ),
-        ...posts.flatMap((p) =>
-          localized(
-            (cc) => {
-              const slug = indexLocale(p, cc)?.slug
-              return slug ? postPath(slug) : null
-            },
-            new Date(p.updated_at),
-            (cc) => postImages(p, indexLocale(p, cc)?.slug ?? "")
-          )
-        ),
+        ...localized(listingPaths, newest(posts)),
+        ...Array.from(byCategory.values()).flatMap((group) => localized(blogMarketPaths(categorySlugs(group[0]), categoryPath), newest(group))),
+        ...posts.flatMap((p) => localized(blogMarketPaths(slugs(p), postPath), new Date(p.updated_at), (cc) => postImages(p, p.locales[blogLang(cc)]?.slug ?? ""))),
       ]
     : []
+  // Routes of the shop's own layer, some in one market only
+  const extra = EXTRA_PATHS.flatMap(({ path, markets: only }) => localized(only ? Object.fromEntries(only.map((code) => [code.toLowerCase(), path])) : path))
 
   return [
     ...STATIC_PATHS.flatMap((path) => entry(path)),
+    ...pages.flatMap((slug) => entry(`/${slug}`)),
+    ...extra,
     ...linkPages.filter((p) => !p.noindex).flatMap((p) => entry(linksPath(p.handle), new Date(p.updated_at))),
     ...toEntries("products", products, productImages),
     ...toEntries("categories", categories),
