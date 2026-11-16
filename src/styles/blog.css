@@ -173,14 +173,20 @@
       scroll-margin-top: 8rem;
     }
   }
-  .blog-prose a:not(.blog-embed) {
+  /* A call-to-action written as <a class="button …"> in a content page keeps the button look */
+  .blog-prose a.button,
+  .blog-prose a.button:hover {
+    text-decoration: none;
+    color: var(--button-fg);
+  }
+  .blog-prose a:not(.blog-embed):not(.button) {
     color: var(--foreground);
     font-weight: 500;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
   }
-  .blog-prose a:not(.blog-embed):hover {
+  .blog-prose a:not(.blog-embed):not(.button):hover {
     text-decoration-thickness: 2px;
   }
   .blog-prose strong {

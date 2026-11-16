@@ -359,6 +359,15 @@ its own slug) and the link-in-bio pages, one entry per market URL with the hrefl
 of your own layer under `src/app/[countryCode]/`; `markets` limits one to the markets that have it (its hreflang
 then names only those). Nothing is listed before `SITE_LIVE=true`.
 
+## Information pages (content/pages)
+
+`content/pages/{language}/{slug}.md` with front matter `title`, `description`, optional `image` + `image_alt` (a
+photo under the header, absolute URL or a file in `public/`; nothing is rendered when it is missing) and optional
+`schema: AboutPage` / `schema: ContactPage` (JSON-LD of that type, with the Organization from `brand.legal` and
+`contact`, when `SITE_LIVE=true`). Raw HTML is allowed: `<a class="button button--lg button--primary" href="/custom">…</a>`
+is a call-to-action button; links that start with `/` get the market prefix. Placeholders: see
+`src/lib/content/pages.ts`. A page missing in one language falls back to `en`.
+
 ## blogPath, contact, analytics
 
 - `blogPath`: the journal's URL segment (`/blog`). Changing it also means renaming the folder

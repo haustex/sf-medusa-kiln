@@ -12,12 +12,27 @@ import { rateCardHtml } from "@lib/data/shipping-rates"
  * content/pages/{language}/{slug}.md with a small front matter (`title`, `description`). The language is the
  * market's dictionary (theme.config.ts `markets`); a page missing in one language falls back to `en`.
  *
+ * Front matter: `title`, `description`, optional `image` + `image_alt` (a photo under the header; no placeholder when
+ * empty) and `schema` (`AboutPage` | `ContactPage`: JSON-LD of that type plus the Organization).
+ *
  * Placeholders in the text: {{brand}}, {{email}}, {{whatsapp}}, {{location}} (theme.config.ts), {{country}}
  * (the market's country name in its language), {{year}} and {{date}} (today), and {{rates}}: the shipping
  * plugin's rate card as tables (lib/data/shipping-rates.ts; empty without medusa-fulfillment-zone-rate). Links
  * that start with `/` get the market prefix, so `[Returns](/returns)` works in every market.
  */
-export type ContentPage = { slug: string; lang: string; title: string; description: string; html: string }
+/** Front matter `schema`: the page's schema.org type for JSON-LD (with the Organization), e.g. `AboutPage`, `ContactPage` */
+export const PAGE_SCHEMAS = ["AboutPage", "ContactPage"] as const
+export type PageSchema = (typeof PAGE_SCHEMAS)[number]
+export type ContentPage = {
+  slug: string
+  lang: string
+  title: string
+  description: string
+  html: string
+  /** Front matter `image` (+ `image_alt`): a photo under the header, absolute or from /public; nothing when unset */
+  image: { src: string; alt: string } | null
+  schema: PageSchema | null
+}
 
 const ROOT = path.join(process.cwd(), "content", "pages")
 const FALLBACK = "en"
@@ -103,5 +118,9 @@ export async function getPage(countryCode: string, slug: string): Promise<Conten
     .replace(/href="\/(?!\/)/g, `href="${marketPath(countryCode, "/")}`)
     .replace(/<table>/g, '<div class="blog-table"><table>')
     .replace(/<\/table>/g, "</table></div>")
-  return { slug, lang, title: fill(data.title ?? slug, values), description: fill(data.description ?? "", values), html }
+  const title = fill(data.title ?? slug, values)
+  const src = (data.image ?? "").trim()
+  const image = /^(\/|https:\/\/)/.test(src) ? { src, alt: fill(data.image_alt ?? "", values) || title } : null
+  const schema = (PAGE_SCHEMAS as readonly string[]).includes(data.schema ?? "") ? (data.schema as PageSchema) : null
+  return { slug, lang, title, description: fill(data.description ?? "", values), html, image, schema }
 }
