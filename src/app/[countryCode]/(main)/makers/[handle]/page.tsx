@@ -3,6 +3,7 @@ import { getImageProps } from "next/image"
 import { notFound } from "next/navigation"
 import { marked } from "marked"
 
+import { productAlts } from "@lib/data/image-alt"
 import { getMaker, listMakerProducts } from "@lib/data/makers"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
@@ -47,7 +48,8 @@ export default async function MakerPage(props: Props) {
   const href = (p: string) => marketPath(countryCode, p)
   const { products, count } = await listMakerProducts(countryCode, maker.id, PRODUCTS, PRODUCT_CARD_FIELDS)
   const ratings = await getProductRatings(products.map((p) => p.id))
-  const cards = products.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id))))
+  const alts = await productAlts(countryCode, products.map((p) => p.id))
+  const cards = products.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id)), alts))
   const story = maker.story ? await marked.parse(maker.story, { gfm: true, async: true }) : null
   const cover = maker.image ? getImageProps({ src: maker.image, alt: "", width: 1920, height: 800, sizes: "(min-width: 1280px) 1280px, 100vw", priority: true, className: "size-full object-cover" }).props : null
 

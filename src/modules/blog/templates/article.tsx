@@ -1,4 +1,5 @@
 import { authorName, categoryPath, postPath, toPostCard, type BlogArticle, type BlogCard } from "@lib/data/blog"
+import { productAlts } from "@lib/data/image-alt"
 import { listProducts } from "@lib/data/products"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { blogPosting, blogShareImage } from "@lib/seo/blog"
@@ -27,8 +28,8 @@ async function productCards(countryCode: string, ids: string[]): Promise<Record<
   const products = await listProducts({ countryCode, queryParams: { id: ids, limit: ids.length, fields: PRODUCT_CARD_FIELDS } })
     .then(({ response }) => response.products)
     .catch(() => [])
-  const ratings = await getProductRatings(products.map((p) => p.id))
-  return Object.fromEntries(products.filter((p) => !isHiddenProduct(p)).map((p) => [p.id, toProductCard(p, countryCode, cardRating(ratings.get(p.id)))]))
+  const [ratings, alts] = await Promise.all([getProductRatings(products.map((p) => p.id)), productAlts(countryCode, products.map((p) => p.id))])
+  return Object.fromEntries(products.filter((p) => !isHiddenProduct(p)).map((p) => [p.id, toProductCard(p, countryCode, cardRating(ratings.get(p.id)), alts)]))
 }
 
 /** The newest products of the market: the "From the shop" band when the post links none */
@@ -37,8 +38,8 @@ async function newestCards(countryCode: string, n = 4): Promise<ProductCardData[
     .then(({ response }) => response.products)
     .catch(() => [])
   const kept = products.filter((p) => !isHiddenProduct(p)).slice(0, n)
-  const ratings = await getProductRatings(kept.map((p) => p.id))
-  return kept.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id))))
+  const [ratings, alts] = await Promise.all([getProductRatings(kept.map((p) => p.id)), productAlts(countryCode, kept.map((p) => p.id))])
+  return kept.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id)), alts))
 }
 
 /**

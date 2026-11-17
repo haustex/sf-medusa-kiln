@@ -67,7 +67,7 @@ export default function QuickView({ product, countryCode, labels, onClose }: { p
     <Sheet open onClose={onClose} side="bottom" label={labels.quickView} title={labels.quickView} closeLabel={labels.close}>
       <div className="grid gap-stack-lg sm:grid-cols-[minmax(0,14rem)_1fr]">
         <div className="relative overflow-hidden rounded-media">
-          <ProductImage src={product.image} name={product.imageName ?? cleanSlug(product.href.split("/").pop() ?? "")} alt={product.title} sizes="(min-width: 640px) 14rem, 90vw" />
+          <ProductImage src={product.image} name={product.imageName ?? cleanSlug(product.href.split("/").pop() ?? "")} alt={product.imageAlt || product.title} sizes="(min-width: 640px) 14rem, 90vw" />
           {product.subtitle && (
             <div className="absolute left-stack-sm top-stack-sm">
               <Badge overPhoto>{product.subtitle}</Badge>

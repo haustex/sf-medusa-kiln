@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 
 import { listCartOptions } from "@lib/data/cart"
+import { productAlts } from "@lib/data/image-alt"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { removedItems } from "@lib/util/cart-notice"
 import { marketPath } from "@lib/util/market"
@@ -20,7 +21,8 @@ export default async function CartTemplate({ cart, customer, countryCode }: { ca
   // the free-shipping nudge reads the options' price rules
   const shippingOptions = cart?.items?.length ? await listCartOptions().then((r) => r.shipping_options).catch(() => []) : []
   const href = (p: string) => marketPath(countryCode, p)
-  const items = [...(cart?.items ?? [])].sort((a, b) => ((a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1)).map(toCartLine)
+  const alts = await productAlts(countryCode, (cart?.items ?? []).map((i) => i.product_id))
+  const items = [...(cart?.items ?? [])].sort((a, b) => ((a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1)).map((i) => toCartLine(i, alts))
   const count = items.reduce((n, i) => n + i.quantity, 0)
   const removed = removedItems(cart)
   const lineLabels = { quantity: t.quantity, decrease: dict.product.decrease, increase: dict.product.increase, remove: t.remove, each: t.each, removeFailed: t.removeFailed, updateFailed: t.updateFailed }

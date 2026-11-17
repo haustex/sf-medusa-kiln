@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 
 import { listCartShippingMethods } from "@lib/data/fulfillment"
+import { productAlts } from "@lib/data/image-alt"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { formatEstimate, getShippingRateCard, serviceForOption } from "@lib/data/shipping-rates"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
@@ -30,6 +31,7 @@ export default async function CheckoutTemplate({ cart, customer, countryCode, st
   const dict = getDictionary(countryCode)
   const t = dict.checkout
   const href = (p: string) => marketPath(countryCode, p)
+  const alts = await productAlts(countryCode, (cart.items ?? []).map((i) => i.product_id))
   const [shippingOptions, paymentProviders, rateCard] = await Promise.all([
     step === "address" ? Promise.resolve([]) : listCartShippingMethods(cart.id).catch(() => null),
     step === "payment" ? listCartPaymentMethods(cart.region?.id ?? "").catch(() => null) : Promise.resolve(null),
@@ -49,7 +51,7 @@ export default async function CheckoutTemplate({ cart, customer, countryCode, st
   return (
     <div className="content-container grid items-start gap-section pb-section pt-stack-md lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-x-16">
       <div className="order-first lg:order-last">
-        <CheckoutSummary cart={cart} labels={{ title: t.orderSummary, show: t.showSummary, promo: { label: t.promoAdd, apply: t.promoApply, remove: t.promoRemove, error: t.errorDiscount } }} />
+        <CheckoutSummary cart={cart} alts={alts} labels={{ title: t.orderSummary, show: t.showSummary, promo: { label: t.promoAdd, apply: t.promoApply, remove: t.promoRemove, error: t.errorDiscount } }} />
       </div>
       <div className="flex flex-col divide-y divide-separator" data-testid="checkout-form">
         <Step

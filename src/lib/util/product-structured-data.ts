@@ -24,6 +24,7 @@ export const buildProductStructuredData = ({
   productUrl,
   offerExtras,
   priceOnRequest = false,
+  alts,
 }: {
   product: HttpTypes.StoreProduct
   currency: string
@@ -31,6 +32,8 @@ export const buildProductStructuredData = ({
   offerExtras?: (variant: HttpTypes.StoreProductVariant) => Record<string, unknown>
   /** Custom product sold by quote: no Offer with a fixed price (the price follows size and material) */
   priceOnRequest?: boolean
+  /** medusa-image-alt texts by image URL: photos become ImageObject { contentUrl, caption } */
+  alts?: Record<string, string>
 }) => {
   const cur = currency.toUpperCase()
   // Our photos as clean JPEG URLs on the shop's domain (/img/produk/{handle}-{n}-1280-{hash}.jpg), others as they are
@@ -41,7 +44,9 @@ export const buildProductStructuredData = ({
   }
   const raw = [...(product.images ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).map((image) => image.url).filter(Boolean)
   if (!raw.length && product.thumbnail) raw.push(product.thumbnail)
-  const images = raw.map(photo)
+  // a photo with an alt text is an ImageObject (its caption is what Google shows as the image's description); plain URL otherwise
+  const described = (url: string): string | Record<string, string> => (alts?.[url] ? { "@type": "ImageObject", contentUrl: photo(url), url: photo(url), caption: alts[url], name: alts[url] } : photo(url))
+  const images = raw.map(described)
   const description = product.description || product.title
   const brand = { "@type": "Brand", name: STORE_NAME }
   const common = {
@@ -103,7 +108,7 @@ export const buildProductStructuredData = ({
         "@type": "Product",
         name: `${product.title} - ${variant.title}`,
         sku: variant.sku || undefined,
-        image: variant.images?.[0]?.url ? photo(variant.images[0].url) : images[0],
+        image: variant.images?.[0]?.url ? described(variant.images[0].url) : images[0],
         ...weight(variant),
         ...(size?.value ? { size: size.value } : {}),
         additionalProperty: (variant.options ?? []).map((value) => ({

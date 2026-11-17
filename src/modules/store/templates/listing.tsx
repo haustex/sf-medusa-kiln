@@ -6,6 +6,7 @@ import { __iconData as x } from "lucide-react/icons/x"
 import config from "@theme"
 import { listCategories } from "@lib/data/categories"
 import { shownCategories } from "@lib/util/categories"
+import { productAlts } from "@lib/data/image-alt"
 import { listProducts } from "@lib/data/products"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
@@ -83,7 +84,8 @@ export default async function ListingTemplate({
   const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize))
   const page = Math.min(query.page, totalPages)
   const pageProducts = sorted.slice((page - 1) * pageSize, page * pageSize)
-  const cards = pageProducts.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id))))
+  const alts = await productAlts(countryCode, pageProducts.map((p) => p.id))
+  const cards = pageProducts.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id)), alts))
 
   const facets = buildFacets(scanned, query, ratings, lang, t)
   const filters = activeFilterCount(query)

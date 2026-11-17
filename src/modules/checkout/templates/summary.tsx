@@ -11,7 +11,7 @@ import PromoCode, { type PromoLabels } from "../components/promo-code"
 
 export type SummaryLabels = { title: string; show: string; promo: PromoLabels }
 
-function Lines({ cart }: { cart: HttpTypes.StoreCart }) {
+function Lines({ cart, alts }: { cart: HttpTypes.StoreCart; alts?: Record<string, string> }) {
   const items = [...(cart.items ?? [])].sort((a, b) => ((a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1))
   return (
     <ul className="flex flex-col gap-stack-md" data-testid="items-table">
@@ -20,7 +20,7 @@ function Lines({ cart }: { cart: HttpTypes.StoreCart }) {
         return (
           <li key={item.id} className="flex items-center gap-stack-md" data-testid="product-row">
             <span className="relative size-16 shrink-0 overflow-hidden rounded-md bg-background">
-              <ProductImage src={item.thumbnail} name={cleanSlug(item.product_handle ?? item.title ?? "item")} alt="" sizes="64px" className="size-full" />
+              <ProductImage src={item.thumbnail} name={cleanSlug(item.product_handle ?? item.title ?? "item")} alt={(item.thumbnail && alts?.[item.thumbnail]) || ""} sizes="64px" className="size-full" />
               <span className="absolute -right-1 -top-1 inline-flex size-5 items-center justify-center rounded-full bg-foreground text-[11px] font-medium text-background" data-testid="product-quantity">
                 {item.quantity}
               </span>
@@ -45,10 +45,11 @@ function Lines({ cart }: { cart: HttpTypes.StoreCart }) {
  * Order summary: lines (thumb with quantity badge, title, variant, line total), promotion code, totals. A sticky
  * card on desktop; on phones a collapsed <details> above the steps with the total in its summary line.
  */
-export default function CheckoutSummary({ cart, labels: t }: { cart: HttpTypes.StoreCart; labels: SummaryLabels }) {
+/** `alts`: medusa-image-alt texts by image URL (lib/data/image-alt.ts) for the thumbnails */
+export default function CheckoutSummary({ cart, labels: t, alts }: { cart: HttpTypes.StoreCart; labels: SummaryLabels; alts?: Record<string, string> }) {
   const content = (
     <div className="flex flex-col gap-stack-lg">
-      <Lines cart={cart} />
+      <Lines cart={cart} alts={alts} />
       <PromoCode promotions={cart.promotions ?? []} labels={t.promo} />
       <CartTotals totals={cart} />
     </div>

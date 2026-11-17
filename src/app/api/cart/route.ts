@@ -1,6 +1,8 @@
 import { cookies } from "next/headers"
 
 import { retrieveCart } from "@lib/data/cart"
+import { productAlts } from "@lib/data/image-alt"
+import { DEFAULT_MARKET, isMarketCode } from "@lib/util/market"
 import { toCartLine, type CartDrawerData } from "@modules/cart/components/cart-line/data"
 
 /**
@@ -10,15 +12,26 @@ import { toCartLine, type CartDrawerData } from "@modules/cart/components/cart-l
 export const dynamic = "force-dynamic"
 
 const NO_STORE = { "Cache-Control": "private, no-store", "Cloudflare-CDN-Cache-Control": "no-store" }
-const FIELDS = "id,currency_code,item_subtotal,total,*items,+items.total,+items.product_handle,+items.product_title,+items.thumbnail,*items.variant"
+const FIELDS = "id,currency_code,item_subtotal,total,*items,+items.total,+items.product_handle,+items.product_title,+items.thumbnail,*items.variant,+region.countries.iso_2"
 
-export async function GET() {
+/** The market of the page that asked (API routes skip the proxy): the Referer's first segment, else the cart's country */
+const marketOf = (req: Request, cart: { region?: { countries?: { iso_2?: string | null }[] | null } | null }): string => {
+  try {
+    const first = new URL(req.headers.get("referer") ?? "").pathname.split("/")[1]
+    if (isMarketCode(first)) return first
+  } catch {}
+  return cart.region?.countries?.[0]?.iso_2 ?? DEFAULT_MARKET
+}
+
+export async function GET(req: Request) {
   const empty: CartDrawerData = { id: null, currency: "", subtotal: 0, count: 0, items: [] }
   const jar = await cookies()
   if (!jar.get("_medusa_cart_id")?.value) return Response.json(empty, { headers: NO_STORE })
   const cart = await retrieveCart(undefined, FIELDS, { fresh: true }).catch(() => null)
   if (!cart) return Response.json(empty, { headers: NO_STORE })
-  const items = [...(cart.items ?? [])].sort((a, b) => ((a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1)).map(toCartLine)
+  // alt texts of the thumbnails (medusa-image-alt), in the language of the cart's market
+  const alts = await productAlts(marketOf(req, cart), (cart.items ?? []).map((i) => i.product_id))
+  const items = [...(cart.items ?? [])].sort((a, b) => ((a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1)).map((i) => toCartLine(i, alts))
   const data: CartDrawerData = {
     id: cart.id,
     currency: cart.currency_code,

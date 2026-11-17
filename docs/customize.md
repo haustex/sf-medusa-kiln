@@ -155,7 +155,7 @@ headings get the display cut (`src/styles/fonts-files`, 40 KB). To use another f
 ## features
 
 ```ts
-features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto", links: "auto", banners: "auto" },
+features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto", links: "auto", banners: "auto", imageAlt: "auto" },
 ```
 
 `"auto"` probes one store route per integration when the server starts (`src/lib/features.ts`): a 404 switches
@@ -171,6 +171,18 @@ environment overrides the file: `KILN_FEATURE_BLOG=off`. What "off" means:
 | `tracking` | medusa-fulfillment-zone-rate | No delivery estimates, `{{rates}}` empty, `/track` (and its language address) and `/api/zone-rate/…` 404, footer link hidden, no shipments on the order page |
 | `links` | medusa-link-in-bio | `/links` and `/links/{handle}` 404, `/l/{key}` sends visitors to `/links`, footer link to `/links` hidden, sitemap without the pages |
 | `banners` | medusa-hero-banners | The home hero shows `hero.slides` from theme.config.ts (or the text hero when that list is empty) instead of the Admin's banners |
+| `imageAlt` | medusa-image-alt | Product photos keep the built-in alt texts: the title on cards and in the share image, "{title} (photo n of m)" in the gallery, decorative (`alt=""`) in the cart and the checkout summary, plain URLs in the Product JSON-LD |
+
+### Alt texts of product photos
+
+With [medusa-image-alt](https://www.npmjs.com/package/medusa-image-alt) installed (`features.imageAlt`, probed at
+start) every product photo gets the text an admin wrote in Medusa's Admin → Image alt (or on the product page), in
+the market's language, or the plugin's own automatic text when the field is empty. `src/lib/data/image-alt.ts`
+fetches the map (image URL → text) for the products of a page, cached like the products; the plugin's `revalidate`
+option posts to `/api/revalidate` when a text changes. Used by the gallery, the product cards (`toProductCard(…, alts)`),
+the cart line and checkout thumbnails, the Open Graph image's `alt` and the Product JSON-LD, where a described photo
+becomes an `ImageObject` with `caption`. Configure the plugin with the store's locales (`locales: ["id", "en"]` for
+the two demo markets) so each market gets its own text.
 
 ## listing
 

@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 
+import { productAlts } from "@lib/data/image-alt"
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { ogBase, productShareImage } from "@lib/og/share"
@@ -33,6 +34,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const path = `/products/${product.handle}`
   const productUrl = `${origin}${marketPath(countryCode, path)}`
   const description = product.subtitle || product.description?.split(/\n\s*\n/)[0] || product.title
+  const alts = await productAlts(countryCode, [product.id])
+  const firstPhoto = [...(product.images ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))[0]?.url ?? product.thumbnail
   return {
     title: product.title,
     description,
@@ -42,7 +45,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       title: `${product.title} | ${STORE_NAME}`,
       description,
       url: productUrl,
-      images: [productShareImage(origin, countryCode, product)],
+      images: [productShareImage(origin, countryCode, product, firstPhoto ? alts[firstPhoto] : null)],
     },
   }
 }

@@ -3,6 +3,20 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.6.0] — 2026-11-17
+
+### Added
+- Alt texts of product photos from [medusa-image-alt](https://www.npmjs.com/package/medusa-image-alt)
+  (`features.imageAlt`, "auto" probes `/store/image-alt` at start). `src/lib/data/image-alt.ts` fetches the texts of
+  a page's products in the market's language (image URL → text, cached with the products; the plugin's `revalidate`
+  hook posts the handles to `/api/revalidate`). Used in the product gallery (each photo its own text), on product
+  cards everywhere (`toProductCard(product, countryCode, rating, alts)`, new `imageAlt` on `ProductCardData`), on
+  the cart line and checkout summary thumbnails (`thumbnailAlt` on `CartLineData`, `alts` on `CheckoutSummary`),
+  as the Open Graph image's `alt` (`productShareImage(…, alt)`) and in the Product JSON-LD, where a photo with a
+  text becomes an `ImageObject` with `caption` (`buildProductStructuredData({ alts })`). Without the plugin
+  nothing changes: title on cards and in the share image, "{title} (photo n of m)" in the gallery, decorative
+  thumbnails in cart and checkout.
+
 ## [0.5.3] — 2026-11-17
 
 ### Fixed

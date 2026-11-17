@@ -3,6 +3,7 @@ import { HttpTypes } from "@medusajs/types"
 import { productReviews } from "medusa-reviews-wishlist/jsonld"
 
 import config from "@theme"
+import { productAlts } from "@lib/data/image-alt"
 import { listProducts } from "@lib/data/products"
 import { formatEstimate, shippingEstimates } from "@lib/data/shipping-rates"
 import { cardRating, getProductRating, getProductRatings, listProductReviews, PDP_REVIEWS } from "@lib/data/reviews"
@@ -73,7 +74,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
     getSiteOrigin(),
     feature("wishlist"),
   ])
-  const relatedRatings = await getProductRatings(related.map((p) => p.id))
+  const [relatedRatings, alts] = await Promise.all([getProductRatings(related.map((p) => p.id)), productAlts(countryCode, [product.id, ...related.map((p) => p.id)])])
   const hasReviews = !!rating && rating.count > 0
   // delivery time after dispatch per service (medusa-fulfillment-zone-rate); [] without the plugin
   const estimates = await shippingEstimates(countryCode)
@@ -103,7 +104,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
       ? []
       : [
           {
-            ...buildProductStructuredData({ product, currency: region.currency_code, productUrl }),
+            ...buildProductStructuredData({ product, currency: region.currency_code, productUrl, alts }),
             ...(hasReviews ? productReviews(rating, reviewPage.reviews, { storeName: STORE_NAME, limit: PDP_REVIEWS }) : {}),
           },
         ]),
@@ -154,7 +155,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
         <Breadcrumb items={crumbs} label={dict.listing.breadcrumb} />
         {/* minmax(0, …) on every breakpoint: a column never grows to the min-content width of a nowrap row inside it */}
         <div className="grid grid-cols-[minmax(0,1fr)] gap-stack-lg lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-x-section">
-          <Gallery images={[...(product.images ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).map((i) => ({ id: i.id, url: i.url }))} handle={product.handle ?? ""} alt={product.title ?? ""} labels={{ gallery: fill(t.gallery, { title: product.title ?? "" }), photoN: t.photoN, showPhoto: t.showPhoto }} />
+          <Gallery images={[...(product.images ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).map((i) => ({ id: i.id, url: i.url, alt: alts[i.url] ?? null }))} handle={product.handle ?? ""} alt={product.title ?? ""} labels={{ gallery: fill(t.gallery, { title: product.title ?? "" }), photoN: t.photoN, showPhoto: t.showPhoto }} />
 
           <div className="flex min-w-0 flex-col gap-stack-lg lg:sticky lg:top-36 lg:self-start">
             <div className="flex flex-col gap-stack-sm">
@@ -235,7 +236,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
       {related.length > 0 && (
         <Carousel id="related" title={maker ? fill(t.moreFrom, { maker: maker.title }) : category ? fill(t.moreFrom, { maker: category.name }) : t.relatedTitle} labels={{ prev: t.prev, next: t.next }} action={{ label: t.seeAll, href: maker ? href(`/collections/${maker.handle}`) : category ? href(`/categories/${category.handle}`) : href("/store") }}>
           {related.map((p) => (
-            <CatalogCard key={p.id} product={toProductCard(p, countryCode, cardRating(relatedRatings.get(p.id)))} countryCode={countryCode} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 38vw, 62vw" />
+            <CatalogCard key={p.id} product={toProductCard(p, countryCode, cardRating(relatedRatings.get(p.id)), alts)} countryCode={countryCode} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 38vw, 62vw" />
           ))}
         </Carousel>
       )}

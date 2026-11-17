@@ -2,6 +2,7 @@ import { Metadata } from "next"
 
 import config from "@theme"
 import { listCategories } from "@lib/data/categories"
+import { productAlts } from "@lib/data/image-alt"
 import { listProducts } from "@lib/data/products"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
@@ -54,7 +55,8 @@ export default async function Home(props: { params: Promise<{ countryCode: strin
     listProducts({ countryCode, queryParams: { limit: 8, fields: PRODUCT_CARD_FIELDS } }).catch(() => ({ response: { products: [], count: 0 } })),
     listCategories({ fields: "id,name,handle,rank,parent_category_id,metadata", limit: 20 }, countryCode).catch(() => []),
   ])
-  const products = response.products.map((p) => toProductCard(p, countryCode))
+  const alts = await productAlts(countryCode, response.products.map((p) => p.id))
+  const products = response.products.map((p) => toProductCard(p, countryCode, undefined, alts))
   const topCategories = shownCategories(categories.filter((c) => !c.parent_category_id)).sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).slice(0, CATEGORY_CARDS)
   const thumbnails = await Promise.all(topCategories.map((c) => newestThumbnails(countryCode, c.id)))
   // two newest products; one product = one photo; none = the category's own image (metadata.image); nothing = no card

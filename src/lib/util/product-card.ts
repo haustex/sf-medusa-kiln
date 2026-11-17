@@ -1,4 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
+import { altFor, type AltMap } from "@lib/data/image-alt"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { isVariantInStock } from "@lib/util/inventory"
 import { marketPath } from "@lib/util/market"
@@ -30,7 +31,8 @@ export function cheapestPrice(product: HttpTypes.StoreProduct) {
 /** Stars on a card only when the product has approved reviews (medusa-reviews-wishlist ratings) */
 export type CardRating = { average: number; count: number } | null | undefined
 
-export function toProductCard(product: HttpTypes.StoreProduct, countryCode: string, rating?: CardRating): ProductCardData {
+/** `alts`: medusa-image-alt texts by image URL (lib/data/image-alt.ts); the card falls back to the title */
+export function toProductCard(product: HttpTypes.StoreProduct, countryCode: string, rating?: CardRating, alts?: AltMap): ProductCardData {
   const dict = getDictionary(countryCode)
   const t = dict.product
   const price = cheapestPrice(product)
@@ -55,6 +57,7 @@ export function toProductCard(product: HttpTypes.StoreProduct, countryCode: stri
     subtitle: product.categories?.[0]?.name ?? product.subtitle,
     image: product.thumbnail,
     image2,
+    imageAlt: altFor(alts, product.thumbnail, product.title ?? ""),
     imageName: productImageName(product, product.thumbnail),
     image2Name: productImageName(product, image2),
     price: price && {

@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import { productAlts } from "@lib/data/image-alt"
 import { listProducts } from "@lib/data/products"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
 import { getWishlist } from "@lib/data/wishlist"
@@ -36,7 +37,8 @@ export default async function WishlistPage(props: { params: Promise<{ countryCod
   const ratings = await getProductRatings(products.map((p) => p.id))
   const order = new Map(ids.map((id, i) => [id, i]))
   products.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0))
-  const cards = products.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id))))
+  const alts = await productAlts(countryCode, products.map((p) => p.id))
+  const cards = products.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id)), alts))
 
   return (
     <Page data-testid="wishlist-page">

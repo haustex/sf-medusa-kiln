@@ -22,6 +22,8 @@ import { MARKET_CODES, marketPath } from "@lib/util/market"
  * POST { link_in_bio: { handles?: string[], all?: boolean } }  (medusa-link-in-bio's `revalidate` option: the pages
  *   that changed; `all` after a deleted page)
  * POST { hero_banners: { placements?: string[] } }  (medusa-hero-banners' `revalidate` option: the home hero changed)
+ * POST { handles, image_alt: { product_ids, handles } }  (medusa-image-alt's `revalidate` option: alt texts changed;
+ *   the top-level `handles` are enough, the product pages and the home are re-rendered)
  * Same three steps for the article pages, the blog listings, the RSS feeds, the sitemap and llms.txt. The catalogue
  * pages are left alone (their HTML does not change with an article).
  */

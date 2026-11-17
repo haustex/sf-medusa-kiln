@@ -78,7 +78,7 @@ export default function CartLine({ item, currency, labels: t, compact, onClose }
   return (
     <li className={cn("flex gap-stack-md", compact ? "py-stack-md" : "py-stack-lg", busy === "remove" && "opacity-50")} aria-busy={!!busy} data-testid="product-row">
       <div className={cn("shrink-0", compact ? "w-20" : "w-20 sm:w-28")}>
-        <ProductImage src={item.thumbnail} name={cleanSlug(item.handle ?? "product")} alt="" sizes="112px" className="rounded-media" />
+        <ProductImage src={item.thumbnail} name={cleanSlug(item.handle ?? "product")} alt={item.thumbnailAlt ?? ""} sizes="112px" className="rounded-media" />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-stack-sm">

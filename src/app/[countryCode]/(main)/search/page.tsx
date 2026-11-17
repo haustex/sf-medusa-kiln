@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import { productAlts } from "@lib/data/image-alt"
 import { getRegion } from "@lib/data/regions"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
 import { searchProducts } from "@lib/data/search"
@@ -39,7 +40,8 @@ export default async function SearchPage(props: Props) {
   const href = (p: string) => marketPath(countryCode, p)
   const { response } = await searchProducts({ countryCode, query, limit: RESULT_LIMIT, fields: PRODUCT_CARD_FIELDS })
   const ratings = await getProductRatings(response.products.map((p) => p.id))
-  const cards = response.products.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id))))
+  const alts = await productAlts(countryCode, response.products.map((p) => p.id))
+  const cards = response.products.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id)), alts))
 
   return (
     <Page data-testid="search-container">

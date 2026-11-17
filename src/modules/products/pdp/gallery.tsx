@@ -5,11 +5,12 @@ import GalleryFrame from "./gallery-frame"
 /**
  * Product gallery: one big 1:1 photo in a snap rail (swipe on phones, dots), thumbnails from sm that scroll the
  * rail (gallery-frame.tsx). Server-rendered images, one priority (LCP). Photos are named {handle}-{n} in their URLs.
+ * `images[].alt`: the photo's own text (medusa-image-alt); without one: "{title} (photo n of m)".
  */
-export default function Gallery({ images, handle, alt, labels }: { images: { id: string; url: string }[]; handle: string; alt: string; labels: { gallery: string; photoN: string; showPhoto: string } }) {
-  const list = images.length ? images : [{ id: "placeholder", url: "" }]
+export default function Gallery({ images, handle, alt, labels }: { images: { id: string; url: string; alt?: string | null }[]; handle: string; alt: string; labels: { gallery: string; photoN: string; showPhoto: string } }) {
+  const list: { id: string; url: string; alt?: string | null }[] = images.length ? images : [{ id: "placeholder", url: "" }]
   const total = list.length
-  const altOf = (i: number) => (total > 1 ? `${alt} (${labels.photoN.replace("{n}", String(i + 1)).replace("{total}", String(total))})` : alt)
+  const altOf = (i: number) => list[i].alt || (total > 1 ? `${alt} (${labels.photoN.replace("{n}", String(i + 1)).replace("{total}", String(total))})` : alt)
   return (
     <GalleryFrame
       label={labels.gallery}

@@ -26,6 +26,8 @@ export type ProductCardData = {
   image?: string | null
   /** Second photo, shown on hover (pointer devices) */
   image2?: string | null
+  /** Alt text of the photo (medusa-image-alt); default: the title */
+  imageAlt?: string
   /** Names of the two photos in their URLs (lib/util/image-name.ts); default: the handle from `href` */
   imageName?: string
   image2Name?: string
@@ -78,7 +80,7 @@ export default function ProductCard({
         className="k-card group flex flex-col gap-stack-sm rounded-media outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <div className="card-media relative overflow-hidden rounded-media">
-          <ProductImage src={image} name={product.imageName ?? handle} alt={title} priority={priority} sizes={sizes} className={cn(soldOut && "opacity-60")} />
+          <ProductImage src={image} name={product.imageName ?? handle} alt={product.imageAlt || title} priority={priority} sizes={sizes} className={cn(soldOut && "opacity-60")} />
           {image2 && (
             <div className="card-media-alt absolute inset-0" aria-hidden="true">
               <ProductImage src={image2} name={product.image2Name ?? handle} alt="" sizes={sizes} />

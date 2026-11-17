@@ -220,6 +220,8 @@ const config = {
     links: "auto" as "auto" | "on" | "off",
     /** medusa-hero-banners: the home hero's slides from the Admin (hero.slides below is the fallback) */
     banners: "auto" as "auto" | "on" | "off",
+    /** medusa-image-alt: alt texts of product photos per language (gallery, cards, cart, share image, JSON-LD); off = title + "photo n" */
+    imageAlt: "auto" as "auto" | "on" | "off",
   },
 
   /**

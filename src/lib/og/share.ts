@@ -50,13 +50,14 @@ export const categoryShareImage = (origin: string, countryCode: string, handle: 
 export const photoShareImage = (origin: string, countryCode: string, ref: ImageRef, alt: string) =>
   img(`${origin}/og/${countryCode}/${KIND_SEGMENT[ref.kind]}/${ref.name}-${imageHash(ref.file)}.jpg`, alt, "image/jpeg")
 
-/** First product photo when it is one of our backend's files; otherwise the brand image. */
+/** First product photo when it is one of our backend's files; otherwise the brand image. `alt`: the photo's own text (medusa-image-alt), else the title. */
 export const productShareImage = (
   origin: string,
   countryCode: string,
-  product: { handle?: string | null; title: string; thumbnail?: string | null; images?: { url: string; rank?: number | null }[] | null }
+  product: { handle?: string | null; title: string; thumbnail?: string | null; images?: { url: string; rank?: number | null }[] | null },
+  alt?: string | null
 ) => {
   const first = [...(product.images ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))[0]?.url ?? product.thumbnail
   const ref = imageRef("produk", productImageName(product, first), first)
-  return ref ? photoShareImage(origin, countryCode, ref, `${product.title} · ${STORE_NAME}`) : brandShareImage(origin, countryCode)
+  return ref ? photoShareImage(origin, countryCode, ref, `${alt || product.title} · ${STORE_NAME}`) : brandShareImage(origin, countryCode)
 }
