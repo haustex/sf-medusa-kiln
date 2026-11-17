@@ -1,6 +1,6 @@
 {
   "name": "kiln",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": true,
   "license": "MIT",
   "description": "Kiln: an open-source Medusa storefront theme (Next.js 16, Tailwind v4, HeroUI v3)",
@@ -13,7 +13,9 @@
     "build": "next build",
     "start": "next start -p 9720 -H localhost",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:overflow": "node scripts/e2e/check-overflow.mjs",
+    "check:hreflang": "node scripts/seo/check-hreflang.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -47,6 +49,7 @@
     "@types/react-dom": "19.0.5",
     "eslint": "^9.13.0",
     "eslint-config-next": "16.3.8",
+    "playwright": "^1.65.1",
     "postcss": "^8.4.8",
     "prettier": "^2.8.8",
     "tailwindcss": "^4.3.3",

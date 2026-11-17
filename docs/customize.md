@@ -359,6 +359,16 @@ its own slug) and the link-in-bio pages, one entry per market URL with the hrefl
 of your own layer under `src/app/[countryCode]/`; `markets` limits one to the markets that have it (its hreflang
 then names only those). Nothing is listed before `SITE_LIVE=true`.
 
+## Checks (scripts/)
+
+- `pnpm check:hreflang <base-url> --x-default id-ID --prefixes us,id`: hreflang/canonical/sitemap audit of a running
+  store (details in the markets section above).
+- `pnpm check:overflow <base-url> [--widths 320,360,375,390,412] [--prefixes ,us] [--paths /,/about]`: horizontal
+  overflow on phones. Playwright (dev dependency) opens home, the first category, the first product, cart and
+  checkout (after adding that product), `/about`, `/contact`, `/link`, the blog and its first article in every
+  market at every width and fails when the page is wider than the screen, printing the elements that stick out.
+  Browser: `pnpm exec playwright install chromium` once, or `CHROME_PATH=/path/to/chrome`.
+
 ## Information pages (content/pages)
 
 `content/pages/{language}/{slug}.md` with front matter `title`, `description`, optional `image` + `image_alt` (a

@@ -169,6 +169,8 @@ const id = {
     what: "Apa ini",
     material: "Bahan",
     sizes: "Ukuran",
+    /** Medusa option titles shown translated (lower-case key); others appear as entered in Admin */
+    optionTitles: { size: "Ukuran", color: "Warna", colour: "Warna", material: "Bahan", finish: "Finishing" } as Record<string, string>,
     care: "Perawatan",
     origin: "Asal",
     originFallback: "{location}",
@@ -986,6 +988,7 @@ const en: Dictionary = {
     what: "What it is",
     material: "Material",
     sizes: "Sizes",
+    optionTitles: { size: "Size", color: "Color", colour: "Colour", material: "Material", finish: "Finish" } as Record<string, string>,
     care: "Care",
     origin: "Origin",
     originFallback: "{location}",

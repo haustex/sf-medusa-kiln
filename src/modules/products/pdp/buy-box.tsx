@@ -132,18 +132,29 @@ export default function BuyBox({ productId, title, countryCode, currency, option
   }
 
   const availability = !variant ? t.unavailable : !variant.inStock ? t.soldOut : variant.low ? t.lowStock.replace("{n}", String(variant.low)) : t.shipsFrom
-  const buttonLabel = status === "adding" ? t.adding : variant && !variant.inStock ? t.soldOut : price ? t.addToCartPrice.replace("{price}", price) : t.addToCart
-  const primary = cn(buttonVariants({ variant: "primary", size: "lg" }), "h-12 min-w-0 flex-1")
+  // Phones (< sm): the quantity and the button share the row, the wishlist heart sits on the price line, and the
+  // "· {price}" part of the label is hidden (the price is shown above the form; the full label does not fit next
+  // to the quantity control under ~450px). From sm up: quantity + "Add to cart · price" + heart in one row.
+  const [labelBefore = "", labelAfter = ""] = t.addToCartPrice.split("{price}")
+  const labelText = labelBefore.replace(/[\s·•:|–—-]+$/, "")
+  const labelSep = labelBefore.slice(labelText.length)
+  const buttonLabel = status === "adding" ? t.adding : variant && !variant.inStock ? t.soldOut : null
+  const primary = cn(buttonVariants({ variant: "primary", size: "lg" }), "h-12 min-w-0 flex-1 max-sm:px-3 max-sm:text-sm max-[359px]:px-2.5")
   const chip = "flex h-11 min-w-11 cursor-pointer select-none items-center justify-center rounded-control border border-foreground bg-background px-4 text-sm transition-colors hover:bg-default peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:ring-2 peer-focus-visible:ring-focus peer-focus-visible:ring-offset-2"
 
   return (
     <>
-      {price && (
-        <p className="flex flex-wrap items-baseline gap-x-stack-sm type-price text-2xl tracking-tight" data-testid="product-price">
-          {varies && <span className="text-base text-muted">{t.from}</span>}
-          <span className="font-medium">{price}</span>
-          {onSale && <s className="text-base text-muted">{formatPrice(variant!.original!, currency)}</s>}
-        </p>
+      {(price || heart) && (
+        <div className="flex items-center justify-between gap-stack-sm">
+          {price && (
+            <p className="flex flex-wrap items-baseline gap-x-stack-sm type-price text-2xl tracking-tight" data-testid="product-price">
+              {varies && <span className="text-base text-muted">{t.from}</span>}
+              <span className="font-medium">{price}</span>
+              {onSale && <s className="text-base text-muted">{formatPrice(variant!.original!, currency)}</s>}
+            </p>
+          )}
+          {heart && <div className="ml-auto sm:hidden">{heart}</div>}
+        </div>
       )}
 
       <form ref={formRef} method="post" action={actionUrl} onSubmit={submit} className="flex flex-col gap-stack-lg" {...{ toolname: "add_to_cart", tooldescription: "Add the selected product variant to the shopping cart" }}>
@@ -152,9 +163,9 @@ export default function BuyBox({ productId, title, countryCode, currency, option
 
         {options.map((o) => (
           <fieldset key={o.id} className="flex flex-col gap-stack-sm">
-            <legend className="flex w-full items-baseline justify-between text-sm">
-              <span className="font-medium">{o.title}</span>
-              {selected[o.id] && <span className="text-muted">{selected[o.id]}</span>}
+            <legend className="flex w-full items-baseline justify-between gap-stack-sm text-sm">
+              <span className="shrink-0 font-medium">{o.title}</span>
+              {selected[o.id] && <span className="min-w-0 truncate text-right text-muted">{selected[o.id]}</span>}
             </legend>
             <div className="flex flex-wrap gap-stack-sm">
               {o.values.map((value) => {
@@ -177,21 +188,35 @@ export default function BuyBox({ productId, title, countryCode, currency, option
 
         <div className="flex gap-stack-sm">
           <div className="flex h-12 shrink-0 items-center rounded-control border border-foreground bg-background">
-            <button type="button" aria-label={t.decrease} onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} className="flex size-11 items-center justify-center rounded-control outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:text-muted">
+            <button type="button" aria-label={t.decrease} onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} className="flex size-11 items-center justify-center rounded-control outline-none max-[359px]:size-10 focus-visible:ring-2 focus-visible:ring-focus disabled:text-muted">
               <Minus {...ICON} size={16} />
             </button>
             <label className="sr-only" htmlFor="pdp-qty">
               {t.quantity}
             </label>
-            <input id="pdp-qty" name="quantity" type="number" inputMode="numeric" min={1} max={MAX_QTY} value={qty} onChange={(e) => setQty(Math.min(MAX_QTY, Math.max(1, Number(e.target.value) || 1)))} className="w-8 appearance-none bg-transparent text-center type-price outline-none [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
-            <button type="button" aria-label={t.increase} onClick={() => setQty((q) => Math.min(MAX_QTY, q + 1))} disabled={qty >= MAX_QTY} className="flex size-11 items-center justify-center rounded-control outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:text-muted">
+            <input id="pdp-qty" name="quantity" type="number" inputMode="numeric" min={1} max={MAX_QTY} value={qty} onChange={(e) => setQty(Math.min(MAX_QTY, Math.max(1, Number(e.target.value) || 1)))} className="w-8 appearance-none max-[359px]:w-7 bg-transparent text-center type-price outline-none [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+            <button type="button" aria-label={t.increase} onClick={() => setQty((q) => Math.min(MAX_QTY, q + 1))} disabled={qty >= MAX_QTY} className="flex size-11 items-center justify-center rounded-control outline-none max-[359px]:size-10 focus-visible:ring-2 focus-visible:ring-focus disabled:text-muted">
               <Plus {...ICON} size={16} />
             </button>
           </div>
           <button type="submit" disabled={!canBuy} className={primary} data-testid="add-product-button">
-            <span className="truncate">{buttonLabel}</span>
+            <span className="truncate">
+              {buttonLabel ??
+                (price ? (
+                  <>
+                    {labelText}
+                    <span className="max-sm:hidden">
+                      {labelSep}
+                      {price}
+                      {labelAfter}
+                    </span>
+                  </>
+                ) : (
+                  t.addToCart
+                ))}
+            </span>
           </button>
-          {heart}
+          {heart && <div className="hidden sm:block">{heart}</div>}
         </div>
 
         <div role="status" aria-live="polite" className="min-h-0 text-sm empty:hidden">

@@ -22,7 +22,7 @@ import CatalogCard from "@modules/products/components/catalog-card"
 import BuyBox, { type BuyBoxVariant } from "@modules/products/pdp/buy-box"
 import QuoteCta from "@modules/products/pdp/quote-cta"
 import Gallery from "@modules/products/pdp/gallery"
-import { Accordion, meta, optionValues, productFaq, ProductSpecs, specRows } from "@modules/products/pdp/product-details"
+import { Accordion, meta, optionValues, productFaq, SpecList, specRows } from "@modules/products/pdp/product-details"
 import ProductReviews, { formatAverage } from "@modules/products/pdp/reviews"
 import WishlistHeart from "@modules/wishlist/heart"
 
@@ -40,8 +40,6 @@ const toBuyBoxVariant = (v: HttpTypes.StoreProductVariant): BuyBoxVariant => {
     low: managed && qty > 0 && qty <= LOW_STOCK ? qty : null,
   }
 }
-
-const firstParagraph = (text?: string | null) => text?.trim().split(/\n\s*\n/)[0]?.trim() ?? null
 
 /**
  * Product page: gallery | sticky info column (maker, title, rating, buy box, notes, accordions), then
@@ -61,7 +59,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
   const makerLocation = typeof maker?.metadata?.location === "string" ? (maker.metadata.location as string) : null
   const location = makerLocation ?? config.brand.location
   const variants = (product.variants ?? []).map(toBuyBoxVariant)
-  const options = (product.variants?.length ?? 0) > 1 ? optionValues(product) : []
+  const options = (product.variants?.length ?? 0) > 1 ? optionValues(product, t, lang) : []
 
   const [related, rating, reviewPage, origin, wish] = await Promise.all([
     listProducts({
@@ -85,8 +83,9 @@ export default async function ProductTemplate({ product, region, countryCode }: 
       })
     : null
 
+  // Shown once: the subtitle as the short paragraph above (when there is one), the description in "Details"
   const description = product.description?.trim() || null
-  const intro = product.subtitle?.trim() || firstParagraph(description)
+  const intro = product.subtitle?.trim() || null
   const materials = meta(product, "materials", lang)
   const care = meta(product, "care", lang)
   const faq = productFaq(product, t, lang)
@@ -114,7 +113,18 @@ export default async function ProductTemplate({ product, region, countryCode }: 
 
   type Row = { title: string; body: React.ReactNode; open?: boolean }
   const accordion = ([
-    description && description !== intro ? { title: t.details, body: <div className="whitespace-pre-line">{description}</div>, open: true } : null,
+    description || specs.length
+      ? {
+          title: t.details,
+          body: (
+            <div className="flex flex-col gap-stack-md">
+              {description && <div className="whitespace-pre-line">{description}</div>}
+              <SpecList rows={specs} />
+            </div>
+          ),
+          open: true,
+        }
+      : null,
     materials || care ? { title: t.materialsCare, body: <div className="flex flex-col gap-stack-xs">{materials && <p>{materials}</p>}{care && <p>{care}</p>}</div> } : null,
     {
       title: t.shippingReturns,
@@ -142,10 +152,11 @@ export default async function ProductTemplate({ product, region, countryCode }: 
       <JsonLd data={structuredData} />
       <div className="content-container flex flex-col gap-stack-lg">
         <Breadcrumb items={crumbs} label={dict.listing.breadcrumb} />
-        <div className="grid gap-stack-lg lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-x-section">
+        {/* minmax(0, …) on every breakpoint: a column never grows to the min-content width of a nowrap row inside it */}
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-stack-lg lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-x-section">
           <Gallery images={[...(product.images ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).map((i) => ({ id: i.id, url: i.url }))} handle={product.handle ?? ""} alt={product.title ?? ""} labels={{ gallery: fill(t.gallery, { title: product.title ?? "" }), photoN: t.photoN, showPhoto: t.showPhoto }} />
 
-          <div className="flex flex-col gap-stack-lg lg:sticky lg:top-36 lg:self-start">
+          <div className="flex min-w-0 flex-col gap-stack-lg lg:sticky lg:top-36 lg:self-start">
             <div className="flex flex-col gap-stack-sm">
               {(maker || category) && (
                 <p className="type-label text-muted">
@@ -218,12 +229,6 @@ export default async function ProductTemplate({ product, region, countryCode }: 
           </div>
         </div>
       </div>
-
-      {specs.length > 0 && (
-        <div className="content-container">
-          <ProductSpecs rows={specs} t={t} />
-        </div>
-      )}
 
       {hasReviews && <ProductReviews rating={rating} reviews={reviewPage.reviews} count={reviewPage.count} productId={product.id} t={dict.reviews} lang={lang} />}
 

@@ -3,6 +3,25 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.5.3] — 2026-11-17
+
+### Fixed
+- Product page wider than a phone screen: below `lg` the two-column grid had no `minmax(0, …)` column, so the info
+  column took the min-content width of the buy row (quantity + "Add to cart · price" + wishlist). The column can
+  shrink now. On phones (< sm) the wishlist heart moves to the price line and the "· price" part of the button
+  label is hidden (the price is shown above the form), so quantity + button fit from 320px; the selected option
+  value in the legend truncates instead of overflowing.
+- Description shown twice (first paragraph above the buy box and again in "Details"). The short paragraph above
+  is now the product subtitle only; "Details" holds the description plus the specification rows (dimensions,
+  material, options, weight, maker, made in). The separate "Specifications" table under the gallery is gone.
+
+### Added
+- Option titles translated: `product.optionTitles` in the dictionaries (Size → Ukuran, Color → Warna, …) or
+  `option.metadata.title_{lang}`; used in the buy box, the specs, the FAQ and the Markdown view.
+- `scripts/e2e/check-overflow.mjs` (`pnpm check:overflow <base>`): Playwright opens home, a category, a product,
+  cart, checkout, the information pages, the link page, the blog and an article in every market at 320, 360,
+  375, 390 and 412px and fails when `scrollWidth > clientWidth`, listing the elements that stick out.
+
 ## [0.5.2] — 2026-11-16
 
 ### Added

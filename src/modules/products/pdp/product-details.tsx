@@ -14,13 +14,21 @@ export const meta = (product: HttpTypes.StoreProduct, key: string, lang: Lang) =
   return typeof v === "string" && v.trim() ? v.trim() : null
 }
 
-/** Options with more than one value, values in variant order */
-export const optionValues = (product: HttpTypes.StoreProduct) =>
+/** Option title in the page language: option.metadata.title_{lang}, else the dictionary (Size → Ukuran), else as entered */
+export const optionLabel = (o: Pick<HttpTypes.StoreProductOption, "title" | "metadata">, t: T, lang: Lang) => {
+  const m = (o.metadata ?? {}) as Record<string, unknown>
+  const own = m[`title_${lang}`]
+  if (typeof own === "string" && own.trim()) return own.trim()
+  return t.optionTitles[(o.title ?? "").trim().toLowerCase()] ?? o.title ?? ""
+}
+
+/** Options with more than one value, values in variant order; titles translated (optionLabel) */
+export const optionValues = (product: HttpTypes.StoreProduct, t: T, lang: Lang) =>
   (product.options ?? [])
     .filter((o) => (o.values?.length ?? 0) > 1 || (product.variants?.length ?? 0) > 1)
     .map((o) => ({
       id: o.id,
-      title: o.title ?? "",
+      title: optionLabel(o, t, lang),
       values: Array.from(new Set((product.variants ?? []).flatMap((v) => v.options?.filter((vo) => vo.option_id === o.id).map((vo) => vo.value) ?? []))),
     }))
     .filter((o) => o.values.length > 0)
@@ -37,12 +45,27 @@ export function specRows(product: HttpTypes.StoreProduct, t: T, lang: Lang, loca
   const d = meta(product, "dimensions", lang) ?? dims(product)
   if (d) rows.push({ k: t.dimensions, v: d })
   if (material) rows.push({ k: t.material, v: material })
-  for (const o of optionValues(product)) rows.push({ k: o.title || t.sizes, v: o.values.join(", ") })
+  for (const o of optionValues(product, t, lang)) rows.push({ k: o.title || t.sizes, v: o.values.join(", ") })
   if (product.weight) rows.push({ k: t.weight, v: product.weight >= 1000 ? `${(product.weight / 1000).toLocaleString(lang === "en" ? "en-US" : "id-ID")} kg` : `${product.weight} g` })
   if (product.collection?.title) rows.push({ k: t.maker, v: product.collection.title })
   const origin = meta(product, "origin", lang) ?? location
   if (origin) rows.push({ k: t.madeIn, v: origin })
   return rows
+}
+
+/** The same rows as a compact list, for the "Details" accordion in the info column */
+export function SpecList({ rows }: { rows: { k: string; v: string }[] }) {
+  if (!rows.length) return null
+  return (
+    <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-stack-md gap-y-stack-xs" data-testid="product-specs">
+      {rows.map((r) => (
+        <div key={r.k} className="contents">
+          <dt className="text-muted">{r.k}</dt>
+          <dd className="min-w-0 text-foreground">{r.v}</dd>
+        </div>
+      ))}
+    </dl>
+  )
 }
 
 export function ProductSpecs({ rows, t }: { rows: { k: string; v: string }[]; t: T }) {
@@ -100,7 +123,7 @@ export function productFaq(product: HttpTypes.StoreProduct, t: T, lang: Lang): {
   }
   const care = meta(product, "care", lang)
   if (care) items.push({ q: t.faq.careQ, a: care })
-  const sizes = optionValues(product).find((o) => o.values.length > 1)
+  const sizes = optionValues(product, t, lang).find((o) => o.values.length > 1)
   if (sizes) items.push({ q: t.faq.sizesQ, a: sizes.values.join(", ") + "." })
   return items
 }
