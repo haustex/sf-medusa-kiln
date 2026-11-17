@@ -1,22 +1,13 @@
-import config from "@theme"
+import { Glyph, type GlyphName } from "./glyphs"
+import { socialLinks, socialRel, type SocialNetwork } from "@lib/social"
 
-import { Glyph, GLYPH_LABELS, type GlyphName } from "./glyphs"
-
-/** Social networks supported in theme.config.ts `social`; an empty URL hides the icon. Glyphs: brand/glyphs.tsx (Iconoir). */
-export type SocialNetwork = keyof typeof config.social
-
-const ORDER: SocialNetwork[] = ["facebook", "instagram", "x", "pinterest", "tiktok", "youtube"]
-
-/** The configured networks, in order; nothing when all URLs are empty. */
-export function socialLinks() {
-  return ORDER.filter((key) => config.social[key]).map((key) => ({ key, label: GLYPH_LABELS[key as GlyphName] ?? key, href: config.social[key] }))
-}
+export { socialLinks, type SocialNetwork } from "@lib/social"
 
 export function SocialIcon({ network, size = 20, className }: { network: SocialNetwork; size?: number; className?: string }) {
   return <Glyph name={network as GlyphName} size={size} className={className} />
 }
 
-/** Row of icon links (footer, phone menu). 44 px targets; `rel="noopener me"` marks them as the brand's own profiles. */
+/** Row of icon links (footer bottom row, phone menu). 44 px targets; `rel="me"` marks the brand's own profiles. */
 export default function SocialLinks({ className = "" }: { className?: string }) {
   const links = socialLinks()
   if (!links.length) return null
@@ -27,11 +18,28 @@ export default function SocialLinks({ className = "" }: { className?: string }) 
           <a
             href={n.href}
             aria-label={n.label}
-            rel="noopener me"
+            rel={socialRel(n)}
             target="_blank"
             className="inline-flex size-11 items-center justify-center rounded-full text-foreground outline-none hover:bg-default/60 focus-visible:ring-2 focus-visible:ring-focus"
           >
             <SocialIcon network={n.key} />
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** The same links as text (footer "Social" column): network names, no icons */
+export function SocialTextLinks({ className = "" }: { className?: string }) {
+  const links = socialLinks()
+  if (!links.length) return null
+  return (
+    <ul className={`flex flex-col gap-stack-sm ${className}`} data-testid="footer-social">
+      {links.map((n) => (
+        <li key={n.key}>
+          <a href={n.href} rel={socialRel(n)} target="_blank" className="hover:underline underline-offset-4">
+            {n.label}
           </a>
         </li>
       ))}

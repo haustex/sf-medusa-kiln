@@ -27,6 +27,7 @@ export type HeroSlideConfig = {
 
 import type { Dictionary } from "./src/lib/i18n/dictionaries"
 import type { ProductNote } from "./src/lib/notes"
+import type { SocialNetwork } from "./src/lib/social"
 
 /** Every key optional, at any depth: `text` below overrides only what it names */
 export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] }
@@ -112,14 +113,42 @@ const config = {
     credit: true,
   },
 
-  /** Social profiles: icons in the footer and the phone menu. Leave a URL empty to hide that network. */
+  /**
+   * Footer layout (the columns themselves are brand.footerColumns).
+   * - `brand`: the first column. Default: the logo with the tagline and footerText. With `qr` it shows that image
+   *   instead (an SVG or PNG under public/, `size` px square, linked to `href`, a market-relative path, `alt` for
+   *   screen readers), then `heading` and `subtitle` under it.
+   * - `shop`: the automatic "Shop" column (top-level categories + "All products"); false hides it.
+   * - `social`: a text column of the profiles in `social` under `title`; null shows them as icons in the bottom row.
+   * On phones the brand block takes the full width and the columns pair up two by two (Help | Studio, Legal | Social).
+   */
+  footer: {
+    brand: {
+      qr: null as null | { src: string; href: string; alt: Localized; size?: number },
+      heading: "" as string,
+      subtitle: null as null | Localized,
+    },
+    shop: true,
+    social: null as null | { title: Localized },
+  },
+
+  /**
+   * Social profiles. Keys from src/lib/social.ts: instagram, threads, facebook, tiktok, pinterest, x, linkedin,
+   * youtube, whatsapp; an empty URL is ignored.
+   * - `footer`: the networks shown, in this order: icons in the footer's bottom row and the phone menu (or a text
+   *   column, see footer.social) and the author box when the shop itself is the writer. `whatsapp` is a chat line
+   *   (wa.me): no rel="me".
+   * - `sameAs`: profiles that exist but are not shown. Both lists (chat lines left out) go into the Organization
+   *   `sameAs` and as `<link rel="me">` in <head>, so search engines and the IndieWeb can tie the profiles to the site.
+   */
   social: {
-    facebook: "https://www.facebook.com/",
-    instagram: "https://www.instagram.com/",
-    x: "https://x.com/",
-    pinterest: "https://www.pinterest.com/",
-    tiktok: "",
-    youtube: "",
+    footer: {
+      instagram: "https://www.instagram.com/",
+      facebook: "https://www.facebook.com/",
+      pinterest: "https://www.pinterest.com/",
+      x: "https://x.com/",
+    } as Partial<Record<SocialNetwork, string>>,
+    sameAs: {} as Partial<Record<SocialNetwork, string>>,
   },
 
   markets: {

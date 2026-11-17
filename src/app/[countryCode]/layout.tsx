@@ -10,6 +10,7 @@ import { analyticsExclude } from "@modules/analytics/exclude"
 import Metricool from "@modules/analytics/metricool"
 import { inter } from "styles/fonts"
 import "styles/globals.css"
+import { sameAsUrls } from "@lib/social"
 
 export const viewport: Viewport = {
   themeColor: config.colors.background,
@@ -64,6 +65,12 @@ export default async function RootLayout(props: { children: React.ReactNode; par
 
   return (
     <html lang={market.htmlLang} data-theme="light" className={inter.variable} style={themeVars}>
+      <head>
+        {/* the brand's profiles (theme.config.ts social, chat lines left out): rel="me" ties them to the site */}
+        {sameAsUrls().map((href) => (
+          <link key={href} rel="me" href={href} />
+        ))}
+      </head>
       <body className="bg-background text-foreground antialiased">
         <main className="relative">{props.children}</main>
         {SITE_LIVE && config.analytics.metricool && <Metricool hash={config.analytics.metricool} exclude={analyticsExclude()} />}

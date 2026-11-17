@@ -3,6 +3,24 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.8.0] — 2026-11-17
+
+Configurable footer.
+
+### Added
+- `theme.config.ts` `footer`: `brand` (the logo + tagline, or a QR code under `public/` linked to a page, with a
+  heading and a subtitle under it), `shop` (the automatic categories column on/off) and `social` (the profiles as
+  a text column under a title instead of icons in the bottom row). Phones: the brand block full width, then the
+  columns two by two.
+- `social` is now `{ footer, sameAs }`: the networks shown (in the config's order) and the profiles that only go
+  into the Organization `sameAs` and one `<link rel="me">` per profile in `<head>`. New networks `threads`,
+  `linkedin`, `whatsapp` (`src/lib/social.ts`). `SocialTextLinks` in `modules/brand/social.tsx`.
+
+### Changed
+- Links to the brand's profiles carry `rel="me noopener"`; `whatsapp` (a chat line, not a profile) gets plain
+  `rel="noopener"` and is left out of the Organization `sameAs`, which now comes from `sameAsUrls()`.
+- The footer grid is `grid-cols-2` on phones (was one column, then two from `sm`).
+
 ## [0.7.0] — 2026-11-17
 
 Product page revision (desktop and phone, every market).

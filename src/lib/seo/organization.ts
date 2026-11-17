@@ -1,5 +1,6 @@
 import config from "@theme"
 import { tx } from "@lib/i18n/localized"
+import { sameAsUrls } from "@lib/social"
 import { getMarket } from "@lib/util/market"
 
 /**
@@ -43,7 +44,8 @@ export function organizationSchema(origin: string, countryCode: string) {
     ...(legal?.identifier ? { identifier: { "@type": "PropertyValue", propertyID: legal.identifier.propertyID, value: legal.identifier.value } } : {}),
     ...(ORG.location ? { foundingLocation: { "@type": "Place", name: ORG.location } } : {}),
     ...(ORG.email || legal?.telephone ? { contactPoint: [contactPoint] } : {}),
-    sameAs: Object.values(config.social).filter(Boolean),
+    // the brand's profiles (theme.config.ts social), chat lines such as WhatsApp left out
+    sameAs: sameAsUrls(),
   }
 }
 

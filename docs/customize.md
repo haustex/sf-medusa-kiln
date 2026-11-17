@@ -26,17 +26,52 @@ value given.
 | `logo` | `type: "text"` sets the name in the site font with a small ink mark; `type: "svg"` draws one path (`svgPath`, `svgViewBox`, fill `currentColor`) |
 | `navLinks` | Links after the categories in the header's category row (`/makers`, `/blog`, …); a link into the journal disappears when the blog is off |
 | `hideCategories` | Handles of top-level categories left out of the header row, the footer's "Shop" column, the home cards, the listing filters and llms.txt (their own pages stay reachable), e.g. `["furniture-custom"]` for a category sold by quote through a page of your own |
-| `footerColumns` | Footer columns and their links; the "Shop" column (categories) is automatic |
+| `footerColumns` | Footer columns and their links (the "Shop" column and the social column are configured under `footer`, see below) |
 | `legal` | Optional legal identity for the Organization JSON-LD: `legalName`, `identifier` (`{ propertyID: "NIB", value }`), `telephone`, `address` (schema.org PostalAddress keys), `hours` (`{ opens, closes, days? }`, opens/closes as times with offset, e.g. `"08:00:00+07:00"`) |
 | `credit` | `false` hides "Theme Kiln by Haus Kayu" after the copyright line |
 
 Paths in `navLinks` and `footerColumns` are market-relative: `/blog` becomes `/id/blog` in the Indonesian market.
 
+## footer
+
+```ts
+footer: {
+  brand: {
+    qr: null,            // or { src: "/brand/qr-link.svg", href: "/link", alt: { en: "QR to …", id: "QR ke …" }, size: 112 }
+    heading: "",         // text under the QR, e.g. "HAUS KAYU"
+    subtitle: null,      // Localized line under the heading
+  },
+  shop: true,            // the automatic "Shop" column (top-level categories + "All products")
+  social: null,          // or { title: { en: "Social", id: "Sosial" } }: the profiles as a text column
+},
+```
+
+- `brand`: the first column. By default the logo with `brand.tagline` + `brand.footerText`. With `qr` the image
+  (SVG or PNG under `public/`, `size` px square, linked to `href`, a market-relative path) replaces the logo, with
+  `heading` and `subtitle` under it. Keep a QR at 96 px or more so phones can read it.
+- The other columns are `brand.footerColumns`, then the social column when `footer.social` is set; without it the
+  social icons sit in the bottom row next to the copyright line.
+- Phones: the brand block takes the full width, the columns pair up two by two in order (Shop | Help, Studio | …).
+
 ## social
 
-One URL per network (`facebook`, `instagram`, `x`, `pinterest`, `tiktok`, `youtube`). An empty string hides the
-icon. The icons appear in the footer and the phone menu, the URLs in the Organization `sameAs` and in the author
-box when the shop itself is the writer. Icons: `src/modules/brand/glyphs.tsx` (Iconoir).
+```ts
+social: {
+  footer: { instagram: "https://instagram.com/…", tiktok: "…", pinterest: "…", whatsapp: "https://wa.me/…" },
+  sameAs: { facebook: "…", threads: "…", x: "…", linkedin: "…" },
+},
+```
+
+Keys from `src/lib/social.ts`: `instagram`, `threads`, `facebook`, `tiktok`, `pinterest`, `x`, `linkedin`,
+`youtube`, `whatsapp`; an empty URL is ignored.
+
+- `footer`: the networks shown, in this order: in the footer (icons in the bottom row, or a text column with
+  `footer.social`), the phone menu and the author box when the shop itself is the writer. Links to profiles carry
+  `rel="me noopener"`; `whatsapp` is a chat line (`https://wa.me/…`), so it gets plain `rel="noopener"`.
+- `sameAs`: profiles of the brand that are not shown anywhere.
+- Both lists, chat lines left out, make the Organization `sameAs` and one `<link rel="me" href>` per profile in
+  `<head>` (every page), which is how search engines and the IndieWeb tie the profiles to the site. Icons:
+  `src/modules/brand/glyphs.tsx` (Iconoir).
 
 ## markets
 
