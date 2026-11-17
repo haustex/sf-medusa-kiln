@@ -53,10 +53,10 @@ type Props = {
   defaultVariantId?: string
   actionUrl: string
   cartUrl: string
-  /** Extra lines under the button (theme.config.ts product.notes) */
-  notes?: string[]
-  /** The inline wishlist heart, rendered next to the button */
-  heart?: React.ReactNode
+  /** Rows under the button (<li>, server-rendered: delivery estimate, theme.config.ts product.notes) */
+  notes?: React.ReactNode
+  /** Icons of the availability row (plain SVG from the server): in stock, sold out */
+  icons: { inStock: React.ReactNode; soldOut: React.ReactNode }
   labels: BuyBoxLabels
 }
 
@@ -65,17 +65,22 @@ const sameOptions = (a: Record<string, string>, b: Record<string, string | undef
   Object.keys(a).length === Object.keys(b).length && Object.entries(a).every(([k, v]) => b[k] === v)
 
 /**
- * Product page price, option chips, quantity and add to cart (plus the wishlist heart slot). Without JavaScript the
- * form posts to /cart/add (radios carry `options[...]`). On phones a frost bar with the price and the button sticks
- * to the bottom once the main button has scrolled out above (transform only, CLS 0).
+ * Product page price, option chips, quantity and add to cart, then the "shipping & policies" rows (availability,
+ * delivery estimate, theme notes) with a line icon each. Without JavaScript the form posts to /cart/add (radios
+ * carry `options[...]`). On phones a frost bar with the price and the button sticks to the bottom once the main
+ * button has scrolled out above (transform only, CLS 0).
  */
-export default function BuyBox({ productId, title, countryCode, currency, options, variants, defaultVariantId, actionUrl, cartUrl, notes = [], heart, labels: t }: Props) {
+export default function BuyBox({ productId, title, countryCode, currency, options, variants, defaultVariantId, actionUrl, cartUrl, notes, icons, labels: t }: Props) {
   const initial = variants.find((v) => v.id === defaultVariantId) ?? variants.find((v) => v.inStock) ?? variants[0]
   const [selected, setSelected] = useState<Record<string, string | undefined>>(initial?.options ?? {})
   const [qty, setQty] = useState(1)
   const [status, setStatus] = useState<"idle" | "adding" | "added" | "error">("idle")
   const [showBar, setShowBar] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  // the "· price" part of the button label and an invisible copy of the whole label, measured (see below)
+  const priceRef = useRef<HTMLSpanElement>(null)
+  const measureRef = useRef<HTMLSpanElement>(null)
 
   const variant = useMemo(() => variants.find((v) => sameOptions(v.options, selected)), [variants, selected])
 
@@ -132,29 +137,42 @@ export default function BuyBox({ productId, title, countryCode, currency, option
   }
 
   const availability = !variant ? t.unavailable : !variant.inStock ? t.soldOut : variant.low ? t.lowStock.replace("{n}", String(variant.low)) : t.shipsFrom
-  // Phones (< sm): the quantity and the button share the row, the wishlist heart sits on the price line, and the
-  // "· {price}" part of the label is hidden (the price is shown above the form; the full label does not fit next
-  // to the quantity control under ~450px). From sm up: quantity + "Add to cart · price" + heart in one row.
+  // The row is quantity + "Add to cart · price" at full width. The "· {price}" part is only shown when the whole
+  // label fits on one line in the button (measured on an invisible copy: a long Indonesian label with a Rupiah price
+  // does not fit next to the quantity control on a 320–390px phone, "Add to cart · $48" does). The price is always
+  // shown above the form, and in the sticky bar on phones. The toggle is done on the DOM (hidden attribute), not
+  // through state: no re-render of the form during hydration.
   const [labelBefore = "", labelAfter = ""] = t.addToCartPrice.split("{price}")
   const labelText = labelBefore.replace(/[\s·•:|–—-]+$/, "")
   const labelSep = labelBefore.slice(labelText.length)
   const buttonLabel = status === "adding" ? t.adding : variant && !variant.inStock ? t.soldOut : null
-  const primary = cn(buttonVariants({ variant: "primary", size: "lg" }), "h-12 min-w-0 flex-1 max-sm:px-3 max-sm:text-sm max-[359px]:px-2.5")
+  const primary = cn(buttonVariants({ variant: "primary", size: "lg" }), "relative h-12 min-w-0 flex-1 max-sm:px-3 max-sm:text-sm max-[359px]:px-2.5")
+
+  useEffect(() => {
+    const button = buttonRef.current
+    const copy = measureRef.current
+    if (!button || !copy || !("ResizeObserver" in window)) return
+    // ResizeObserver reports once right after observe(), so this also runs the first measurement
+    const ro = new ResizeObserver(() => {
+      const cs = getComputedStyle(button)
+      const room = button.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
+      const fits = copy.offsetWidth <= room
+      if (priceRef.current) priceRef.current.hidden = !fits
+      button.dataset.priceFits = String(fits)
+    })
+    ro.observe(button)
+    return () => ro.disconnect()
+  }, [price, labelText, buttonLabel])
   const chip = "flex h-11 min-w-11 cursor-pointer select-none items-center justify-center rounded-control border border-foreground bg-background px-4 text-sm transition-colors hover:bg-default peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:ring-2 peer-focus-visible:ring-focus peer-focus-visible:ring-offset-2"
 
   return (
     <>
-      {(price || heart) && (
-        <div className="flex items-center justify-between gap-stack-sm">
-          {price && (
-            <p className="flex flex-wrap items-baseline gap-x-stack-sm type-price text-2xl tracking-tight" data-testid="product-price">
-              {varies && <span className="text-base text-muted">{t.from}</span>}
-              <span className="font-medium">{price}</span>
-              {onSale && <s className="text-base text-muted">{formatPrice(variant!.original!, currency)}</s>}
-            </p>
-          )}
-          {heart && <div className="ml-auto sm:hidden">{heart}</div>}
-        </div>
+      {price && (
+        <p className="flex flex-wrap items-baseline gap-x-stack-sm type-price text-2xl tracking-tight" data-testid="product-price">
+          {varies && <span className="text-base text-muted">{t.from}</span>}
+          <span className="font-medium">{price}</span>
+          {onSale && <s className="text-base text-muted">{formatPrice(variant!.original!, currency)}</s>}
+        </p>
       )}
 
       <form ref={formRef} method="post" action={actionUrl} onSubmit={submit} className="flex flex-col gap-stack-lg" {...{ toolname: "add_to_cart", tooldescription: "Add the selected product variant to the shopping cart" }}>
@@ -199,13 +217,13 @@ export default function BuyBox({ productId, title, countryCode, currency, option
               <Plus {...ICON} size={16} />
             </button>
           </div>
-          <button type="submit" disabled={!canBuy} className={primary} data-testid="add-product-button">
+          <button ref={buttonRef} type="submit" disabled={!canBuy} className={primary} data-testid="add-product-button">
             <span className="truncate">
               {buttonLabel ??
                 (price ? (
                   <>
                     {labelText}
-                    <span className="max-sm:hidden">
+                    <span ref={priceRef} hidden>
                       {labelSep}
                       {price}
                       {labelAfter}
@@ -215,8 +233,18 @@ export default function BuyBox({ productId, title, countryCode, currency, option
                   t.addToCart
                 ))}
             </span>
+            {/* invisible copy of the full label, measured to decide whether the price part fits (see above); clipped so it never widens the page */}
+            {price && (
+              <span aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+                <span ref={measureRef} className="invisible absolute left-0 top-0 whitespace-nowrap">
+                  {labelText}
+                  {labelSep}
+                  {price}
+                  {labelAfter}
+                </span>
+              </span>
+            )}
           </button>
-          {heart && <div className="hidden sm:block">{heart}</div>}
         </div>
 
         <div role="status" aria-live="polite" className="min-h-0 text-sm empty:hidden">
@@ -232,17 +260,13 @@ export default function BuyBox({ productId, title, countryCode, currency, option
           {status === "error" && <p className="rounded-control border border-separator px-stack-md py-stack-sm text-danger">{t.addError}</p>}
         </div>
 
-        <ul className="flex flex-col gap-stack-xs text-sm text-muted" data-testid="product-availability">
+        {/* Shipping & policies: availability (variant-dependent, so here), then the server-rendered rows */}
+        <ul className="flex flex-col gap-stack-sm text-sm" data-testid="product-availability">
           <li className="flex items-start gap-stack-sm">
-            <span aria-hidden="true" className={cn("mt-[0.45em] size-1.5 shrink-0 rounded-full", variant?.inStock ? "bg-foreground" : "border border-foreground")} />
-            {availability}
+            <span className={cn("mt-px shrink-0 [&_svg]:size-[18px]", !variant?.inStock && "text-muted")}>{variant?.inStock ? icons.inStock : icons.soldOut}</span>
+            <span className={cn("min-w-0", !variant?.inStock && "text-muted")}>{availability}</span>
           </li>
-          {notes.map((n) => (
-            <li key={n} className="flex items-start gap-stack-sm">
-              <span aria-hidden="true" className="mt-[0.45em] size-1.5 shrink-0 rounded-full bg-foreground" />
-              {n}
-            </li>
-          ))}
+          {notes}
         </ul>
       </form>
 

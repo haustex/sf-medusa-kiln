@@ -7,7 +7,9 @@ import { type Dictionary } from "@lib/i18n/dictionaries"
 import { fill } from "@lib/i18n/fill"
 import { Button } from "@modules/common/components/ui"
 
-type T = Dictionary["reviews"]
+/** The strings the form needs (a subset of the reviews dictionary, so callers may ship only these to the client) */
+export type ReviewFormLabels = Pick<Dictionary["reviews"], "rating" | "ratingStar" | "ratingHint" | "formTitle" | "formBody" | "formBodyHint" | "formPhotos" | "formPhotosHint" | "formRemovePhoto" | "formSubmit" | "formDone" | "formErrorRating" | "formErrorBody" | "formErrorPhotos" | "formError">
+type T = ReviewFormLabels
 export type ReviewItem = { order_item_id: string; title?: string | null; product_title?: string | null; thumbnail?: string | null }
 
 export const MAX_PHOTOS = 3

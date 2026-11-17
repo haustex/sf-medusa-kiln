@@ -214,14 +214,48 @@ pages through) or move to a search engine.
 ```ts
 product: {
   notes: [
-    { en: "Free shipping over $120 · 30-day returns", id: "Gratis ongkir di atas Rp1.500.000 · retur 30 hari" },
-    { en: "Custom sizes available on request", id: "Ukuran custom bisa dipesan" },
+    { icon: "truck", text: { en: "Free shipping over $120 · [30-day returns](/returns)", id: "Gratis ongkir di atas Rp1.500.000 · [retur 30 hari](/returns)" } },
+    { icon: "ruler", text: { en: "Custom sizes available [on request](/contact)", id: "Ukuran custom bisa dipesan [lewat kontak](/contact)" } },
   ],
 },
 ```
 
-Short promises under the add-to-cart button. `[]` hides the list. Specifications on the product page come from
-`product.metadata` (one row per key), the maker from the product's collection.
+The "shipping & policies" rows under the add-to-cart button, each with a line icon (lucide, drawn on the server).
+The first row is always the availability ("In stock · ships from {location}", package icon), then the delivery
+estimate when medusa-fulfillment-zone-rate is installed (truck), then these notes. An item is `{ icon, text }` or a
+plain text (check icon); the icons are listed in `src/lib/notes.ts` (`check`, `truck`, `package`, `hand`, `ruler`,
+`undo`, `shield`, `leaf`, `trees`, `gift`, `clock`, `sparkles`, `badge`, `hammer`). `[label](href)` inside a text
+becomes a link with a dotted underline: a market-relative path ("/custom") gets the market prefix, an absolute URL
+opens in a new tab. `[]` keeps only the availability row.
+
+### Specifications ("Details")
+
+The "Details" accordion holds the description and a specification list built from the product and its metadata.
+Every metadata key may carry a `_{lang}` twin for the other language (`material_en`, `finishing_id`, …); the
+market's language wins, then the bare key.
+
+| Row | Source |
+| --- | --- |
+| Dimensions | `metadata.dimensions`, else `length × width × height` (cm) |
+| Material | `metadata.material` / `material_{lang}`, else Medusa's `material` field |
+| Finish | `metadata.finishing` / `finishing_{lang}` (or `finish`) |
+| Options | Product options with more than one value (titles translated by `product.optionTitles`) |
+| Weight | `weight` (g, shown in kg from 1000) |
+| Maker | The product's collection |
+| Made in | `metadata.origin`, else the collection's `metadata.location`, else `brand.location` |
+
+"Materials & care" shows `metadata.materials` and `metadata.care`; the FAQ comes from `metadata.faq` (JSON
+`[{ "q", "a" }]`) plus care and sizes.
+
+### Reviews block
+
+With medusa-reviews-wishlist (`features.reviews`) the product page ends with a full-width reviews block: the average
+with the 5→1 distribution, a strip of buyers' photos, the newest reviews as cards in a rail, "See all reviews"
+(a drawer with a star / "with photos" filter and a sort, pages from `/api/reviews`) and "Write a review". The page is
+static, so the write button checks the visitor on click (`/api/reviews/eligible`): a login prompt, "nothing to review
+yet", or one form per order item that may be reviewed (the plugin's rules: verified buyers, after shipping; photos
+allowed). Without reviews the block is a short invitation, no empty bars; the "{avg} · n reviews" link under the
+title and the `AggregateRating` / `Review` JSON-LD exist only with approved reviews.
 
 ### Products sold by quote
 

@@ -26,6 +26,7 @@ export type HeroSlideConfig = {
 }
 
 import type { Dictionary } from "./src/lib/i18n/dictionaries"
+import type { ProductNote } from "./src/lib/notes"
 
 /** Every key optional, at any depth: `text` below overrides only what it names */
 export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] }
@@ -247,12 +248,17 @@ const config = {
     },
   },
 
-  /** Product page: short promises under the add-to-cart button (shipping, returns, custom work); [] hides the list */
+  /**
+   * Product page: short promises under the add-to-cart button (shipping, returns, custom work), one line icon each
+   * (src/lib/notes.ts lists the icons: check, truck, package, hand, ruler, undo, shield, leaf, trees, gift, clock,
+   * sparkles, badge, hammer). A plain text gets the check icon. `[label](href)` in a text becomes a link (a
+   * market-relative path gets the market prefix). [] hides the list; the availability row stays.
+   */
   product: {
     notes: [
-      { en: "Free shipping over $120 · 30-day returns", id: "Gratis ongkir di atas Rp1.500.000 · retur 30 hari" },
-      { en: "Custom sizes available on request", id: "Ukuran custom bisa dipesan" },
-    ] as Localized[],
+      { icon: "truck", text: { en: "Free shipping over $120 · [30-day returns](/returns)", id: "Gratis ongkir di atas Rp1.500.000 · [retur 30 hari](/returns)" } },
+      { icon: "ruler", text: { en: "Custom sizes available [on request](/contact)", id: "Ukuran custom bisa dipesan [lewat kontak](/contact)" } },
+    ] as ProductNote[],
     /**
      * Products sold by quote instead of the cart: metadata `metadata` = true (or "true"), or a category whose handle
      * contains `category`. The product page shows "Request a quote" (dictionary product.requestQuote) with the lowest

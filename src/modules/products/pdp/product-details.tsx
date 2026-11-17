@@ -37,14 +37,18 @@ const dims = (p: { length?: number | null; width?: number | null; height?: numbe
 
 /**
  * Specification rows from the product and its metadata: dimensions (metadata.dimensions or length/width/height),
- * material, options, weight, maker (collection), made in (collection metadata.location or metadata.origin).
+ * material (Medusa's `material` field, or metadata.material / material_{lang}), finish (metadata.finishing /
+ * finishing_{lang}), options, weight, maker (collection), made in (collection metadata.location or metadata.origin).
+ * Every metadata key may carry a `_{lang}` twin for the other language (metadata.material_en, finishing_en, …).
  */
 export function specRows(product: HttpTypes.StoreProduct, t: T, lang: Lang, location: string | null) {
   const material = meta(product, "material", lang) ?? product.material ?? null
+  const finish = meta(product, "finishing", lang) ?? meta(product, "finish", lang)
   const rows: { k: string; v: string }[] = []
   const d = meta(product, "dimensions", lang) ?? dims(product)
   if (d) rows.push({ k: t.dimensions, v: d })
   if (material) rows.push({ k: t.material, v: material })
+  if (finish) rows.push({ k: t.finish, v: finish })
   for (const o of optionValues(product, t, lang)) rows.push({ k: o.title || t.sizes, v: o.values.join(", ") })
   if (product.weight) rows.push({ k: t.weight, v: product.weight >= 1000 ? `${(product.weight / 1000).toLocaleString(lang === "en" ? "en-US" : "id-ID")} kg` : `${product.weight} g` })
   if (product.collection?.title) rows.push({ k: t.maker, v: product.collection.title })

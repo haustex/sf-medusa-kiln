@@ -8,10 +8,12 @@ import { ICON } from "@modules/ds/icons"
 import { loadWishlist, toggleWishlist, useWishlistState } from "./store"
 
 /**
- * Heart toggle for a product (card corner or next to the PDP title). Renders unfilled in the static HTML, fills once
- * the shared wishlist state is loaded (modules/wishlist/store.ts). A button, never inside the card's link.
- * overlay: a solid heart over the photo, no background or shadow: cardIconColor (theme.config.ts) when not saved,
+ * Heart toggle for a product (card corner, product photo). Renders unfilled in the static HTML, fills once the
+ * shared wishlist state is loaded (modules/wishlist/store.ts). A button, never inside the card's link.
+ * overlay: a solid heart over a card photo, no background or shadow: cardIconColor (theme.config.ts) when not saved,
  * the opposite tone when saved (white → ink by default); 44 px transparent target.
+ * photo: the product page gallery: a frost disc (translucent white + blur) with an ink outline heart, filled when saved.
+ * inline: a plain outlined button.
  */
 export default function WishlistHeart({
   productId,
@@ -23,8 +25,8 @@ export default function WishlistHeart({
   productId: string
   variantId?: string | null
   labels: { add: string; remove: string }
-  /** overlay: white chip over the photo (cards); inline: plain button (PDP) */
-  variant?: "overlay" | "inline"
+  /** overlay: bare icon over a card photo; photo: frost disc over the gallery photo; inline: plain outlined button */
+  variant?: "overlay" | "photo" | "inline"
   className?: string
 }) {
   const { ids } = useWishlistState()
@@ -54,7 +56,7 @@ export default function WishlistHeart({
       data-product-id={productId}
       className={cn(
         "inline-flex items-center justify-center rounded-full outline-none transition-colors focus-visible:ring-2 focus-visible:ring-focus",
-        variant === "overlay" ? cn("size-11", saved ? "k-card-icon-alt" : "k-card-icon") : "size-11 border border-foreground bg-surface hover:bg-default",
+        variant === "overlay" ? cn("size-11", saved ? "k-card-icon-alt" : "k-card-icon") : variant === "photo" ? "frost size-11 shadow-sm hover:bg-background" : "size-11 border border-foreground bg-surface hover:bg-default",
         className
       )}
     >

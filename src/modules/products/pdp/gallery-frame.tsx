@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react"
  * the page works without JS. With JS: the thumbnails (server-rendered too, passed as `thumbs`) scroll the rail to
  * a photo, and scrolling the rail moves the active thumbnail and the dots.
  */
-export default function GalleryFrame({ thumbs, label, showPhoto, className, children }: { thumbs: React.ReactNode[]; label: string; /** "Show photo {n}" */ showPhoto: string; className?: string; children: React.ReactNode }) {
+export default function GalleryFrame({ thumbs, label, showPhoto, overlay, className, children }: { thumbs: React.ReactNode[]; label: string; /** "Show photo {n}" */ showPhoto: string; /** Control over the top-right corner of the photo (the wishlist heart) */ overlay?: React.ReactNode; className?: string; children: React.ReactNode }) {
   const railRef = useRef<HTMLUListElement>(null)
   const [active, setActive] = useState(0)
   const count = thumbs.length
@@ -42,9 +42,12 @@ export default function GalleryFrame({ thumbs, label, showPhoto, className, chil
 
   return (
     <div className={cn("flex flex-col gap-stack-sm", className)}>
-      <ul ref={railRef} tabIndex={count > 1 ? 0 : undefined} aria-label={count > 1 ? label : undefined} className="no-scrollbar -mx-container-x flex snap-x snap-mandatory overflow-x-auto scroll-smooth outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus sm:mx-0 sm:rounded-media">
-        {children}
-      </ul>
+      <div className="relative">
+        <ul ref={railRef} tabIndex={count > 1 ? 0 : undefined} aria-label={count > 1 ? label : undefined} className="no-scrollbar -mx-container-x flex snap-x snap-mandatory overflow-x-auto scroll-smooth outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus sm:mx-0 sm:rounded-media">
+          {children}
+        </ul>
+        {overlay && <div className="absolute right-3 top-3 z-10">{overlay}</div>}
+      </div>
       {count > 1 && (
         <>
           {/* dots: phones */}

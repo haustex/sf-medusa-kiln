@@ -41,13 +41,29 @@ export async function getProductRatings(productIds: string[]): Promise<Map<strin
 /** Card rating: only when the product has reviews */
 export const cardRating = (r: Rating | undefined | null) => (r && r.count > 0 ? { average: r.average, count: r.count } : undefined)
 
-export async function listProductReviews(productId: string, opts: { limit?: number; offset?: number; order?: "newest" | "oldest" | "highest" | "lowest" } = {}) {
-  if (!(await feature("reviews"))) return { reviews: [] as StoreReview[], count: 0, limit: opts.limit ?? PDP_REVIEWS, offset: opts.offset ?? 0 }
+export type ReviewOrder = "newest" | "oldest" | "highest" | "lowest"
+export type ReviewListOptions = { limit?: number; offset?: number; order?: ReviewOrder; rating?: number; withImages?: boolean }
+
+/**
+ * A page of approved reviews. `rating` filters one star value (the count follows the filter); `withImages` keeps
+ * only the reviews of the page that have photos (the plugin filters after paging, so the count stays the total).
+ */
+export async function listProductReviews(productId: string, opts: ReviewListOptions = {}) {
+  const empty = { reviews: [] as StoreReview[], count: 0, limit: opts.limit ?? PDP_REVIEWS, offset: opts.offset ?? 0 }
+  if (!(await feature("reviews"))) return empty
   try {
-    return await store.list({ product_id: productId, limit: opts.limit ?? PDP_REVIEWS, offset: opts.offset ?? 0, order: opts.order ?? "newest" })
+    return await store.list({ product_id: productId, limit: opts.limit ?? PDP_REVIEWS, offset: opts.offset ?? 0, order: opts.order ?? "newest", ...(opts.rating ? { rating: opts.rating } : {}), ...(opts.withImages ? { with_images: true } : {}) })
   } catch {
-    return { reviews: [] as StoreReview[], count: 0, limit: opts.limit ?? PDP_REVIEWS, offset: opts.offset ?? 0 }
+    return empty
   }
+}
+
+export type ReviewPhoto = { id: string; url: string; reviewId: string; name: string }
+
+/** Photos of the newest reviews with pictures (first `max`), for the strip on the product page */
+export async function listReviewPhotos(productId: string, max = 12): Promise<ReviewPhoto[]> {
+  const { reviews } = await listProductReviews(productId, { limit: 50, withImages: true })
+  return reviews.flatMap((r) => r.images.map((img) => ({ id: img.id, url: img.url, reviewId: r.id, name: r.display_name }))).slice(0, max)
 }
 
 /** The order behind a magic link (never consumes it); null when invalid, used or expired */

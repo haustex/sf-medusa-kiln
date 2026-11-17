@@ -3,6 +3,40 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.7.0] — 2026-11-17
+
+Product page revision (desktop and phone, every market).
+
+### Changed
+- Layout: gallery and info column 50:50 from `lg` (was 58:42); the info column stays sticky. The first photo is
+  requested at 640px on wide screens (`sizes`), not 58vw.
+- Wishlist heart: over the top-right corner of the gallery photo (frost disc, translucent white with blur, outline
+  heart that fills when saved; new `WishlistHeart` variant `photo`, `Gallery` prop `action`), on desktop and phones.
+  Gone from the buy row, which is now the quantity control plus a full-width "Add to cart · price" button. The
+  "· price" part is shown whenever the whole label fits on one line in the button (measured; the price is always
+  shown above the form and in the phone sticky bar), so EN labels show it from 320px while a long Indonesian label
+  with a Rupiah price shows it from about 412px. `BuyBox` lost `heart` and `notes: string[]`; it takes `notes` (rows)
+  and `icons` now.
+- The three bullet points under the button are an icon list ("shipping & policies"): availability with a package
+  icon, the delivery estimate with a truck (moved here from "Shipping & returns"), then `product.notes` from
+  theme.config.ts, each `{ icon, text }` (`src/lib/notes.ts` lists the icons; a plain text gets a check). `[label](href)`
+  inside a note becomes a link with a dotted underline (market prefix added to relative paths). Icons are plain SVG
+  from the server (`ds/icons`), no client islands.
+- "Details": a "Finish" row from `metadata.finishing` / `finishing_{lang}` (or `finish`) after "Material"
+  (Medusa's `material` field or `metadata.material` / `material_{lang}`); the Indonesian label of the material row is
+  "Bahan baku".
+- Reviews block rebuilt, full width under gallery and info: average + stars + count with the 5→1 distribution bars,
+  a strip of buyers' photos (opens the drawer on "with photos"), the six newest reviews as cards in a horizontal
+  rail (stars, title, text clamped to four lines, photo thumbs, avatar initials, name, relative time, verified badge),
+  "See all reviews (n)" (a drawer with star / "with photos" filter and newest / highest / lowest sort, pages from
+  `/api/reviews`, which now takes `order`, `rating` and `with_images`) and "Write a review" (a sheet that checks the
+  visitor's orders through the new `/api/reviews/eligible`: login prompt, nothing to review yet, or the plugin's
+  review form per reviewable item). Without reviews: "No reviews yet" with an invitation, no bars. The drawer, the
+  write sheet and the form load on first use; the rest is static HTML. `AggregateRating` / `Review` JSON-LD and the
+  "{avg} · n reviews" link under the title (now to `#reviews`) remain reviews-only. `reviews-more.tsx` is gone.
+- Dictionaries: `product.finish`, `reviews.photosTitle`, `photoFrom`, `railLabel`, `seeAll`, `allTitle`,
+  `filter*`, `sortLabel`, `sort`, `noneFiltered`, `empty`, `emptyBody`, `write*`, `toAccount`, `close`.
+
 ## [0.6.0] — 2026-11-17
 
 ### Added

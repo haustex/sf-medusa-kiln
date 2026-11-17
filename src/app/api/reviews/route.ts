@@ -1,10 +1,11 @@
 import { feature } from "@lib/features"
 import { getAuthHeaders } from "@lib/data/cookies"
-import { listProductReviews } from "@lib/data/reviews"
+import { listProductReviews, type ReviewOrder } from "@lib/data/reviews"
 
 /**
  * Reviews of medusa-reviews-wishlist, through the storefront so the browser never talks to the backend directly.
- *   GET ?product_id=&offset=&limit=  → approved reviews (public, short cache): "Show more" on the product page
+ *   GET ?product_id=&offset=&limit=&order=newest|oldest|highest|lowest&rating=1..5&with_images=1
+ *       → approved reviews (public, short cache): the "All reviews" drawer on the product page
  *   POST { order_id | request_token, reviews: [...], website: "" } → create (customer cookie or magic-link token)
  */
 export const dynamic = "force-dynamic"
@@ -23,7 +24,15 @@ export async function GET(req: Request) {
   if (!ID.test(productId)) return Response.json({ message: "product_id required" }, { status: 400, headers: NO_STORE })
   const offset = Math.max(0, parseInt(url.searchParams.get("offset") ?? "0", 10) || 0)
   const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get("limit") ?? "10", 10) || 10))
-  const page = await listProductReviews(productId, { offset, limit })
+  const order = url.searchParams.get("order") ?? "newest"
+  const rating = parseInt(url.searchParams.get("rating") ?? "", 10)
+  const page = await listProductReviews(productId, {
+    offset,
+    limit,
+    order: (["newest", "oldest", "highest", "lowest"] as const).includes(order as ReviewOrder) ? (order as ReviewOrder) : "newest",
+    rating: rating >= 1 && rating <= 5 ? rating : undefined,
+    withImages: url.searchParams.get("with_images") === "1",
+  })
   return Response.json(page, { headers: PUBLIC })
 }
 
