@@ -181,10 +181,8 @@ export default function BuyBox({ productId, title, countryCode, currency, option
 
         {options.map((o) => (
           <fieldset key={o.id} className="flex flex-col gap-stack-sm">
-            <legend className="flex w-full items-baseline justify-between gap-stack-sm text-sm">
-              <span className="shrink-0 font-medium">{o.title}</span>
-              {selected[o.id] && <span className="min-w-0 truncate text-right text-muted">{selected[o.id]}</span>}
-            </legend>
+            {/* The chips carry the value as text, so the legend is the option's name alone. Swatches without text (a colour or an image) would need it after the name instead: "Colour: Natural". */}
+            <legend className="text-sm font-medium">{o.title}</legend>
             <div className="flex flex-wrap gap-stack-sm">
               {o.values.map((value) => {
                 // Only single-option products can tell a value is sold out on its own

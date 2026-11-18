@@ -3,6 +3,13 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.8.1] — 2026-11-18
+
+### Changed
+- Product page: the option legend no longer repeats the selected value at its right ("Size   15×15×8cm"); the
+  chips already show it. Colour or image swatches without text, when a theme adds them, should put the value
+  after the name instead ("Colour: Natural").
+
 ## [0.8.0] — 2026-11-17
 
 Configurable footer.
