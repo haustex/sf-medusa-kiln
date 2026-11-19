@@ -284,6 +284,10 @@ const config = {
    * market-relative path gets the market prefix). [] hides the list; the availability row stays.
    */
   product: {
+    /** The visible breadcrumb above the gallery (Home › Category › Product). Off: the label above the title links to the category (and the maker) instead; the BreadcrumbList structured data stays. */
+    breadcrumb: true as boolean,
+    /** The share button over the photo, under the wishlist heart: the system share sheet on phones, a menu (copy link, WhatsApp, Facebook, X, Pinterest, e-mail) elsewhere */
+    share: true as boolean,
     notes: [
       { icon: "truck", text: { en: "Free shipping over $120 · [30-day returns](/returns)", id: "Gratis ongkir di atas Rp1.500.000 · [retur 30 hari](/returns)" } },
       { icon: "ruler", text: { en: "Custom sizes available [on request](/contact)", id: "Ukuran custom bisa dipesan [lewat kontak](/contact)" } },

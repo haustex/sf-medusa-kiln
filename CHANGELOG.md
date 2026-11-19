@@ -3,6 +3,18 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.9.0] — 2026-11-19
+
+Product page: share button, optional breadcrumb.
+
+### Added
+- A share button over the product photo, under the wishlist heart (`theme.config.ts` product.share): the system
+  share sheet on phones (Web Share API), elsewhere a menu with copy link (toast "link copied"), WhatsApp, Facebook,
+  X, Pinterest (main photo + alt text) and e-mail, with `utm_source=share&utm_medium={channel}` on the canonical
+  URL. `modules/products/pdp/share.tsx`; texts in dictionary `product.share`; a "mail" mark in `brand/marks.tsx`.
+- `theme.config.ts` product.breadcrumb: the visible breadcrumb on the product page can be switched off; the label
+  above the title then links to the category (and the maker). The BreadcrumbList structured data stays.
+
 ## [0.8.1] — 2026-11-18
 
 ### Changed

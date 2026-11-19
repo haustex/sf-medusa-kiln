@@ -1,9 +1,10 @@
 /**
  * Filled brand marks for the article share row: Simple Icons (https://simpleicons.org, CC0 1.0) — WhatsApp,
  * Telegram, Threads, Facebook, X, Pinterest from 16.x; LinkedIn from the last Simple Icons release that carried it
- * (8.x, CC0). "link" is Phosphor Icons' link (bold, MIT). 24-unit grid, fill currentColor. See THIRD_PARTY_NOTICES.md.
+ * (8.x, CC0). "link" and "mail" are Phosphor Icons' link (bold) and envelope-simple (regular), MIT. 24-unit grid,
+ * fill currentColor. See THIRD_PARTY_NOTICES.md.
  */
-export type MarkName = "whatsapp" | "telegram" | "threads" | "facebook" | "x" | "linkedin" | "pinterest" | "link"
+export type MarkName = "whatsapp" | "telegram" | "threads" | "facebook" | "x" | "linkedin" | "pinterest" | "link" | "mail"
 
 export const MARK_LABELS: Record<MarkName, string> = {
   whatsapp: "WhatsApp",
@@ -14,6 +15,7 @@ export const MARK_LABELS: Record<MarkName, string> = {
   linkedin: "LinkedIn",
   pinterest: "Pinterest",
   link: "Link",
+  mail: "Email",
 }
 
 const MARKS: Record<MarkName, { d: string; viewBox?: string }> = {
@@ -41,6 +43,10 @@ const MARKS: Record<MarkName, { d: string; viewBox?: string }> = {
   link: {
     viewBox: "0 0 256 256",
     d: "M117.18,188.74a12,12,0,0,1,0,17l-5.12,5.12A58.26,58.26,0,0,1,70.6,228h0A58.62,58.62,0,0,1,29.14,127.92L63.89,93.17a58.64,58.64,0,0,1,98.56,28.11,12,12,0,1,1-23.37,5.44,34.65,34.65,0,0,0-58.22-16.58L46.11,144.89A34.62,34.62,0,0,0,70.57,204h0a34.41,34.41,0,0,0,24.49-10.14l5.11-5.12A12,12,0,0,1,117.18,188.74ZM226.83,45.17a58.65,58.65,0,0,0-82.93,0l-5.11,5.11a12,12,0,0,0,17,17l5.12-5.12a34.63,34.63,0,1,1,49,49L175.1,145.86A34.39,34.39,0,0,1,150.61,156h0a34.63,34.63,0,0,1-33.69-26.72,12,12,0,0,0-23.38,5.44A58.64,58.64,0,0,0,150.56,180h.05a58.28,58.28,0,0,0,41.47-17.17l34.75-34.75a58.62,58.62,0,0,0,0-82.91Z",
+  },
+  mail: {
+    viewBox: "0 0 256 256",
+    d: "M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48ZM203.43,64,128,133.15,52.57,64ZM216,192H40V74.19l82.59,75.71a8,8,0,0,0,10.82,0L216,74.19V192Z",
   },
 }
 

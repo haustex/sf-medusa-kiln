@@ -19,6 +19,8 @@ import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
 import { quoteLink, soldByQuote } from "@lib/quote"
 import { buildProductStructuredData } from "@lib/util/product-structured-data"
 import { getSiteOrigin, STORE_NAME } from "@lib/util/site"
+import { productImageName } from "@lib/util/image-name"
+import { imageJpeg, imageRef } from "@lib/util/image-url"
 import Link from "@modules/common/components/app-link"
 import { Breadcrumb, Carousel, Page, Stars } from "@modules/ds"
 import { Icon } from "@modules/ds/icons"
@@ -26,6 +28,7 @@ import CatalogCard from "@modules/products/components/catalog-card"
 import BuyBox, { type BuyBoxVariant } from "@modules/products/pdp/buy-box"
 import QuoteCta from "@modules/products/pdp/quote-cta"
 import Gallery from "@modules/products/pdp/gallery"
+import ShareButton from "@modules/products/pdp/share"
 import { Accordion, meta, optionValues, productFaq, SpecList, specRows } from "@modules/products/pdp/product-details"
 import ProductNotes, { NoteRow } from "@modules/products/pdp/product-notes"
 import ProductReviews, { formatAverage } from "@modules/products/pdp/reviews"
@@ -47,10 +50,12 @@ const toBuyBoxVariant = (v: HttpTypes.StoreProductVariant): BuyBoxVariant => {
 }
 
 /**
- * Product page: gallery (with the wishlist heart over the photo) | sticky info column (maker, title, rating, buy
- * box, the icon rows "shipping & policies", accordions), 50:50 from lg; then the reviews block (medusa-reviews-wishlist:
- * summary, photos, cards, drawer, write) full width, and "More from {maker}" (the product's collection, else its
- * category). JSON-LD: Product (+ AggregateRating and Review only with approved reviews), BreadcrumbList, FAQPage.
+ * Product page: gallery (with the wishlist heart and the share button over the photo) | sticky info column (maker,
+ * title, rating, buy box, the icon rows "shipping & policies", accordions), 50:50 from lg; then the reviews block
+ * (medusa-reviews-wishlist: summary, photos, cards, drawer, write) full width, and "More from {maker}" (the product's
+ * collection, else its category). The breadcrumb above is optional (theme.config.ts product.breadcrumb); without it
+ * the label above the title carries the hierarchy (maker · category, as links). JSON-LD: Product (+ AggregateRating
+ * and Review only with approved reviews), BreadcrumbList (always), FAQPage.
  */
 export default async function ProductTemplate({ product, region, countryCode }: { product: HttpTypes.StoreProduct; region: HttpTypes.StoreRegion; countryCode: string }) {
   if (!product?.id) notFound()
@@ -116,6 +121,17 @@ export default async function ProductTemplate({ product, region, countryCode }: 
 
   const abs = (path: string) => `${origin}${href(path)}`
   const productUrl = abs(`/products/${product.handle}`)
+  // the share menu: the main photo as a clean JPEG URL on our domain (an external one as is) and its alt text, for Pinterest
+  const mainPhoto = [...(product.images ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))[0]?.url || product.thumbnail || null
+  const mainPhotoRef = mainPhoto ? imageRef("produk", productImageName(product, mainPhoto), mainPhoto) : null
+  const share = config.product.share ? { url: productUrl, title: product.title ?? "", image: mainPhotoRef ? imageJpeg(origin, mainPhotoRef) : mainPhoto, imageAlt: mainPhoto ? (alts[mainPhoto] ?? null) : null } : null
+  const overlay =
+    wish || share ? (
+      <div className="flex flex-col gap-2">
+        {wish && <WishlistHeart productId={product.id} variant="photo" labels={{ add: dict.wishlist.add, remove: dict.wishlist.remove }} />}
+        {share && <ShareButton {...share} labels={{ ...t.share, button: fill(t.share.button, { title: share.title }) }} />}
+      </div>
+    ) : undefined
   const crumbs = [{ label: t.home, href: href("/") }, category ? { label: category.name, href: href(`/categories/${category.handle}`) } : { label: t.store, href: href("/store") }, { label: product.title ?? "" }]
   const structuredData = [
     ...(byQuote
@@ -169,31 +185,36 @@ export default async function ProductTemplate({ product, region, countryCode }: 
     <Page data-testid="product-container">
       <JsonLd data={structuredData} />
       <div className="content-container flex flex-col gap-stack-lg">
-        <Breadcrumb items={crumbs} label={dict.listing.breadcrumb} />
+        {config.product.breadcrumb && <Breadcrumb items={crumbs} label={dict.listing.breadcrumb} />}
         {/* 50:50 from lg; minmax(0, …) on every breakpoint: a column never grows to the min-content width of a nowrap row inside it */}
         <div className="grid grid-cols-[minmax(0,1fr)] gap-stack-lg lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-x-section">
           <Gallery
             images={[...(product.images ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0)).map((i) => ({ id: i.id, url: i.url, alt: alts[i.url] ?? null }))}
             handle={product.handle ?? ""}
             alt={product.title ?? ""}
-            action={wish ? <WishlistHeart productId={product.id} variant="photo" labels={{ add: dict.wishlist.add, remove: dict.wishlist.remove }} /> : undefined}
+            action={overlay}
             labels={{ gallery: fill(t.gallery, { title: product.title ?? "" }), photoN: t.photoN, showPhoto: t.showPhoto }}
           />
 
           <div className="flex min-w-0 flex-col gap-stack-lg lg:sticky lg:top-36 lg:self-start">
             <div className="flex flex-col gap-stack-sm">
+              {/* the maker (and, without the breadcrumb, the category too: the hierarchy stays visible), as links */}
               {(maker || category) && (
                 <p className="type-label text-muted">
-                  {maker ? (
+                  {maker && (
                     <Link href={href(`/collections/${maker.handle}`)} className="underline-offset-4 hover:underline">
                       {maker.title}
                     </Link>
-                  ) : (
-                    <Link href={href(`/categories/${category!.handle}`)} className="underline-offset-4 hover:underline">
-                      {category!.name}
-                    </Link>
                   )}
-                  {makerLocation && <span> · {makerLocation}</span>}
+                  {maker && makerLocation && <span> · {makerLocation}</span>}
+                  {category && (!maker || !config.product.breadcrumb) && (
+                    <>
+                      {maker && <span> · </span>}
+                      <Link href={href(`/categories/${category.handle}`)} className="underline-offset-4 hover:underline" data-testid="product-category">
+                        {category.name}
+                      </Link>
+                    </>
+                  )}
                 </p>
               )}
               <h1 className="type-h1 text-balance" data-testid="product-title">

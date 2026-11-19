@@ -248,12 +248,22 @@ pages through) or move to a search engine.
 
 ```ts
 product: {
+  breadcrumb: true,
+  share: true,
   notes: [
     { icon: "truck", text: { en: "Free shipping over $120 · [30-day returns](/returns)", id: "Gratis ongkir di atas Rp1.500.000 · [retur 30 hari](/returns)" } },
     { icon: "ruler", text: { en: "Custom sizes available [on request](/contact)", id: "Ukuran custom bisa dipesan [lewat kontak](/contact)" } },
   ],
 },
 ```
+
+`breadcrumb`: the visible breadcrumb above the gallery (Home › Category › Product). With `false` the label above
+the title carries the hierarchy instead (the maker and the category, as links); the BreadcrumbList structured data
+stays either way. `share`: the share button over the photo, under the wishlist heart. Phones (touch + Web Share
+API) get the system share sheet with the title and URL; elsewhere a menu: copy link (with a "link copied" toast),
+WhatsApp, Facebook, X, Pinterest (the main photo and its alt text), e-mail, the filled marks of the article share
+row. Every channel shares the canonical URL with `utm_source=share&utm_medium={channel}` (`copy`, `native`,
+`whatsapp`, `facebook`, `x`, `pinterest`, `email`). Texts: dictionary `product.share`.
 
 The "shipping & policies" rows under the add-to-cart button, each with a line icon (lucide, drawn on the server).
 The first row is always the availability ("In stock · ships from {location}", package icon), then the delivery
