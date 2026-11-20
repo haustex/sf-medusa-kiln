@@ -163,7 +163,7 @@ export default function BuyBox({ productId, title, countryCode, currency, option
     ro.observe(button)
     return () => ro.disconnect()
   }, [price, labelText, buttonLabel])
-  const chip = "flex h-11 min-w-11 cursor-pointer select-none items-center justify-center rounded-control border border-foreground bg-background px-4 text-sm transition-colors hover:bg-default peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:ring-2 peer-focus-visible:ring-focus peer-focus-visible:ring-offset-2"
+  const chip = "glass flex h-11 min-w-11 cursor-pointer select-none items-center justify-center rounded-button px-4 text-sm peer-checked:bg-foreground peer-checked:text-background peer-checked:shadow-none peer-checked:hover:bg-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-focus peer-focus-visible:ring-offset-2"
 
   return (
     <>
@@ -203,15 +203,15 @@ export default function BuyBox({ productId, title, countryCode, currency, option
         ))}
 
         <div className="flex gap-stack-sm">
-          <div className="flex h-12 shrink-0 items-center rounded-control border border-foreground bg-background">
-            <button type="button" aria-label={t.decrease} onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} className="flex size-11 items-center justify-center rounded-control outline-none max-[359px]:size-10 focus-visible:ring-2 focus-visible:ring-focus disabled:text-muted">
+          <div className="glass flex h-12 shrink-0 items-center rounded-button hover:bg-(--k-glass-bg)">
+            <button type="button" aria-label={t.decrease} onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={qty <= 1} className="flex size-11 items-center justify-center rounded-full outline-none max-[359px]:size-10 focus-visible:ring-2 focus-visible:ring-focus disabled:text-muted">
               <Minus {...ICON} size={16} />
             </button>
             <label className="sr-only" htmlFor="pdp-qty">
               {t.quantity}
             </label>
             <input id="pdp-qty" name="quantity" type="number" inputMode="numeric" min={1} max={MAX_QTY} value={qty} onChange={(e) => setQty(Math.min(MAX_QTY, Math.max(1, Number(e.target.value) || 1)))} className="w-8 appearance-none max-[359px]:w-7 bg-transparent text-center type-price outline-none [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
-            <button type="button" aria-label={t.increase} onClick={() => setQty((q) => Math.min(MAX_QTY, q + 1))} disabled={qty >= MAX_QTY} className="flex size-11 items-center justify-center rounded-control outline-none max-[359px]:size-10 focus-visible:ring-2 focus-visible:ring-focus disabled:text-muted">
+            <button type="button" aria-label={t.increase} onClick={() => setQty((q) => Math.min(MAX_QTY, q + 1))} disabled={qty >= MAX_QTY} className="flex size-11 items-center justify-center rounded-full outline-none max-[359px]:size-10 focus-visible:ring-2 focus-visible:ring-focus disabled:text-muted">
               <Plus {...ICON} size={16} />
             </button>
           </div>

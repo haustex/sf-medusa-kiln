@@ -45,7 +45,7 @@ export default function MarketBanner({ href, text, cta, closeLabel, lang }: { hr
       aria-label={text}
       lang={lang}
       data-testid="market-banner"
-      className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-md items-center gap-3 rounded-[var(--radius)] border border-separator bg-surface py-2 pl-4 pr-2 text-sm shadow-lift sm:inset-x-auto sm:right-6"
+      className="frost fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-md items-center gap-3 rounded-media border border-separator py-2 pl-4 pr-2 text-sm shadow-lift sm:inset-x-auto sm:right-6"
     >
       <span className="text-muted">{text}</span>
       <Link href={href} prefetch={false} className="inline-flex min-h-11 items-center font-medium underline underline-offset-4" onClick={dismiss}>

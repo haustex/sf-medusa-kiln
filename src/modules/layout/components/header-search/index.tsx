@@ -16,7 +16,7 @@ type HeaderSearchProps = {
 }
 
 /**
- * Centered header search (white, soft shadow): HeroUI SearchField styles on a plain GET form.
+ * Centered header search (glass pill on the frost header): HeroUI SearchField styles on a plain GET form.
  * Server component, so the header ships no JS for it and works without JS.
  */
 export default function HeaderSearch({ action, placeholder, label, formLabel, defaultValue, submitLabel, className }: HeaderSearchProps) {
@@ -27,7 +27,7 @@ export default function HeaderSearch({ action, placeholder, label, formLabel, de
         <label
           className={cn(
             s.group(),
-            "h-11 border border-control bg-surface shadow-soft md:h-12"
+            "glass h-11 rounded-button border-0 hover:bg-(--k-glass-bg) md:h-12"
           )}
         >
           <span className="sr-only">{label}</span>

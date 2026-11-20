@@ -51,6 +51,7 @@ const themeVars = {
   "--k-card-icon": config.cardIconColor === "dark" ? config.colors.ink : config.colors.background,
   "--k-card-icon-alt": config.cardIconColor === "dark" ? config.colors.background : config.colors.ink,
   "--k-frost-blur": config.frost.blur,
+  "--k-radius-button": config.buttons.radius,
 } as React.CSSProperties
 
 /**
@@ -64,7 +65,7 @@ export default async function RootLayout(props: { children: React.ReactNode; par
   const market = getMarket(countryCode)
 
   return (
-    <html lang={market.htmlLang} data-theme="light" className={inter.variable} style={themeVars}>
+    <html lang={market.htmlLang} data-theme="light" data-buttons={config.buttons.style} className={inter.variable} style={themeVars}>
       <head>
         {/* the brand's profiles (theme.config.ts social, chat lines left out): rel="me" ties them to the site */}
         {sameAsUrls().map((href) => (

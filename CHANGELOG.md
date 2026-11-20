@@ -3,6 +3,26 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.10.0] — 2026-11-20
+
+Glass buttons (shop.com-like).
+
+### Added
+- `theme.config.ts` buttons: `style` "glass" (default) or "solid", `radius` (pill by default). Secondary/outline
+  buttons, chips, the quantity stepper, the sort/filter controls and the new "See all →" pill are translucent
+  blurred pills with a hairline (`glass`); the controls over photos (heart, share, card labels, hero buttons)
+  `glass-photo` / `glass-dark`. Solid white with an ink line without backdrop-filter, with
+  prefers-reduced-transparency, or with `style: "solid"`. `src/styles/globals.css`.
+
+### Changed
+- Home sections (categories, featured, journal, carousels): the "See all" text link on the title line is gone; a
+  centred "See all →" glass pill sits under the content, whatever the number of items (`ds/section.tsx`;
+  `SectionHeader` no longer takes `action`).
+- Primary buttons are pills (`buttons.radius`). The header search field is a glass pill; the market banner, the
+  share toast, the sticky add-to-cart bar and the product-page heart/share discs use the glass/frost tokens.
+  Labels over card photos (`Badge overPhoto`) are glass pills instead of white rectangles. The hero's buttons are
+  glass pills (white, dark) on every screen size.
+
 ## [0.9.0] — 2026-11-19
 
 Product page: share button, optional breadcrumb.

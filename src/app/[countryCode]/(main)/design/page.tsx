@@ -93,8 +93,8 @@ export default async function DesignPage(props: { params: Promise<{ countryCode:
         <h2 id="d-section" className="type-h2">Section header</h2>
         <p className="max-w-2xl text-sm text-muted">Title 26px / 500 / -0.02em, small text link on the title line (underline on hover). A: title only (home). B: with an eyebrow.</p>
         <div className="flex flex-col gap-section rounded-media border border-border p-stack-lg">
-          <SectionHeader title="This week's picks" description="The pieces people come back for." action={{ label: "View all", href: "#" }} />
-          <SectionHeader eyebrow="Journal" title="From the Journal" action={{ label: "View all", href: "#" }} />
+          <SectionHeader title="This week's picks" description="The pieces people come back for." />
+          <SectionHeader eyebrow="Journal" title="From the Journal" />
         </div>
       </section>
 
@@ -114,6 +114,9 @@ export default async function DesignPage(props: { params: Promise<{ countryCode:
           <button className={cn(buttonVariants({ variant: "secondary", size: "sm" }))}>Secondary sm</button>
           <button disabled className={cn(buttonVariants({ variant: "primary", size: "md" }), "opacity-50")}>Disabled</button>
         </div>
+        <p className="max-w-2xl text-sm text-muted">
+          buttons.style {config.buttons.style}, buttons.radius {config.buttons.radius}: secondary buttons, chips, steppers and the &ldquo;See all&rdquo; pills are glass (white tint, hairline, blur), the controls over photos a stronger glass; solid white with an ink line when the style is &ldquo;solid&rdquo; or the browser has no backdrop-filter.
+        </p>
         <div className="grid max-w-xl gap-stack-sm sm:grid-cols-2">
           <label className="flex flex-col gap-stack-xs">
             <span className="type-label text-muted">Email</span>
@@ -125,7 +128,7 @@ export default async function DesignPage(props: { params: Promise<{ countryCode:
           </label>
         </div>
         <ul className="flex flex-wrap gap-stack-sm">
-          {[["control", config.radius.control, "buttons, inputs"], ["media", config.radius.media, "photos, cards, tiles"], ["sheet", config.radius.sheet, "drawers, sheets"]].map(([n, r, note]) => (
+          {[["control", config.radius.control, "inputs"], ["media", config.radius.media, "photos, cards, tiles"], ["sheet", config.radius.sheet, "drawers, sheets"], ["buttons", config.buttons.radius, "buttons, chips, steppers"]].map(([n, r, note]) => (
             <li key={n} className="flex items-center gap-stack-sm">
               <span className="block size-16 bg-default" style={{ borderRadius: r }} />
               <span className="text-sm">

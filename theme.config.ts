@@ -233,6 +233,16 @@ const config = {
   },
 
   /**
+   * Buttons (shop.com-like). Primary buttons stay solid ink. `style` "glass": secondary/outline buttons, chips,
+   * steppers, the "See all" pills, the filter/sort controls and the controls over photos (heart, share, hero
+   * buttons, card labels) are translucent blurred pills: a white tint on the page, a stronger one over photos, a
+   * dark one for the hero's second button. "solid": the same shapes in plain white with an ink hairline, no
+   * backdrop-filter at all. Browsers without backdrop-filter and visitors with prefers-reduced-transparency get
+   * the solid look either way. `radius`: buttons, chips and steppers ("9999px" = pill); inputs keep radius.control.
+   */
+  buttons: { style: "glass" as "glass" | "solid", radius: "9999px" },
+
+  /**
    * Font: Inter variable (Latin, 400–700, optical sizes), self-hosted in src/styles/fonts-files. To use another
    * font edit src/styles/fonts.ts (next/font) and the metric fallbacks in src/styles/globals.css.
    */

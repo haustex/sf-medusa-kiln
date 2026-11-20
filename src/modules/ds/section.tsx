@@ -1,10 +1,14 @@
 import { cn } from "@heroui/styles"
+import { __iconData as arrowRight } from "lucide-react/icons/arrow-right"
+
+import Link from "@modules/common/components/app-link"
+import { Icon } from "./icons"
 import SectionHeader from "./section-header"
 
 /**
- * Page section: optional header + content, header -> content = section-head.
- * No vertical padding of its own: the parent <Page>/<Stack gap="section"> spaces
- * sections, so two neighbours never add up their padding.
+ * Page section: optional header + content, header -> content = section-head, then an optional "See all →" glass
+ * pill centred under the content (`action`; shown whatever the number of items). No vertical padding of its own:
+ * the parent <Page>/<Stack gap="section"> spaces sections, so two neighbours never add up their padding.
  */
 export default function Section({
   id,
@@ -23,11 +27,11 @@ export default function Section({
   title?: string
   eyebrow?: string
   description?: string
-  /** Small "View all" text link on the title line */
+  /** "See all →" pill centred under the content */
   action?: { label: string; href: string }
   /** Keep the h2 for screen readers/outline but hide it visually. */
   titleHidden?: boolean
-  /** Extra controls next to the action (e.g. carousel arrows). */
+  /** Extra controls on the title line (e.g. carousel arrows). */
   headerExtra?: React.ReactNode
   /** Wrap in .content-container (default). */
   contained?: boolean
@@ -51,12 +55,19 @@ export default function Section({
             title={title}
             eyebrow={eyebrow}
             description={description}
-            action={action}
           >
             {headerExtra}
           </SectionHeader>
         ))}
       {children}
+      {action && (
+        <div className="flex justify-center">
+          <Link href={action.href} className="glass inline-flex h-11 items-center gap-1.5 rounded-button px-5 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2" data-testid="section-action">
+            {action.label}
+            <Icon icon={arrowRight} size={16} />
+          </Link>
+        </div>
+      )}
     </section>
   )
 }

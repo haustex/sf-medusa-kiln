@@ -141,13 +141,14 @@ Permanent redirects (308) for addresses from before this theme. Patterns are mat
 market prefix and answered in the same market (`/us/produk/x` → `/us/products/x`); `:name` matches one segment,
 `:name*` everything that follows; the query string is kept. Handled in `src/proxy.ts`, so no page is rendered.
 
-## colors, cardIconColor, radius, frost
+## colors, cardIconColor, radius, frost, buttons
 
 ```ts
 colors: { background: "#ffffff", ink: "#0c0c0c", inkHover: "#2b2b2b", muted: "#6b6b6b", border: "#e5e5e5", control: "#8a8a8a", soft: "#f5f5f5", softHover: "#ebebeb" },
 cardIconColor: "light",
 radius: { control: "0.5rem", media: "0.75rem", sheet: "1rem" },
 frost: { alpha: 0.8, blur: "14px" },
+buttons: { style: "glass", radius: "9999px" },
 ```
 
 The values become CSS variables on `<html>` (`src/app/[countryCode]/layout.tsx`) and `src/styles/theme.css` maps
@@ -161,9 +162,17 @@ them onto HeroUI's variables, so buttons, inputs, chips and sheets follow. Roles
   a light one (`"dark"`), whichever reads on your photos.
 - `radius.control` buttons, inputs, chips; `radius.media` photos, cards, tiles, hero; `radius.sheet` bottom sheets
   and drawers. Tailwind utilities `rounded-control`, `rounded-media`, `rounded-sheet` use them.
-- `frost`: the frosted surfaces (sticky header, mega menu, cart drawer, quick view, filter sheet, sticky
-  add-to-cart bar) are white at `alpha` behind a `blur`. Browsers without `backdrop-filter` and visitors with
-  `prefers-reduced-transparency` get solid white.
+- `frost`: the frosted surfaces (sticky header and its search field, mega menu, cart drawer, quick view, filter
+  sheet, sticky add-to-cart bar, market banner, toasts) are white at `alpha` behind a `blur`. Browsers without
+  `backdrop-filter` and visitors with `prefers-reduced-transparency` get solid white.
+- `buttons` (shop.com-like): primary buttons stay solid ink. With `style: "glass"` the secondary/outline buttons,
+  the chips (sizes, filters), the quantity stepper, the sort/filter controls and the "See all →" pill under each
+  home section are translucent blurred pills with a 1px hairline (`glass`); the controls over photos (heart, share,
+  card labels, the hero's first button) a stronger glass (`glass-photo`), the hero's second button a dark one
+  (`glass-dark`). `"solid"` keeps the shapes in plain white with an ink line and no `backdrop-filter`; browsers
+  without it and `prefers-reduced-transparency` get that look either way. `radius` is the radius of buttons, chips
+  and steppers (`rounded-button`; `"9999px"` = pill); inputs keep `radius.control`. Blur is only ever on these small
+  controls and the frost surfaces, never on a whole section.
 
 Spacing and the type scale are in `src/styles/globals.css`: `--space-*` tokens (`gap-section`, `gap-stack-md`,
 `px-container-x`, …) switch per breakpoint inside the variables, and the `type-*` utilities (`type-display`,

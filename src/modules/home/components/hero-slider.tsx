@@ -235,7 +235,7 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
                           <Link
                             href={s.href}
                             draggable={false}
-                            className="inline-flex h-11 min-w-0 shrink items-center whitespace-nowrap rounded-control before:block before:h-px before:w-[18px] before:min-w-2 before:shrink after:block after:h-px after:w-[18px] after:min-w-2 after:shrink max-[374px]:text-sm sm:w-fit sm:shrink-0 sm:before:hidden sm:after:hidden bg-white text-[15px] font-medium text-foreground outline-none hover:bg-white/90 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 sm:h-12 sm:px-6 sm:text-sm"
+                            className="glass-photo inline-flex h-11 min-w-0 shrink items-center justify-center whitespace-nowrap rounded-button px-4 text-[15px] font-medium outline-none max-[374px]:px-3.5 max-[374px]:text-sm focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 sm:h-12 sm:w-fit sm:shrink-0 sm:px-6 sm:text-sm"
                             data-testid={first ? "hero-cta" : undefined}
                           >
                             {s.cta}
@@ -245,7 +245,7 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
                           <Link
                             href={s.secondary.href}
                             draggable={false}
-                            className="inline-flex h-11 min-w-0 shrink items-center whitespace-nowrap rounded-control before:block before:h-px before:w-[18px] before:min-w-2 before:shrink after:block after:h-px after:w-[18px] after:min-w-2 after:shrink max-[374px]:text-sm sm:w-fit sm:shrink-0 sm:before:hidden sm:after:hidden border border-white/70 text-[15px] font-medium text-white outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 sm:h-12 sm:px-6 sm:text-sm"
+                            className="glass-dark inline-flex h-11 min-w-0 shrink items-center justify-center whitespace-nowrap rounded-button px-4 text-[15px] font-medium outline-none max-[374px]:px-3.5 max-[374px]:text-sm focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 sm:h-12 sm:w-fit sm:shrink-0 sm:px-6 sm:text-sm"
                             data-testid={first ? "hero-cta-secondary" : undefined}
                           >
                             {s.secondary.label}

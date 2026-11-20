@@ -40,7 +40,7 @@ export const shareUrl = (url: string, medium: string) => `${url}${url.includes("
 const item = "flex h-11 w-full items-center gap-stack-sm rounded-control px-3 text-sm outline-none hover:bg-default/70 focus-visible:bg-default/70"
 
 /**
- * Share button over the product photo (under the wishlist heart, same frost disc). On touch devices with the Web
+ * Share button over the product photo (under the wishlist heart, same glass-photo disc). On touch devices with the Web
  * Share API (phones) it opens the system share sheet with the title and URL; elsewhere a small frost menu: copy
  * link (with a "link copied" toast), WhatsApp, Facebook, X, Pinterest (the main photo and its alt text), e-mail,
  * the filled marks of the article share row. `url`: the product's canonical URL; every channel gets its own
@@ -122,7 +122,7 @@ export default function ShareButton({ url, title, image, imageAlt, labels, class
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={id}
-        className="frost inline-flex size-11 items-center justify-center rounded-full shadow-sm outline-none transition-colors hover:bg-background focus-visible:ring-2 focus-visible:ring-focus"
+        className="glass-photo inline-flex size-11 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-focus"
         data-testid="share-button"
       >
         <Share {...ICON} />
@@ -141,8 +141,8 @@ export default function ShareButton({ url, title, image, imageAlt, labels, class
           ))}
         </div>
       )}
-      {/* "link copied": a frost pill where the menu was, 2.5 s */}
-      <div role="status" aria-live="polite" className={cn("absolute right-0 top-full z-50 mt-2 whitespace-nowrap rounded-full px-3 py-2 text-sm shadow-lift", copied ? "frost border border-separator" : "sr-only")} data-testid="share-copied">
+      {/* "link copied": a glass pill where the menu was, 2.5 s */}
+      <div role="status" aria-live="polite" className={cn("absolute right-0 top-full z-50 mt-2 whitespace-nowrap rounded-full px-3 py-2 text-sm shadow-lift", copied ? "glass-photo" : "sr-only")} data-testid="share-copied">
         {copied ? labels.copied : ""}
       </div>
     </div>

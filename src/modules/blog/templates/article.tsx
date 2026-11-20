@@ -10,7 +10,7 @@ import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
 import { getSiteOrigin } from "@lib/util/site"
 import Link from "@modules/common/components/app-link"
-import { Page, type ProductCardData, SectionHeader, Stack } from "@modules/ds"
+import { Page, type ProductCardData, Section, Stack } from "@modules/ds"
 
 import AuthorBox from "../components/author-box"
 import FromTheShop from "../components/from-the-shop"
@@ -166,19 +166,14 @@ export default async function ArticleTemplate({
       </article>
 
       {more.posts.length > 0 && (
-        <section className="content-container flex flex-col gap-section-head" aria-labelledby="post-more">
-          <SectionHeader
-            id="post-more"
-            title={more.same_category && post.category ? fill(t.blog.moreIn, { name: post.category.name }) : t.blog.more}
-            action={{ label: t.blog.allArticles, href: more.same_category && categoryHref ? categoryHref : href("/blog") }}
-          />
+        <Section id="post-more" title={more.same_category && post.category ? fill(t.blog.moreIn, { name: post.category.name }) : t.blog.more} action={{ label: t.blog.allArticles, href: more.same_category && categoryHref ? categoryHref : href("/blog") }}>
           {/* 4 on phones (2 x 2), 3 from md (one row) */}
           <PostGrid className="md:[&>li:nth-child(n+4)]:hidden">
             {more.posts.map((p) => (
               <PostCard key={p.id} post={toPostCard(p, countryCode)} />
             ))}
           </PostGrid>
-        </section>
+        </Section>
       )}
     </Page>
   )
