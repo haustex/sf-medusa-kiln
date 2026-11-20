@@ -114,6 +114,7 @@ Sumber: `~/hauskayu/apps/storefront`. "Bawa" = disalin lalu dibersihkan dari hal
 | Gambar R2 (`medusa-storage-r2`) | `NEXT_PUBLIC_MEDIA_URL` terisi | `next/image` pakai origin backend; `remotePatterns` dari env |
 | Meilisearch | `MEILISEARCH_HOST` + key | `/store/products?q=`; filter PLP hanya kategori/koleksi/sort |
 | Pembayaran | provider dari `/store/payment-providers` region | Stripe kalau ada key; provider lain lewat slot `payment/providers/<id>.tsx` |
+| Asisten AI (`medusa-ai-chat`) | `GET /store/ai-chat/config` 200 | Tanpa tombol chat, `/api/ai-chat/*` 404 |
 
 Override manual lewat env (`KILN_FEATURE_REVIEWS=off`), supaya deteksi bisa dimatikan tanpa mencopot plugin.
 

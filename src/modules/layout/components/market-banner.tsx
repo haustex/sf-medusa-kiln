@@ -30,6 +30,11 @@ export default function MarketBanner({ href, text, cta, closeLabel, lang }: { hr
     }
   }, [])
 
+  useEffect(() => {
+    // The chat launcher (modules/ai-chat) stacks above whatever carries data-k-dock
+    window.dispatchEvent(new Event("k:dock"))
+  }, [visible])
+
   if (!visible) return null
 
   const dismiss = () => {
@@ -45,6 +50,7 @@ export default function MarketBanner({ href, text, cta, closeLabel, lang }: { hr
       aria-label={text}
       lang={lang}
       data-testid="market-banner"
+      data-k-dock=""
       className="frost fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-md items-center gap-3 rounded-media border border-separator py-2 pl-4 pr-2 text-sm shadow-lift sm:inset-x-auto sm:right-6"
     >
       <span className="text-muted">{text}</span>

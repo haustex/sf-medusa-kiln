@@ -39,8 +39,10 @@ Demo: [kiln.hauskayu.com](https://kiln.hauskayu.com) (Stripe test mode, the data
   JavaScript. Lighthouse (mobile, local production build): see [docs/lighthouse.md](docs/lighthouse.md).
 - **Optional integrations switch themselves on**: reviews and wishlist
   ([medusa-reviews-wishlist](https://www.npmjs.com/package/medusa-reviews-wishlist)), the journal
-  (medusa-blog-seo) and a Meilisearch route are probed once at start; a backend without them gets a storefront
-  without hearts, stars or a journal link, and search falls back to Medusa's own.
+  (medusa-blog-seo), an AI shopping assistant with WhatsApp handover
+  ([medusa-ai-chat](https://www.npmjs.com/package/medusa-ai-chat)) and a Meilisearch route are probed once at
+  start; a backend without them gets a storefront without hearts, stars, a journal link or a chat button, and
+  search falls back to Medusa's own.
 - **One config file**: `theme.config.ts` holds the brand, logo, social profiles, markets, colours, radii, frosted
   surfaces, font, feature switches, listing filters, product notes, products sold by quote, account links, hero
   slides, a home banner, contact and analytics. Every colour and

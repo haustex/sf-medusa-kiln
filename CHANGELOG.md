@@ -3,6 +3,23 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.11.0] — 2026-11-20
+
+AI assistant (medusa-ai-chat).
+
+### Added
+- `theme.config.ts` features.aiChat (`"auto"`): with [medusa-ai-chat](https://www.npmjs.com/package/medusa-ai-chat)
+  on the backend, a round glass button bottom right opens the assistant: consent notice before the first message
+  (names the model provider, links the privacy page), the Admin's greeting, streamed answers with product cards,
+  thumbs up/down, "Chat with our team" (WhatsApp with a server-made summary of the conversation) and the team's
+  hours. Hidden when the plugin is missing or switched off in the Admin; over the daily budget only the WhatsApp
+  link remains. The button stacks above the market banner and the product page's sticky bar (`data-k-dock`). The
+  panel's code loads on the first click, nothing on page load. `modules/ai-chat`, relay `/api/ai-chat/*`
+  (publishable key and the visitor's IP forwarded, answer stream piped through), dictionary `aiChat`.
+- Information pages as Markdown: `/shipping.md`, `/us/returns.md`, or the page URL with `Accept: text/markdown`
+  (`[page]/markdown/route.ts`, rewrites in `next.config.js`): for AI agents and for the assistant's `get_policy`
+  tool (`knowledge.pages` in the plugin options).
+
 ## [0.10.0] — 2026-11-20
 
 Glass buttons (shop.com-like).

@@ -144,6 +144,14 @@ const nextConfig = {
           has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
           destination: "/:countryCode/products/:handle/markdown",
         },
+        // Information pages (content/pages) as Markdown: /shipping.md, /us/returns.md, or Accept: text/markdown
+        { source: "/:page([a-z0-9-]+).md", destination: `/${DEFAULT_MARKET}/:page/markdown` },
+        { source: "/:countryCode/:page([a-z0-9-]+).md", destination: "/:countryCode/:page/markdown" },
+        {
+          source: "/:countryCode/:page([a-z0-9-]+)",
+          has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
+          destination: "/:countryCode/:page/markdown",
+        },
       ],
     }
   },

@@ -4,6 +4,7 @@ import { StoreCartShippingOption } from "@medusajs/types"
 import config from "@theme"
 import { getDictionary } from "@lib/i18n/dictionaries"
 import { getMarket, marketPath } from "@lib/util/market"
+import AiChat from "@modules/ai-chat"
 import MarketBanner from "@modules/layout/components/market-banner"
 import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
 import Footer from "@modules/layout/templates/footer"
@@ -42,6 +43,7 @@ export default async function PageLayout(props: { children: React.ReactNode; par
       {suggest && banner && suggest.on.toLowerCase() === countryCode.toLowerCase() && (
         <MarketBanner href={marketPath(suggest.to, "/") || "/"} lang={getMarket(suggest.to).htmlLang} text={banner.text} cta={banner.cta} closeLabel={banner.close} />
       )}
+      <AiChat countryCode={countryCode} />
     </>
   )
 }

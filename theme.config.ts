@@ -262,6 +262,8 @@ const config = {
     banners: "auto" as "auto" | "on" | "off",
     /** medusa-image-alt: alt texts of product photos per language (gallery, cards, cart, share image, JSON-LD); off = title + "photo n" */
     imageAlt: "auto" as "auto" | "on" | "off",
+    /** medusa-ai-chat: the AI assistant (round button bottom right, chat panel, handover to WhatsApp) */
+    aiChat: "auto" as "auto" | "on" | "off",
   },
 
   /**

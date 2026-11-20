@@ -199,7 +199,7 @@ headings get the display cut (`src/styles/fonts-files`, 40 KB). To use another f
 ## features
 
 ```ts
-features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto", links: "auto", banners: "auto", imageAlt: "auto" },
+features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto", links: "auto", banners: "auto", imageAlt: "auto", aiChat: "auto" },
 ```
 
 `"auto"` probes one store route per integration when the server starts (`src/lib/features.ts`): a 404 switches
@@ -216,6 +216,25 @@ environment overrides the file: `KILN_FEATURE_BLOG=off`. What "off" means:
 | `links` | medusa-link-in-bio | `/links` and `/links/{handle}` 404, `/l/{key}` sends visitors to `/links`, footer link to `/links` hidden, sitemap without the pages |
 | `banners` | medusa-hero-banners | The home hero shows `hero.slides` from theme.config.ts (or the text hero when that list is empty) instead of the Admin's banners |
 | `imageAlt` | medusa-image-alt | Product photos keep the built-in alt texts: the title on cards and in the share image, "{title} (photo n of m)" in the gallery, decorative (`alt=""`) in the cart and the checkout summary, plain URLs in the Product JSON-LD |
+| `aiChat` | medusa-ai-chat | No chat button; `/api/ai-chat/*` 404 |
+
+### AI assistant
+
+With [medusa-ai-chat](https://www.npmjs.com/package/medusa-ai-chat) installed (`features.aiChat`, probed at start)
+a round glass button bottom right opens the assistant (`src/modules/ai-chat`). The button is server-rendered;
+the panel's code is fetched on the first click, so page loads carry nothing of it. The panel shows a consent notice
+before the first message (the model provider's name comes from the plugin's config, the link goes to the plugin's
+`storefront.privacy_path`, `/privacy` by default), the greeting and name set in the Admin, streamed answers with
+product cards (price in the market's currency, link to the product page), thumbs up/down, a "Chat with our team"
+link (the plugin's WhatsApp number; once a conversation exists the link carries a summary the server composed) and
+the team's hours (`contact.hours` in the plugin options). Hidden when the Admin switch is off; over the plugin's
+daily budget only the WhatsApp link remains. The browser talks to `/api/ai-chat/*` only (`app/api/ai-chat`), which
+relays the plugin's five Store routes with the publishable key and the visitor's IP.
+
+Point the plugin's `knowledge.pages` at the information pages as Markdown, e.g. `https://your-store.com/returns.md`
+and `https://your-store.com/us/returns.md` (see "Information pages"), so the assistant quotes your own policies.
+The consent text and every label live in dictionary `aiChat`; the launcher stacks above any element with
+`data-k-dock` (market banner, sticky add-to-cart bar) that dispatches a `k:dock` event when it appears or leaves.
 
 ### Alt texts of product photos
 
@@ -507,6 +526,8 @@ missing in one language falls back to `en`. The front matter holds `title` and `
 country), `{{year}}` and `{{date}}`. Links that start with `/` get the market prefix. Add a file to add a page;
 link it from `brand.footerColumns`. The demo texts are placeholders: replace the policies with your own before
 going live. `{{rates}}` in a page puts the shipping plugin's rate card there as tables (see "Shipping and tracking").
+Every page is also served as Markdown at `/{slug}.md` (and with `Accept: text/markdown`), for AI agents and the
+AI assistant's policy tool.
 
 ### Shipping and tracking
 

@@ -104,6 +104,7 @@ export default function BuyBox({ productId, title, countryCode, currency, option
     const root = document.documentElement
     if (showBar) root.dataset.stickyBar = ""
     else delete root.dataset.stickyBar
+    window.dispatchEvent(new Event("k:dock"))
     return () => {
       delete root.dataset.stickyBar
     }
@@ -277,6 +278,7 @@ export default function BuyBox({ productId, title, countryCode, currency, option
           showBar ? "translate-y-0" : "translate-y-full"
         )}
         data-testid="sticky-bar"
+        data-k-dock=""
       >
         <div className="flex items-center gap-stack-md">
           <div className="min-w-0 flex-1">
