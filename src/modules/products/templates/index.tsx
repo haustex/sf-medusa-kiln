@@ -53,7 +53,7 @@ const toBuyBoxVariant = (v: HttpTypes.StoreProductVariant): BuyBoxVariant => {
  * Product page: gallery (with the wishlist heart and the share button over the photo) | sticky info column (maker,
  * title, rating, buy box, the icon rows "shipping & policies", accordions), 50:50 from lg; then the reviews block
  * (medusa-reviews-wishlist: summary, photos, cards, drawer, write) full width, and "More from {maker}" (the product's
- * collection, else its category). The breadcrumb above is optional (theme.config.ts product.breadcrumb); without it
+ * collection, else its category). The breadcrumb above is optional (theme.config.ts breadcrumb.visible); without it
  * the label above the title carries the hierarchy (maker · category, as links). JSON-LD: Product (+ AggregateRating
  * and Review only with approved reviews), BreadcrumbList (always), FAQPage.
  */
@@ -142,7 +142,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
             ...(hasReviews ? productReviews(rating, reviewPage.reviews, { storeName: STORE_NAME, limit: PDP_REVIEWS }) : {}),
           },
         ]),
-    breadcrumbList(crumbs.map((c) => ({ name: c.label, url: c.href ? `${origin}${c.href}` : undefined }))),
+    config.breadcrumb.schema ? breadcrumbList(crumbs.map((c) => ({ name: c.label, url: c.href ? `${origin}${c.href}` : undefined }))) : null,
     faqPage(faq, productUrl),
   ].filter(Boolean)
 
@@ -185,7 +185,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
     <Page data-testid="product-container">
       <JsonLd data={structuredData} />
       <div className="content-container flex flex-col gap-stack-lg">
-        {config.product.breadcrumb && <Breadcrumb items={crumbs} label={dict.listing.breadcrumb} />}
+        <Breadcrumb items={crumbs} label={dict.listing.breadcrumb} />
         {/* 50:50 from lg; minmax(0, …) on every breakpoint: a column never grows to the min-content width of a nowrap row inside it */}
         <div className="grid grid-cols-[minmax(0,1fr)] gap-stack-lg lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-x-section">
           <Gallery
@@ -207,7 +207,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
                     </Link>
                   )}
                   {maker && makerLocation && <span> · {makerLocation}</span>}
-                  {category && (!maker || !config.product.breadcrumb) && (
+                  {category && (!maker || !config.breadcrumb.visible) && (
                     <>
                       {maker && <span> · </span>}
                       <Link href={href(`/categories/${category.handle}`)} className="underline-offset-4 hover:underline" data-testid="product-category">

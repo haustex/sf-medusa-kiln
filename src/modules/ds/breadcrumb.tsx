@@ -1,13 +1,19 @@
 import { breadcrumbsVariants, cn } from "@heroui/styles"
 import { __iconData as chevronRight } from "lucide-react/icons/chevron-right"
 
+import config from "@theme"
 import Link from "@modules/common/components/app-link"
 import { Icon } from "@modules/ds/icons"
 
 export type Crumb = { label: string; href?: string }
 
-/** HeroUI Breadcrumbs styles as plain server markup. The last item is the current page. */
+/**
+ * HeroUI Breadcrumbs styles as plain server markup. The last item is the current page. Renders nothing while
+ * theme.config.ts breadcrumb.visible is off (no wrapper, so a flex/grid gap around it collapses too); the
+ * BreadcrumbList structured data is the page's own business (breadcrumb.schema).
+ */
 export default function Breadcrumb({ items, label = "Breadcrumb", className }: { items: Crumb[]; label?: string; className?: string }) {
+  if (!config.breadcrumb.visible) return null
   const s = breadcrumbsVariants()
   return (
     <nav aria-label={label} className={cn("overflow-x-auto no-scrollbar", className)}>

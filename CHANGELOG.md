@@ -3,6 +3,17 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.12.0] — 2026-11-21
+
+No visible breadcrumbs.
+
+### Changed
+- `theme.config.ts` breadcrumb `{ visible, schema }` replaces product.breadcrumb and applies to every page: with
+  `visible: false` (default) the trail is gone from listings, product, blog, information, makers and tracking pages
+  without leaving a gap; the BreadcrumbList structured data stays on the pages that had it (`schema: true`).
+- Article: the category is a label above the title linking to the blog category (as on the product page) instead
+  of a pill in the meta row.
+
 ## [0.11.0] — 2026-11-20
 
 AI assistant (medusa-ai-chat).

@@ -272,11 +272,22 @@ for `product.metadata` keys, `collection` offers the product's collection (maker
 more than `scan` products per listing should raise `scan` (the Store API caps one request at 100, the listing
 pages through) or move to a search engine.
 
+## breadcrumb
+
+```ts
+breadcrumb: { visible: false, schema: true },
+```
+
+`visible`: the Home › … › Page trail above the title on every page that has one (store, categories, collections,
+product, blog index and categories, articles, information pages, makers, tracking). Off, nothing is rendered (no
+leftover gap) and the label above the title links up instead: the category (and the maker) on the product page, the
+category in an article. `schema`: the BreadcrumbList structured data on the pages that carry it (listings, product,
+blog), kept by default and independent of `visible`.
+
 ## product
 
 ```ts
 product: {
-  breadcrumb: true,
   share: true,
   notes: [
     { icon: "truck", text: { en: "Free shipping over $120 · [30-day returns](/returns)", id: "Gratis ongkir di atas Rp1.500.000 · [retur 30 hari](/returns)" } },
@@ -285,9 +296,7 @@ product: {
 },
 ```
 
-`breadcrumb`: the visible breadcrumb above the gallery (Home › Category › Product). With `false` the label above
-the title carries the hierarchy instead (the maker and the category, as links); the BreadcrumbList structured data
-stays either way. `share`: the share button over the photo, under the wishlist heart. Phones (touch + Web Share
+`share`: the share button over the photo, under the wishlist heart. Phones (touch + Web Share
 API) get the system share sheet with the title and URL; elsewhere a menu: copy link (with a "link copied" toast),
 WhatsApp, Facebook, X, Pinterest (the main photo and its alt text), e-mail, the filled marks of the article share
 row. Every channel shares the canonical URL with `utm_source=share&utm_medium={channel}` (`copy`, `native`,

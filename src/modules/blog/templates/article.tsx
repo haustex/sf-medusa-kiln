@@ -3,6 +3,7 @@ import { productAlts } from "@lib/data/image-alt"
 import { listProducts } from "@lib/data/products"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { blogPosting, blogShareImage } from "@lib/seo/blog"
+import config from "@theme"
 import { breadcrumbList, faqPage, JsonLd } from "@lib/seo/jsonld"
 import { isHiddenProduct } from "@lib/util/hidden-products"
 import { marketPath } from "@lib/util/market"
@@ -84,20 +85,22 @@ export default async function ArticleTemplate({
       {!preview && (
         <>
           <JsonLd data={blogPosting(origin, countryCode, post)} />
-          <JsonLd
-            data={breadcrumbList([
-              { name: t.product.home, url: `${origin}${href("/")}` },
-              { name: t.blog.title, url: `${origin}${href("/blog")}` },
-              ...(post.category ? [{ name: post.category.name, url: `${origin}${categoryHref}` }] : []),
-              { name: post.title },
-            ])}
-          />
+          {config.breadcrumb.schema && (
+            <JsonLd
+              data={breadcrumbList([
+                { name: t.product.home, url: `${origin}${href("/")}` },
+                { name: t.blog.title, url: `${origin}${href("/blog")}` },
+                ...(post.category ? [{ name: post.category.name, url: `${origin}${categoryHref}` }] : []),
+                { name: post.title },
+              ])}
+            />
+          )}
           <JsonLd data={faqPage(post.faq, url)} />
         </>
       )}
 
       <article className="content-container flex flex-col gap-section">
-        {/* No visual breadcrumb (JSON-LD only): the category label above the title links back up */}
+        {/* No visual breadcrumb (theme.config.ts breadcrumb; JSON-LD only): the category label above the title links back up, as on the product page */}
         <Stack gap="lg">
           {preview && (
             <p role="status" className="rounded-md bg-default px-stack-md py-stack-sm text-sm">
@@ -105,17 +108,18 @@ export default async function ArticleTemplate({
             </p>
           )}
           <header className="blog-column flex flex-col gap-stack-md">
-            <h1 className="blog-title">{post.title}</h1>
-            {/* "[Care] · 12 November 2026 · 1 min read | Published by Nadia Tjipto" — the author part drops to its own line on phones */}
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-stack-xs text-sm text-muted" data-testid="post-meta">
+            <div className="flex flex-col gap-stack-sm">
               {post.category && categoryHref && (
-                <>
-                  <Link href={categoryHref} className="inline-flex h-8 items-center rounded-full border border-separator px-3 text-sm text-foreground transition-colors hover:border-control">
+                <p className="type-label text-muted">
+                  <Link href={categoryHref} className="underline-offset-4 hover:underline" data-testid="post-category">
                     {post.category.name}
                   </Link>
-                  <span aria-hidden="true">·</span>
-                </>
+                </p>
               )}
+              <h1 className="blog-title">{post.title}</h1>
+            </div>
+            {/* "12 November 2026 · 1 min read | Published by Nadia Tjipto" — the author part drops to its own line on phones */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-stack-xs text-sm text-muted" data-testid="post-meta">
               <time dateTime={post.published_at}>{card.dateLabel}</time>
               <span aria-hidden="true">·</span>
               <span>{card.readingTime}</span>

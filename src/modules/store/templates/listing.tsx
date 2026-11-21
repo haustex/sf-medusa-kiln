@@ -109,7 +109,7 @@ export default async function ListingTemplate({
 
   const origin = await getSiteOrigin()
   const structuredData = [
-    breadcrumbList(crumbs.map((c) => ({ name: c.label, url: c.href ? `${origin}${c.href}` : undefined }))),
+    config.breadcrumb.schema ? breadcrumbList(crumbs.map((c) => ({ name: c.label, url: c.href ? `${origin}${c.href}` : undefined }))) : null,
     {
       "@context": "https://schema.org",
       "@type": "ItemList",

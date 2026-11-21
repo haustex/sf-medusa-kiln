@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { categoryPath, listBlogCategories, listPosts, pagePath, toPostCard } from "@lib/data/blog"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { blogItemList } from "@lib/seo/blog"
+import config from "@theme"
 import { breadcrumbList, JsonLd } from "@lib/seo/jsonld"
 import { marketPath } from "@lib/util/market"
 import { getSiteOrigin } from "@lib/util/site"
@@ -41,13 +42,15 @@ export default async function BlogListing({ countryCode, category, page = 1 }: {
 
   return (
     <Page>
-      <JsonLd
-        data={breadcrumbList([
-          { name: t.product.home, url: `${origin}${href("/")}` },
-          { name: t.blog.title, url: `${origin}${href("/blog")}` },
-          ...(data.category ? [{ name: data.category.name, url: `${origin}${href(base)}` }] : []),
-        ])}
-      />
+      {config.breadcrumb.schema && (
+        <JsonLd
+          data={breadcrumbList([
+            { name: t.product.home, url: `${origin}${href("/")}` },
+            { name: t.blog.title, url: `${origin}${href("/blog")}` },
+            ...(data.category ? [{ name: data.category.name, url: `${origin}${href(base)}` }] : []),
+          ])}
+        />
+      )}
       <JsonLd data={blogItemList(origin, countryCode, [...(featured ? [featured] : []), ...posts])} />
 
       {/* "Blog // Stories from the workshop…": title and intro on one line (the intro wraps under it on phones) */}

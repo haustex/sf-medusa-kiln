@@ -295,9 +295,14 @@ const config = {
    * sparkles, badge, hammer). A plain text gets the check icon. `[label](href)` in a text becomes a link (a
    * market-relative path gets the market prefix). [] hides the list; the availability row stays.
    */
+  /**
+   * Breadcrumbs, for every page that has one (listings, product, blog, information, makers, tracking). `visible`: the
+   * Home › … › Page trail above the title. Off, the label above the title links up instead (the category on the
+   * product page and in an article). `schema`: the BreadcrumbList structured data on the pages that carry it
+   * (listings, product, blog), independent of `visible`.
+   */
+  breadcrumb: { visible: false as boolean, schema: true as boolean },
   product: {
-    /** The visible breadcrumb above the gallery (Home › Category › Product). Off: the label above the title links to the category (and the maker) instead; the BreadcrumbList structured data stays. */
-    breadcrumb: true as boolean,
     /** The share button over the photo, under the wishlist heart: the system share sheet on phones, a menu (copy link, WhatsApp, Facebook, X, Pinterest, e-mail) elsewhere */
     share: true as boolean,
     notes: [
