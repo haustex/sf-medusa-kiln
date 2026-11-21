@@ -15,7 +15,7 @@ export default function RemovedNotice({ titles, message }: { titles: string[]; m
   return (
     <div role="status" className="rounded-media border border-control p-stack-md text-sm" data-testid="cart-removed-notice">
       <p className="font-medium">{message}</p>
-      <p className="mt-1 text-muted">{titles.join(", ")}</p>
+      <p className="mt-stack-xs text-muted">{titles.join(", ")}</p>
     </div>
   )
 }

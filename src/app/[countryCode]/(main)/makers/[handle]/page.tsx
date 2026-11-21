@@ -77,7 +77,7 @@ export default async function MakerPage(props: Props) {
           </div>
         )}
 
-        {story && <div className="blog-prose mx-auto w-full max-w-[44rem]" dangerouslySetInnerHTML={{ __html: story }} data-testid="maker-story" />}
+        {story && <div className="blog-prose mx-auto w-full max-w-measure" dangerouslySetInnerHTML={{ __html: story }} data-testid="maker-story" />}
 
         {cards.length > 0 && (
           <Section id="maker-products" title={fill(t.makers.products, { name: maker.name })} contained={false} action={count > cards.length ? { label: fill(t.makers.seeAll, { n: count }), href: href(`/collections/${maker.handle}`) } : undefined}>

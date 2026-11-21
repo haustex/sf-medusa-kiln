@@ -22,11 +22,11 @@ export default function FeaturedPost({ post, cta, label }: { post: PostCardData;
       <div className="flex flex-col gap-stack-md px-0.5 lg:px-0">
         <div className="flex flex-col gap-stack-sm">
           <p className="type-eyebrow">{[label, post.category].filter(Boolean).join(" · ")}</p>
-          <h2 className="type-section max-w-[16em] text-balance">{post.title}</h2>
-          {post.excerpt && <p className="line-clamp-3 max-w-xl text-base leading-relaxed text-muted sm:text-lg">{post.excerpt}</p>}
+          <h2 className="type-h2 max-w-[16em] text-balance">{post.title}</h2>
+          {post.excerpt && <p className="type-lead line-clamp-3 max-w-xl text-muted">{post.excerpt}</p>}
         </div>
         <PostMeta post={post} />
-        <span className={cn(buttonVariants({ size: "lg" }), "gap-2 self-start")}>
+        <span className={cn(buttonVariants({ size: "lg" }), "gap-stack-sm self-start")}>
           {cta}
           <ArrowRight />
         </span>

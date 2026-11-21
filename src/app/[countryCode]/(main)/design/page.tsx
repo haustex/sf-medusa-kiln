@@ -28,11 +28,14 @@ const SWATCHES: { name: string; token: keyof typeof config.colors; note: string 
 ]
 const TYPE = [
   ["type-display", "Display 56–72 fluid · 600 · -0.03em"],
-  ["type-h1", "Heading 1 · 40 · 600 · -0.02em"],
-  ["type-h2", "Heading 2 · 28 · 600 · -0.02em"],
-  ["type-h3", "Heading 3 · 20 · 600 · -0.01em"],
-  ["type-body", "Body 16 / 1.6 · 400. The quick brown fox jumps over the lazy dog, and the stoneware plate goes in the dishwasher."],
-  ["type-label", "Label 12 · 500 · uppercase · +0.08em"],
+  ["type-h1", "Heading 1 · 32–44 fluid · 700 · -0.03em · page titles"],
+  ["type-h2", "Heading 2 · 22–28 fluid · 600 · -0.02em · sections"],
+  ["type-h3", "Heading 3 · 18–20 fluid · 600 · -0.01em"],
+  ["type-h4", "Heading 4 · body size · 600 · card titles"],
+  ["type-lead", "Lead 18–19 / 1.5 · excerpts, the sentence under a title."],
+  ["type-body", "Body 16–17 fluid / 1.6 · 400. The quick brown fox jumps over the lazy dog, and the stoneware plate goes in the dishwasher."],
+  ["type-label", "Label 13 · 500 · uppercase · +0.08em"],
+  ["type-caption", "Caption 13 / 1.4 · muted · meta lines, photo captions"],
   ["type-price", "Price tnum  $1,234.00  Rp 1.234.000  0123456789"],
 ] as const
 

@@ -49,7 +49,7 @@ export default async function CheckoutTemplate({ cart, customer, countryCode, st
   const shipping = addressLines(cart.shipping_address)
 
   return (
-    <div className="content-container grid items-start gap-section pb-section pt-stack-md lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-x-16">
+    <div className="content-container grid items-start gap-section pb-section pt-page-top lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-x-16">
       <div className="order-first lg:order-last">
         <CheckoutSummary cart={cart} alts={alts} labels={{ title: t.orderSummary, show: t.showSummary, promo: { label: t.promoAdd, apply: t.promoApply, remove: t.promoRemove, error: t.errorDiscount } }} />
       </div>

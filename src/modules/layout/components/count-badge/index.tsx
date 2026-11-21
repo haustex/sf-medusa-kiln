@@ -9,7 +9,7 @@ export default function CountBadge({ count, className }: { count: number; classN
     <span
       aria-hidden="true"
       className={cn(
-        "type-price absolute right-0 top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[11px] font-medium leading-none text-accent-foreground",
+        "type-price absolute right-0 top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-xs font-medium leading-none text-accent-foreground",
         count <= 0 && "invisible",
         className
       )}

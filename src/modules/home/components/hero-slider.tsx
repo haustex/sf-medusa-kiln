@@ -224,13 +224,13 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
                   {!text && <SlideImage slide={s} first={first} load={first || rest} />}
                   {/* scrim: white copy stays AA on any photo */}
                   {!text && <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />}
-                  <div className={cn("absolute inset-0 flex flex-col gap-stack-md p-6 pb-14 text-white sm:p-8 sm:pb-14 md:p-12 md:pb-16 lg:p-16 lg:pb-20", text ? "justify-center" : "justify-end")}>
+                  <div className={cn("absolute inset-0 flex flex-col gap-stack-md p-inset-banner pb-14 text-white md:pb-16 lg:pb-20", text ? "justify-center" : "justify-end")}>
                     <div className="flex max-w-xl flex-col gap-stack-sm">
                       <Title className="type-hero text-balance text-white">{s.title}</Title>
-                      {s.subtitle && <p className="max-w-md text-base leading-relaxed text-white/90 sm:text-lg">{s.subtitle}</p>}
+                      {s.subtitle && <p className="type-lead max-w-md text-white/90">{s.subtitle}</p>}
                     </div>
                     {(s.href || s.secondary) && (
-                      <div className="flex flex-nowrap gap-2 sm:flex-wrap sm:gap-stack-sm">
+                      <div className="flex flex-nowrap gap-stack-sm sm:flex-wrap">
                         {s.href && (
                           <Link
                             href={s.href}
@@ -261,7 +261,7 @@ export default function HeroSlider({ slides, autoplay, labels }: { slides: HeroS
         </ul>
 
         {many && (
-          <ol className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1 md:bottom-5" data-testid="hero-dots">
+          <ol className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-stack-xs md:bottom-5" data-testid="hero-dots">
             {slides.map((s, i) => (
               <li key={s.id}>
                 <button

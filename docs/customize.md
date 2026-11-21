@@ -175,9 +175,12 @@ them onto HeroUI's variables, so buttons, inputs, chips and sheets follow. Roles
   controls and the frost surfaces, never on a whole section.
 
 Spacing and the type scale are in `src/styles/globals.css`: `--space-*` tokens (`gap-section`, `gap-stack-md`,
-`px-container-x`, …) switch per breakpoint inside the variables, and the `type-*` utilities (`type-display`,
-`type-h1`, `type-h2`, `type-h3`, `type-label`, `type-price`, `type-eyebrow`, …) carry size, weight and tracking.
-Components use those names, never raw sizes, so a change there reaches every page.
+`pt-page-top` for the gap under the header, `px-container-x`, …) switch per breakpoint inside the variables, and the
+`type-*` utilities (`type-display`, `type-h1` … `type-h4`, `type-lead`, `type-body`, `type-label`, `type-caption`,
+`type-price`, …) carry size, weight and tracking. The scale is fluid (`--type-*` tokens: body 16 → 17px, h1
+32 → 44px, nothing under 13px) and Tailwind's `text-xs` / `text-base` / `text-lg` follow it; `max-w-measure`
+(`--k-measure`) is the reading column of articles and information pages. Components use those names, never raw
+sizes, so a change there reaches every page.
 
 ## font
 
@@ -283,6 +286,18 @@ product, blog index and categories, articles, information pages, makers, trackin
 leftover gap) and the label above the title links up instead: the category (and the maker) on the product page, the
 category in an article. `schema`: the BreadcrumbList structured data on the pages that carry it (listings, product,
 blog), kept by default and independent of `visible`.
+
+## pageHeader
+
+```ts
+pageHeader: { align: "center" },
+```
+
+The title block of the listing pages (`/store`, categories, collections, the blog index and its categories, search):
+the h1 in the page-title size (`type-h1`) with the description as one muted line under it (the category's or
+collection's description, the blog category's description, the result count on the search page). `"center"` is
+shop.com's look; `"left"` keeps both at the left edge. On the search page the field follows the alignment.
+`src/modules/ds/page-header.tsx`.
 
 ## product
 

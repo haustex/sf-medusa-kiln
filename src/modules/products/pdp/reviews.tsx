@@ -42,7 +42,7 @@ function Summary({ rating, t, lang }: { rating: Rating; t: T; lang: Lang }) {
           const pct = total ? Math.round((c / total) * 100) : 0
           return (
             <li key={n} className="grid grid-cols-[2.25rem_minmax(0,1fr)_2.5rem] items-center gap-stack-sm text-sm">
-              <span className="flex items-center gap-1 whitespace-nowrap tabular-nums text-muted">
+              <span className="flex items-center gap-stack-xs whitespace-nowrap tabular-nums text-muted">
                 <span className="sr-only">{fill(t.ratingStar, { n })}</span>
                 <span aria-hidden="true">{n}</span>
                 <Icon icon={star} size={12} fill="currentColor" />

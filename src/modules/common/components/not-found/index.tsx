@@ -13,8 +13,8 @@ export default function NotFoundContent({ countryCode, labels: t }: { countryCod
     <div className="content-container py-section">
       <div className="mx-auto flex max-w-xl flex-col items-center gap-stack-md text-center" data-testid="not-found">
         <p className="type-eyebrow">404</p>
-        <h1 className="type-title text-balance">{t.title}</h1>
-        <p className="text-muted">{t.body}</p>
+        <h1 className="type-h1">{t.title}</h1>
+        <p className="type-body text-muted">{t.body}</p>
         <form action={marketPath(countryCode, "/search")} method="get" role="search" className="mt-stack-sm flex w-full gap-stack-sm">
           <label htmlFor="nf-q" className="sr-only">{t.search}</label>
           <input

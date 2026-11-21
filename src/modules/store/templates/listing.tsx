@@ -16,7 +16,7 @@ import { getMarket, marketPath } from "@lib/util/market"
 import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
 import { getSiteOrigin } from "@lib/util/site"
 import Link from "@modules/common/components/app-link"
-import { Breadcrumb, ButtonLink, type Crumb, formatPrice, Page, ProductGrid } from "@modules/ds"
+import { ButtonLink, type Crumb, formatPrice, Page, PageHeader, ProductGrid } from "@modules/ds"
 import { Icon } from "@modules/ds/icons"
 import CatalogCard from "@modules/products/components/catalog-card"
 import FilterForm, { type CategoryLink } from "@modules/store/components/filter-form"
@@ -27,8 +27,9 @@ const FORM_ID = "kiln-filters"
 const SHEET_FORM_ID = "kiln-filters-sheet"
 
 /**
- * Product listing for /store, categories and collections: breadcrumb, title, toolbar (count, filters on phones,
- * sort), filter sidebar from lg, product grid, numbered pages. Everything is in the first HTML; filters and pages
+ * Product listing for /store, categories and collections: title block (PageHeader: h1 + one-line description,
+ * centred by default), toolbar (count, filters on phones, sort), filter sidebar from lg, product grid, numbered
+ * pages. The breadcrumb is structured data only (`crumbs`; theme.config.ts breadcrumb). Everything is in the first HTML; filters and pages
  * are URL state (lib/listing/filters.ts), so every state is a link. The listing fetches up to config.listing.scan
  * products once (Next cache) and filters in memory: fine up to a few hundred products per listing; a search engine
  * with facets can replace this later without touching the UI.
@@ -87,11 +88,12 @@ export default async function ListingTemplate({
   const alts = await productAlts(countryCode, pageProducts.map((p) => p.id))
   const cards = pageProducts.map((p) => toProductCard(p, countryCode, cardRating(ratings.get(p.id)), alts))
 
-  const facets = buildFacets(scanned, query, ratings, lang, t)
+  const facets = buildFacets(scanned, query, ratings, lang, dict)
   const filters = activeFilterCount(query)
   const currency = scanned[0]?.variants?.[0]?.calculated_price?.currency_code ?? market.currency ?? "usd"
   const money = (n: number) => formatPrice(n, currency)
-  const currencySymbol = new Intl.NumberFormat(undefined, { style: "currency", currency: currency.toUpperCase() }).formatToParts(0).find((p) => p.type === "currency")?.value ?? currency.toUpperCase()
+  // the price fields' prefix in the market's own notation ("Rp", "$"), not the ISO code
+  const currencySymbol = new Intl.NumberFormat(market.locale, { style: "currency", currency: currency.toUpperCase(), currencyDisplay: "narrowSymbol" }).formatToParts(0).find((p) => p.type === "currency")?.value?.trim() ?? currency.toUpperCase()
   const chips = activeChips(query, facets, t, money)
   const countText = sorted.length === 1 ? t.countOne : fill(t.count, { n: sorted.length })
 
@@ -138,15 +140,7 @@ export default async function ListingTemplate({
       <JsonLd data={structuredData} />
       <div className="content-container flex flex-col gap-stack-lg">
         <div className="flex flex-col gap-section-head">
-          <div className="flex flex-col gap-stack-md">
-            <Breadcrumb items={crumbs} label={t.breadcrumb} />
-            <div className="flex flex-col gap-stack-sm">
-              <h1 className="type-h1" data-testid="category-page-title">
-                {title}
-              </h1>
-              {description && <p className="type-body max-w-2xl text-muted">{description}</p>}
-            </div>
-          </div>
+          <PageHeader title={title} description={description} titleTestId="category-page-title" />
 
           {/* Phones and tablets: the top-level categories as a chip row (the header's category row is hidden there) */}
           <nav aria-label={t.filterLabel} className="-mx-container-x lg:hidden">

@@ -143,26 +143,26 @@ export default function LinksTemplate({ countryCode, page }: { countryCode: stri
 
   return (
     <div style={vars} className="min-h-svh bg-(--lib-bg) text-(--lib-fg)" data-testid="links-page" data-profile={hero ? "hero" : "circle"}>
-      <div className={`mx-auto flex w-full max-w-[600px] flex-col items-center pb-10 ${hero ? "sm:pt-6" : "px-4 pt-10 sm:pt-16"}`}>
+      <div className={`mx-auto flex w-full max-w-[600px] flex-col items-center pb-section ${hero ? "sm:pt-stack-lg" : "px-stack-md pt-section"}`}>
         {hero ? (
           <header className="flex w-full flex-col items-center text-center">
             <Hero page={page} alt={page.hero_alt ?? ""} />
-            <div className={`flex flex-col items-center px-4 ${heroAvatar ? "-mt-10" : "-mt-6 sm:-mt-8"}`} data-testid="links-profile" data-avatar={heroAvatar ? "true" : "false"}>
+            <div className={`flex flex-col items-center px-stack-md ${heroAvatar ? "-mt-10" : "-mt-6 sm:-mt-8"}`} data-testid="links-profile" data-avatar={heroAvatar ? "true" : "false"}>
               {heroAvatar && <Picture src={page.avatar as string} alt={avatarAlt} size={80} eager focus={page.focus.avatar} className="size-20 rounded-full object-cover ring-4 ring-(--lib-bg)" />}
-              <h1 className={heroAvatar ? "mt-3 text-xl font-semibold tracking-[-0.01em]" : "text-2xl font-semibold tracking-[-0.015em]"}>{page.title}</h1>
-              {page.bio && <p className={`max-w-[32em] text-balance text-sm leading-6 opacity-75 ${heroAvatar ? "mt-1.5" : "mt-2"}`}>{page.bio}</p>}
+              <h1 className={heroAvatar ? "mt-stack-sm text-xl font-semibold tracking-[-0.01em]" : "text-2xl font-semibold tracking-[-0.015em]"}>{page.title}</h1>
+              {page.bio && <p className="mt-stack-sm max-w-[32em] text-balance text-sm leading-6 opacity-80">{page.bio}</p>}
             </div>
           </header>
         ) : (
           <header className="flex flex-col items-center text-center">
             {page.avatar ? <Picture src={page.avatar} alt={avatarAlt} size={96} eager focus={page.focus.avatar} className="size-24 rounded-full object-cover" /> : monogram}
-            <h1 className="mt-4 text-xl font-semibold tracking-[-0.01em]">{page.title}</h1>
-            {page.bio && <p className="mt-1.5 max-w-[32em] text-balance text-sm leading-6 opacity-75">{page.bio}</p>}
+            <h1 className="mt-stack-md text-xl font-semibold tracking-[-0.01em]">{page.title}</h1>
+            {page.bio && <p className="mt-stack-sm max-w-[32em] text-balance text-sm leading-6 opacity-80">{page.bio}</p>}
           </header>
         )}
 
         {page.socials.length > 0 && (
-          <ul aria-label={t.socials} className="mt-4 flex flex-wrap justify-center px-4" data-testid="links-socials">
+          <ul aria-label={t.socials} className="mt-stack-md flex flex-wrap justify-center px-stack-md" data-testid="links-socials">
             {page.socials.map((s) => {
               const glyph = SOCIAL_GLYPH[s.network] ?? "link"
               const label = GLYPH_LABELS[glyph] && SOCIAL_GLYPH[s.network] ? GLYPH_LABELS[glyph]! : SOCIAL_LABEL[s.network] ?? s.network
@@ -178,18 +178,18 @@ export default function LinksTemplate({ countryCode, page }: { countryCode: stri
         )}
 
         {items.length > 0 && (
-          <ul aria-label={t.items} className="mt-8 flex w-full flex-col gap-3 px-4" data-testid="links-items">
+          <ul aria-label={t.items} className="mt-stack-lg flex w-full flex-col gap-gutter px-stack-md" data-testid="links-items">
             {items.map((item) => {
               if (item.type === "header") {
                 return (
-                  <li key={item.id} className="pt-3">
-                    <h2 className="text-center text-xs font-medium uppercase tracking-[0.08em] opacity-60">{item.label}</h2>
+                  <li key={item.id} className="pt-stack-sm">
+                    <h2 className="text-center text-xs font-medium uppercase tracking-[0.08em] opacity-70">{item.label}</h2>
                   </li>
                 )
               }
               if (item.type === "divider") {
                 return (
-                  <li key={item.id} role="separator" className="py-1">
+                  <li key={item.id} role="separator" className="py-stack-xs">
                     <hr className="border-(--lib-fg)/15" />
                   </li>
                 )
@@ -248,8 +248,8 @@ export default function LinksTemplate({ countryCode, page }: { countryCode: stri
           </ul>
         )}
 
-        <footer className="mt-12 flex flex-col items-center gap-2 text-xs opacity-70">
-          <a href={shop} aria-label={config.brand.name} className="inline-flex min-h-11 items-center gap-2 hover:opacity-100" data-testid="links-shop-link">
+        <footer className="mt-section flex flex-col items-center gap-stack-sm text-xs opacity-80">
+          <a href={shop} aria-label={config.brand.name} className="inline-flex min-h-11 items-center gap-stack-sm hover:opacity-100" data-testid="links-shop-link">
             <Logo size="sm" decorative className="text-(--lib-fg)" />
           </a>
           <a href={shop} className="hover:underline underline-offset-4">

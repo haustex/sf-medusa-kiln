@@ -38,9 +38,9 @@ export default async function GlobalNotFound() {
             <Logo size="lg" />
           </Link>
           <p className="type-eyebrow mt-stack-md">404</p>
-          <h1 className="type-title text-balance">{t.title}</h1>
-          <p className="max-w-md text-muted">{t.body}</p>
-          <form action={marketPath(market, "/search")} method="get" role="search" className="flex w-full max-w-md gap-2">
+          <h1 className="type-h1">{t.title}</h1>
+          <p className="type-body max-w-md text-muted">{t.body}</p>
+          <form action={marketPath(market, "/search")} method="get" role="search" className="flex w-full max-w-md gap-stack-sm">
             <label htmlFor="nf-q" className="sr-only">{t.search}</label>
             <input
               id="nf-q"

@@ -43,9 +43,9 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
       <Component
         ref={ref}
         className={cn(
-          Component === "h1" && "type-section",
-          Component === "h2" && "type-heading",
-          Component === "h3" && "text-base font-medium sm:text-lg",
+          Component === "h1" && "type-h1",
+          Component === "h2" && "type-h2",
+          Component === "h3" && "type-h3",
           className
         )}
         {...props}

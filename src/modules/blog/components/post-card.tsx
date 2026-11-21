@@ -59,14 +59,14 @@ export default function PostCard({
       <PostCover slug={post.href.split("/").pop() ?? ""} src={post.cover} alt="" shape={journal ? "wide" : "square"} priority={priority} sizes={sizes} className="card-media" />
       <div className="flex flex-col gap-stack-xs px-0.5">
         {post.category && <p className="type-eyebrow">{post.category}</p>}
-        <Heading className="line-clamp-3 text-base font-semibold leading-snug tracking-[-0.01em] text-foreground sm:text-lg">{post.title}</Heading>
+        <Heading className="type-h4 line-clamp-3 text-foreground">{post.title}</Heading>
         {journal && post.excerpt && <p className="line-clamp-2 text-sm text-muted">{post.excerpt}</p>}
         {journal ? (
-          <p className="text-xs text-muted sm:text-sm">
+          <p className="text-sm text-muted">
             <time dateTime={post.publishedAt}>{post.dateLabel}</time>
           </p>
         ) : (
-          <PostMeta post={post} className="text-xs sm:text-sm" />
+          <PostMeta post={post} />
         )}
       </div>
     </Link>

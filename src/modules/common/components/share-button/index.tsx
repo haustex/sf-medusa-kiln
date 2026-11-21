@@ -40,13 +40,34 @@ export const shareUrl = (url: string, medium: string) => `${url}${url.includes("
 const item = "flex h-11 w-full items-center gap-stack-sm rounded-control px-3 text-sm outline-none hover:bg-default/70 focus-visible:bg-default/70"
 
 /**
- * Share button over the product photo (under the wishlist heart, same glass-photo disc). On touch devices with the Web
- * Share API (phones) it opens the system share sheet with the title and URL; elsewhere a small frost menu: copy
- * link (with a "link copied" toast), WhatsApp, Facebook, X, Pinterest (the main photo and its alt text), e-mail,
- * the filled marks of the article share row. `url`: the product's canonical URL; every channel gets its own
- * utm_medium on it. Keyboard: Escape closes, arrows move, Tab leaves and closes.
+ * Share button: a round glass disc, over the product photo (under the wishlist heart, `surface` "photo") or on the
+ * page at the end of an article ("page"). On touch devices with the Web Share API (phones) it opens the system share
+ * sheet with the title and URL; elsewhere a small frost menu: copy link (with a "link copied" toast), WhatsApp,
+ * Facebook, X, Pinterest (the photo and its alt text), e-mail, with the filled brand marks. `url`: the page's
+ * canonical URL; every channel gets its own utm_medium on it (utm_source=share). `align`: which edge of the button
+ * the menu hangs from. Keyboard: Escape closes, arrows move, Tab leaves and closes.
  */
-export default function ShareButton({ url, title, image, imageAlt, labels, className }: { url: string; title: string; image: string | null; imageAlt: string | null; labels: ShareLabels; className?: string }) {
+export default function ShareButton({
+  url,
+  title,
+  image,
+  imageAlt,
+  labels,
+  surface = "photo",
+  align = "end",
+  className,
+}: {
+  url: string
+  title: string
+  image: string | null
+  imageAlt: string | null
+  labels: ShareLabels
+  /** "photo": glass-photo disc over a picture; "page": glass disc on the page */
+  surface?: "photo" | "page"
+  /** The menu's edge: "end" hangs from the right edge of the button, "start" from the left */
+  align?: "start" | "end"
+  className?: string
+}) {
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
@@ -122,13 +143,13 @@ export default function ShareButton({ url, title, image, imageAlt, labels, class
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={id}
-        className="glass-photo inline-flex size-11 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-focus"
+        className={cn("inline-flex size-11 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-focus", surface === "photo" ? "glass-photo" : "glass focus-visible:ring-offset-2")}
         data-testid="share-button"
       >
         <Share {...ICON} />
       </button>
       {open && (
-        <div id={id} ref={menuRef} role="menu" aria-label={labels.menu} onKeyDown={onMenuKey} className="frost absolute right-0 top-full z-50 mt-2 w-56 rounded-media border border-separator p-1 shadow-lift" data-testid="share-menu">
+        <div id={id} ref={menuRef} role="menu" aria-label={labels.menu} onKeyDown={onMenuKey} className={cn("frost absolute top-full z-50 mt-stack-sm w-56 rounded-media border border-separator p-1 shadow-lift", align === "end" ? "right-0" : "left-0")} data-testid="share-menu">
           <button type="button" role="menuitem" onClick={copy} className={item} data-share="copy">
             <Mark name="link" size={20} />
             <span>{labels.copy}</span>
@@ -142,7 +163,7 @@ export default function ShareButton({ url, title, image, imageAlt, labels, class
         </div>
       )}
       {/* "link copied": a glass pill where the menu was, 2.5 s */}
-      <div role="status" aria-live="polite" className={cn("absolute right-0 top-full z-50 mt-2 whitespace-nowrap rounded-full px-3 py-2 text-sm shadow-lift", copied ? "glass-photo" : "sr-only")} data-testid="share-copied">
+      <div role="status" aria-live="polite" className={cn("absolute top-full z-50 mt-stack-sm whitespace-nowrap rounded-full px-3 py-2 text-sm shadow-lift", align === "end" ? "right-0" : "left-0", copied ? "glass-photo" : "sr-only")} data-testid="share-copied">
         {copied ? labels.copied : ""}
       </div>
     </div>

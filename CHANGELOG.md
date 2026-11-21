@@ -3,7 +3,44 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
-## [0.12.0] — 2026-11-21
+## [0.13.0] — 2026-11-21
+
+Header that tucks its second row away, shop.com-like page titles, one type scale.
+
+### Added
+- `theme.config.ts` pageHeader `{ align: "center" | "left" }` and `ds/page-header.tsx`: the listing pages (store,
+  categories, collections, blog index and categories, search) open with the h1 in the page-title size and the
+  category's / collection's / blog category's description as one muted line under it, centred by default. The
+  search page's field follows the alignment.
+- A fluid type scale with tokens in `src/styles/globals.css` (`--type-h1` … `--type-h4`, `--type-lead`,
+  `--type-body`, `--type-xs`): body 16 → 17px (line-height 1.6 for running text), h1 32 → 44 / 700 / -0.03em,
+  h2 22 → 28 / 600, h3 18 → 20 / 600, h4 = body / 600, nothing under 13px. `text-xs`, `text-base` and `text-lg`
+  follow it, so every page sits on the same scale; new utilities `type-h4`, `type-lead`, `type-caption`.
+  `--k-measure` (`max-w-measure`, 40rem ≈ 68 characters) is the reading column of articles and information pages.
+- `--space-page-top` (`pt-page-top`, 24px / 32px from lg): the one token for the gap between the header and a
+  page's first block (`<Page>`, checkout). Was `stack-md` (16px).
+
+### Changed
+- Header: the second row (the category row from md, the search field on phones) slides up behind the top row and
+  fades while scrolling down and comes back on scrolling up or near the top, on every width; the row with the logo,
+  the search and the icons always stays. Transform + opacity only (CLS 0), 200ms, nothing animates with
+  prefers-reduced-motion. Both rows are frost surfaces on a transparent, click-through `<header>`
+  (`.header-secondary` in globals.css, `HeaderScroll`).
+- Article: the share row (seven brand marks) is replaced by the product page's share button, moved to
+  `modules/common/components/share-button` (`surface` "photo" | "page", `align`): the system share sheet on phones,
+  a menu with copy link, WhatsApp, Facebook, X, Pinterest (the cover and its alt text) and e-mail elsewhere, the same
+  `utm_source=share&utm_medium={channel}` tags. Dictionary `blog.share` is now the label next to it; the menu's
+  wording is `product.share`.
+- Article text is the body step (16 → 17 / 1.6, was 18 / 1.7), its title, h2 and h3 the site's h1/h2/h3; the
+  header column and the text share the reading measure. Information pages use the same measure.
+- Listing filters: the currency in the price fields is its own adornment ("Rp | Min", "$ | Max"), in the market's
+  notation; option titles are translated like the product page's legends (`Size` → `Ukuran`,
+  `src/lib/i18n/option-title.ts`).
+- Spacing audit: raw `mt-*` / `gap-*` numbers in the hero slider, value props, blog chips and pagination, the AI
+  chat panel, the link-in-bio page, product and post cards replaced by the spacing tokens; the blog category chips
+  are the listing's glass chips; `SectionHeader` descriptions and hero copy use `type-body` / `type-lead`;
+  `Heading` (common/ui) maps h1/h2/h3 onto `type-h1`/`type-h2`/`type-h3`; the 404 pages use `type-h1`.
+
 
 No visible breadcrumbs.
 

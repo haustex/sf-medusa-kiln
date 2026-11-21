@@ -8,6 +8,18 @@
 
 @theme inline {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /*
+   * Type tokens (values in :root below): text-xs / text-base / text-lg follow the scale, so a plain `text-base`
+   * is the fluid body size and nothing in the UI drops under 13px.
+   */
+  --text-xs: var(--type-xs);
+  --text-xs--line-height: 1.4;
+  --text-base: var(--type-body);
+  --text-base--line-height: 1.5;
+  --text-lg: var(--type-lead);
+  --text-lg--line-height: 1.5;
+  /* max-w-measure: one reading column (articles, information pages), ≈ 68 characters of Inter at the body size */
+  --container-measure: var(--k-measure);
   /* Palette helpers (values in theme.css): border-control = borders of inputs/selects/checkboxes (>= 3:1) */
   --color-control: var(--k-control);
   /* lg radius for photos, cards, tiles, hero (buttons/inputs stay md = --radius) */
@@ -26,6 +38,7 @@
    */
   --spacing-section: var(--space-section);
   --spacing-section-head: var(--space-section-head);
+  --spacing-page-top: var(--space-page-top);
   --spacing-stack-xs: var(--space-stack-xs);
   --spacing-stack-sm: var(--space-stack-sm);
   --spacing-stack-md: var(--space-stack-md);
@@ -39,6 +52,7 @@
 :root {
   --space-section: 2.5rem; /* 40: between sections (shop.com 40) */
   --space-section-head: 1rem; /* 16: section header -> its content (shop.com 16) */
+  --space-page-top: 1.5rem; /* 24: header -> the page's first block (<Page>, checkout); the one place this gap is set */
   --space-stack-xs: 0.25rem; /* 4: title -> subtitle, lines inside a card */
   --space-stack-sm: 0.5rem; /* 8: photo -> card text (shop.com 8), label -> control */
   --space-stack-md: 1rem; /* 16: header -> first block, blocks inside a group */
@@ -56,6 +70,7 @@
 @media (min-width: 1024px) {
   :root {
     --space-section: 3rem; /* 48 */
+    --space-page-top: 2rem; /* 32 */
     --space-gutter: 1rem; /* 16 */
     --space-container-x: 2rem; /* 32 */
     --space-inset-banner: 3rem; /* 48 */
@@ -111,6 +126,10 @@
   html {
     font-family: var(--font-sans);
   }
+  /* unstyled text (accordion bodies, cart lines, forms) sits on the body step of the scale too */
+  body {
+    font-size: var(--type-body);
+  }
 }
 
 /* Layout: content max 1280px (max-w-7xl) with responsive side padding. */
@@ -119,40 +138,73 @@
 }
 
 /*
- * Type scale (Inter, optical sizes on). Weights: headings 600, UI 500, body 400. Big headings carry negative tracking.
- *   type-display  56–72 fluid, 600, -0.03em   hero / editorial opener
- *   type-h1       40, 600, -0.02em            page titles, PDP title
- *   type-h2       26, 500, -0.02em            section titles (SectionHeader: eyebrow above, small "View all" link right)
- *   type-h3       20, 600, -0.01em            card groups, drawer titles
- *   type-body     16 / 1.6                    running text
- *   type-label    12, 500, uppercase, +0.08em eyebrows, form labels, chips
- *   type-price    tabular figures             prices, quantities, totals
- * Older aliases (type-hero / type-section / type-title / type-heading / type-eyebrow / type-caption) map onto these.
+ * Type scale (Inter, optical sizes on), one fluid scale for every page. Sizes are clamp()s of the viewport width:
+ * phones get the first value, desktops (≥ 1280) the second. Weights: h1 700, h2–h4 600, UI 500, body 400. Big
+ * headings carry negative tracking; line-height 1.6 for running text, 1.1–1.3 for headings. Nothing under 13px.
+ *   type-display  56–72, 600, -0.03em, 1.02      hero / editorial opener
+ *   type-h1       32–44, 700, -0.03em, 1.1       page titles (PageHeader), PDP title, article title
+ *   type-h2       22–28, 600, -0.02em, 1.2       section titles (SectionHeader), article h2
+ *   type-h3       18–20, 600, -0.01em, 1.25      card groups, drawer titles, checkout steps, article h3
+ *   type-h4       body size, 600, 1.3            card titles, small headings in forms
+ *   type-lead     18–19 / 1.5                    excerpts, hero copy, the sentence under a title
+ *   type-body     16–17 / 1.6                    running text (text-base is the same size at 1.5)
+ *   type-label    13, 500, uppercase, +0.08em    eyebrows, form labels, chips
+ *   type-caption  13 / 1.4, muted                 photo captions, meta lines
+ *   type-price    tabular figures                 prices, quantities, totals
+ * Older aliases (type-hero / type-section / type-title / type-heading / type-eyebrow) map onto these.
  */
+:root {
+  --type-body: clamp(1rem, 0.9375rem + 0.2vw, 1.0625rem); /* 16 → 17 */
+  --type-lead: clamp(1.125rem, 1.0625rem + 0.2vw, 1.1875rem); /* 18 → 19 */
+  --type-h1: clamp(2rem, 1.5rem + 1.6vw, 2.75rem); /* 32 → 44 */
+  --type-h2: clamp(1.375rem, 1.15rem + 0.75vw, 1.75rem); /* 22 → 28 */
+  --type-h3: clamp(1.125rem, 1.05rem + 0.25vw, 1.25rem); /* 18 → 20 */
+  --type-h4: var(--type-body);
+  --type-small: 0.875rem; /* 14 */
+  --type-xs: 0.8125rem; /* 13: the floor */
+  --leading-body: 1.6;
+  --leading-heading: 1.2;
+  --k-measure: 40rem; /* 640px ≈ 68ch of Inter at 17px: articles, information pages */
+}
 @utility type-display {
   font-size: clamp(3.5rem, 2.5rem + 2.8vw, 4.5rem);
   @apply leading-[1.02] font-semibold tracking-[-0.03em] text-balance;
 }
 @utility type-h1 {
-  @apply text-[2.5rem] leading-[1.08] font-semibold tracking-[-0.02em] text-balance;
+  font-size: var(--type-h1);
+  @apply leading-[1.1] font-bold tracking-[-0.03em] text-balance;
 }
 @utility type-h2 {
-  @apply text-[1.625rem] leading-[1.15] font-medium tracking-[-0.02em];
+  font-size: var(--type-h2);
+  line-height: var(--leading-heading);
+  @apply font-semibold tracking-[-0.02em];
 }
 @utility type-h3 {
-  @apply text-[1.25rem] leading-[1.3] font-semibold tracking-[-0.01em];
+  font-size: var(--type-h3);
+  @apply leading-[1.25] font-semibold tracking-[-0.01em];
+}
+@utility type-h4 {
+  font-size: var(--type-h4);
+  @apply leading-[1.3] font-semibold tracking-[-0.005em];
+}
+@utility type-lead {
+  font-size: var(--type-lead);
+  @apply leading-[1.5];
 }
 @utility type-body {
-  @apply text-base leading-[1.6];
+  font-size: var(--type-body);
+  line-height: var(--leading-body);
 }
 @utility type-label {
-  @apply text-xs font-medium uppercase tracking-[0.08em];
+  font-size: var(--type-xs);
+  @apply leading-[1.25] font-medium uppercase tracking-[0.08em];
 }
 @utility type-price {
   font-variant-numeric: tabular-nums;
 }
 @utility type-caption {
-  @apply text-xs leading-5 text-muted sm:text-sm;
+  font-size: var(--type-xs);
+  @apply leading-[1.4] text-muted;
 }
 /* aliases used by the extracted components */
 @utility type-hero {
@@ -160,16 +212,21 @@
   @apply leading-[1.02] font-semibold tracking-[-0.03em] text-balance;
 }
 @utility type-section {
-  @apply text-[1.625rem] leading-[1.15] font-medium tracking-[-0.02em];
+  font-size: var(--type-h2);
+  line-height: var(--leading-heading);
+  @apply font-semibold tracking-[-0.02em];
 }
 @utility type-title {
-  @apply text-[1.625rem] leading-[1.15] font-medium tracking-[-0.02em];
+  font-size: var(--type-h1);
+  @apply leading-[1.1] font-bold tracking-[-0.03em] text-balance;
 }
 @utility type-heading {
-  @apply text-[1.25rem] leading-[1.3] font-semibold tracking-[-0.01em];
+  font-size: var(--type-h3);
+  @apply leading-[1.25] font-semibold tracking-[-0.01em];
 }
 @utility type-eyebrow {
-  @apply text-xs font-medium uppercase tracking-[0.08em] text-muted;
+  font-size: var(--type-xs);
+  @apply leading-[1.25] font-medium uppercase tracking-[0.08em] text-muted;
 }
 
 /*
@@ -536,32 +593,44 @@ input[type="radio"] {
 }
 
 /*
- * Sticky header "shrinks" on scroll without layout shift: it sticks at a negative top, so its extra top padding
- * scrolls away (--header-tuck). Only a paint-only shadow follows the scroll (scroll-timeline, CSS only).
+ * Header. Two frost rows (header-top: logo, search, icons; header-secondary: the search field on phones, the
+ * category row from md); the <header> itself has no background and lets clicks through, so when the second row is
+ * tucked away the page shows through where it was. HeaderScroll toggles data-collapsed while scrolling down (back on
+ * scrolling up or near the top); the row slides up behind the top row and fades, transform + opacity only, so
+ * nothing in the layout moves (CLS 0). From md the header is sticky at a negative top, so its extra top padding
+ * (--header-tuck) scrolls away and it gets a little smaller without moving the page. A paint-only shadow follows the
+ * scroll under the open row (scroll-timeline, CSS only) and sits under the top row while collapsed.
  */
 :root {
   --header-tuck: 0.75rem;
 }
+.header-secondary {
+  transition:
+    transform 200ms ease-out,
+    opacity 200ms ease-out;
+}
+.header-top {
+  transition: box-shadow 200ms ease-out;
+}
+.site-header[data-collapsed] .header-secondary {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.site-header[data-collapsed] .header-top {
+  box-shadow: var(--k-shadow-soft);
+}
 @supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
-    .site-header {
+  @media (prefers-reduced-motion: no-preference) {
+    .header-secondary {
       animation: site-header-shadow linear both;
       animation-timeline: scroll(root);
       animation-range: 0 96px;
     }
   }
 }
-/* Phones: the search + category rows slide behind the top row while collapsed (HeaderScroll) */
-@media (max-width: 767.98px) {
-  .header-secondary {
-    transition: transform 200ms ease-out;
-  }
-  .site-header[data-collapsed] .header-secondary {
-    transform: translateY(-100%);
-  }
-}
-@media (max-width: 767.98px) and (prefers-reduced-motion: reduce) {
-  .header-secondary {
+@media (prefers-reduced-motion: reduce) {
+  .header-secondary,
+  .header-top {
     transition: none;
   }
 }

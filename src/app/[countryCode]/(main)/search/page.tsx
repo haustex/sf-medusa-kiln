@@ -1,3 +1,4 @@
+import { cn } from "@heroui/styles"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
@@ -8,7 +9,8 @@ import { searchProducts } from "@lib/data/search"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { marketPath } from "@lib/util/market"
 import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
-import { ButtonLink, Page, ProductGrid, Section, Stack } from "@modules/ds"
+import config from "@theme"
+import { ButtonLink, Page, PageHeader, ProductGrid, Section, Stack } from "@modules/ds"
 import HeaderSearch from "@modules/layout/components/header-search"
 import CatalogCard from "@modules/products/components/catalog-card"
 
@@ -46,13 +48,10 @@ export default async function SearchPage(props: Props) {
   return (
     <Page data-testid="search-container">
       <Stack gap="md" className="content-container">
-        <Stack gap="xs">
-          <h1 className="type-h1">{query ? fill(t.searchResults, { q: query }) : t.searchTitle}</h1>
-          <p className="text-muted" data-testid="search-count">
-            {query ? (response.count === 1 ? t.countOne : fill(t.count, { n: response.count })) : t.searchHint}
-          </p>
-        </Stack>
-        <HeaderSearch action={href("/search")} placeholder={dict.nav.search} label={dict.nav.searchLabel} formLabel={t.searchRefine} defaultValue={query} submitLabel={t.searchSubmit} className="max-w-2xl" />
+        {/* the title block (PageHeader) with the count as its description; the search field follows its alignment */}
+        <PageHeader title={query ? fill(t.searchResults, { q: query }) : t.searchTitle} description={query ? (response.count === 1 ? t.countOne : fill(t.count, { n: response.count })) : t.searchHint} titleTestId="search-title">
+          <HeaderSearch action={href("/search")} placeholder={dict.nav.search} label={dict.nav.searchLabel} formLabel={t.searchRefine} defaultValue={query} submitLabel={t.searchSubmit} className={cn("max-w-2xl pt-stack-sm", config.pageHeader.align === "center" && "mx-auto")} />
+        </PageHeader>
         {query && (
           <Section id="results" title={t.searchTitle} titleHidden contained={false} className="pt-stack-md">
             {cards.length ? (

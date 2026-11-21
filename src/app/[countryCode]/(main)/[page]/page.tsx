@@ -64,7 +64,8 @@ export default async function ContentPageRoute(props: Props) {
   return (
     <Page data-testid="content-page">
       <JsonLd data={pageJsonLd(page, origin, countryCode)} />
-      <Stack gap="section" className="content-container mx-auto max-w-[44rem]">
+      {/* one reading column (--k-measure ≈ 68 characters), like an article */}
+      <Stack gap="section" className="mx-auto w-full max-w-measure px-container-x">
         <Stack gap="md" as="header">
           <Breadcrumb items={crumbs} label={t.listing.breadcrumb} />
           <h1 className="type-h1">{page.title}</h1>
@@ -72,7 +73,7 @@ export default async function ContentPageRoute(props: Props) {
         </Stack>
         {page.image && (
           <figure className="relative aspect-[3/2] overflow-hidden rounded-media bg-surface" data-testid="content-page-image">
-            <Image src={page.image.src} alt={page.image.alt} fill sizes="(min-width: 768px) 44rem, 100vw" className="object-cover" />
+            <Image src={page.image.src} alt={page.image.alt} fill sizes="(min-width: 768px) 40rem, 100vw" className="object-cover" />
           </figure>
         )}
         <div className="blog-prose" dangerouslySetInnerHTML={{ __html: page.html }} />

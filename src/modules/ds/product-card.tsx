@@ -100,7 +100,7 @@ export default function ProductCard({
         <div className="flex flex-col gap-stack-xs px-0.5">
           <h3 className="line-clamp-2 text-sm font-medium leading-snug text-foreground sm:text-base">{title}</h3>
           {rating && rating.count > 0 && (
-            <p className="flex items-center gap-1.5 text-xs text-muted">
+            <p className="flex items-center gap-stack-sm text-xs text-muted">
               <Stars value={rating.average} label={ratingLabel ?? `${rating.average.toFixed(1)}/5`} />
               <span className="tabular-nums">{`(${rating.count})`}</span>
             </p>

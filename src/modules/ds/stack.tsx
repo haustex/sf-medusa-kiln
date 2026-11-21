@@ -39,12 +39,12 @@ export default function Stack({
 }
 
 /**
- * Page body: header -> first block = stack-md, sections apart by `section`.
- * The footer adds its own `mt-section` above it.
+ * Page body: header -> first block = page-top (the one token for that gap, 24px / 32px from lg), sections apart by
+ * `section`. The footer adds its own `mt-section` above it.
  */
 export function Page({ className, children, ...rest }: { className?: string; children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("flex flex-col gap-section pt-stack-md", className)} {...rest}>
+    <div className={cn("flex flex-col gap-section pt-page-top", className)} {...rest}>
       {children}
     </div>
   )

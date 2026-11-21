@@ -42,7 +42,8 @@ const id = {
     writtenBy: "Ditulis oleh {name}",
     authorWebsite: "Situs web",
     authorProfiles: "Profil {name}",
-    share: { share: "Bagikan", shareOn: "Bagikan ke {network}", copy: "Salin link", copied: "Link disalin" },
+    /** Label next to the share button at the end of an article (the button's own wording: product.share) */
+    share: "Bagikan",
     fromShop: "Dari toko",
     moreIn: "Artikel lain di {name}",
     more: "Artikel lainnya",
@@ -1130,7 +1131,7 @@ const en: Dictionary = {
     writtenBy: "Written by {name}",
     authorWebsite: "Website",
     authorProfiles: "{name}'s profiles",
-    share: { share: "Share", shareOn: "Share on {network}", copy: "Copy link", copied: "Link copied" },
+    share: "Share",
     fromShop: "From the shop",
     moreIn: "More in {name}",
     more: "More articles",

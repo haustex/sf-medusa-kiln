@@ -28,7 +28,7 @@ import CatalogCard from "@modules/products/components/catalog-card"
 import BuyBox, { type BuyBoxVariant } from "@modules/products/pdp/buy-box"
 import QuoteCta from "@modules/products/pdp/quote-cta"
 import Gallery from "@modules/products/pdp/gallery"
-import ShareButton from "@modules/products/pdp/share"
+import ShareButton from "@modules/common/components/share-button"
 import { Accordion, meta, optionValues, productFaq, SpecList, specRows } from "@modules/products/pdp/product-details"
 import ProductNotes, { NoteRow } from "@modules/products/pdp/product-notes"
 import ProductReviews, { formatAverage } from "@modules/products/pdp/reviews"
@@ -127,7 +127,7 @@ export default async function ProductTemplate({ product, region, countryCode }: 
   const share = config.product.share ? { url: productUrl, title: product.title ?? "", image: mainPhotoRef ? imageJpeg(origin, mainPhotoRef) : mainPhoto, imageAlt: mainPhoto ? (alts[mainPhoto] ?? null) : null } : null
   const overlay =
     wish || share ? (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-stack-sm">
         {wish && <WishlistHeart productId={product.id} variant="photo" labels={{ add: dict.wishlist.add, remove: dict.wishlist.remove }} />}
         {share && <ShareButton {...share} labels={{ ...t.share, button: fill(t.share.button, { title: share.title }) }} />}
       </div>

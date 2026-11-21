@@ -3,6 +3,7 @@ import type { HttpTypes } from "@medusajs/types"
 import config from "@theme"
 import { fill, type Dictionary } from "@lib/i18n/dictionaries"
 import { tx } from "@lib/i18n/localized"
+import { optionTitle } from "@lib/i18n/option-title"
 import { isVariantInStock } from "@lib/util/inventory"
 import { cheapestPrice } from "@lib/util/product-card"
 import type { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -169,9 +170,11 @@ export type Facet =
 
 /**
  * Facets of a listing: for every value, how many products would match if it were (also) selected, counted against
- * the other groups' filters. Values that never occur in the listing are not listed at all.
+ * the other groups' filters. Values that never occur in the listing are not listed at all. Option titles are shown
+ * in the page language (dictionary product.optionTitles, as on the product page); the query keeps the Admin's title.
  */
-export function buildFacets(products: Product[], q: ListingQuery, ratings: Ratings, lang: string, t: Dictionary["listing"]): Facet[] {
+export function buildFacets(products: Product[], q: ListingQuery, ratings: Ratings, lang: string, dict: Dictionary): Facet[] {
+  const t = dict.listing
   const f = config.listing.filters
   const facets: Facet[] = []
   const count = (group: Group, has: (p: Product) => boolean) => applyFilters(products, q, ratings, group).filter(has).length
@@ -187,7 +190,7 @@ export function buildFacets(products: Product[], q: ListingQuery, ratings: Ratin
       count: count(`opt:${title}`, (p) => optionValues(p, title).has(value)),
       active: !!q.opt[title]?.includes(value),
     }))
-    if (values.length > 1 || values.some((v) => v.active)) facets.push({ group: `opt:${title}`, name: "opt", key: title, label: title, values })
+    if (values.length > 1 || values.some((v) => v.active)) facets.push({ group: `opt:${title}`, name: "opt", key: title, label: optionTitle(title, dict.product), values })
   }
 
   // metadata attributes from theme.config.ts

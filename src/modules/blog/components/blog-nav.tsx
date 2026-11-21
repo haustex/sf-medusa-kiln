@@ -1,20 +1,14 @@
 import { cn } from "@heroui/styles"
 import Link from "@modules/common/components/app-link"
 
-// Same chips as the product listing (store/templates/listing.tsx): white + hairline, Ink when active
-const chip =
-  "inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full border px-4 text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
-const on = "border-foreground bg-foreground text-surface"
-const off = "border-separator bg-surface hover:border-control"
-
-/** Category filter: plain links (crawlable, no JS). Scrolls sideways on phones. */
+/** Category filter: plain links (crawlable, no JS), the same glass chips as the product listing (k-chip). Scrolls sideways on phones. */
 export function CategoryChips({ items, label }: { items: { label: string; href: string; active?: boolean }[]; label: string }) {
   return (
     <nav aria-label={label} className="-mx-container-x lg:mx-0">
-      <ul className="no-scrollbar flex gap-stack-sm overflow-x-auto px-container-x py-1 lg:px-0">
+      <ul className="no-scrollbar flex gap-stack-sm overflow-x-auto px-container-x py-stack-xs lg:px-0">
         {items.map((c) => (
           <li key={c.href}>
-            <Link href={c.href} aria-current={c.active ? "page" : undefined} className={cn(chip, c.active ? on : off)}>
+            <Link href={c.href} aria-current={c.active ? "page" : undefined} className="k-chip">
               {c.label}
             </Link>
           </li>
@@ -61,11 +55,11 @@ export function Pagination({
       </>
     )
     return disabled ? (
-      <span aria-disabled="true" className={cn(cell, "gap-1.5 text-muted")}>
+      <span aria-disabled="true" className={cn(cell, "gap-stack-sm text-muted")}>
         {body}
       </span>
     ) : (
-      <Link href={href(target)} rel={flip ? "prev" : "next"} className={cn(cell, "gap-1.5 font-medium hover:bg-default")}>
+      <Link href={href(target)} rel={flip ? "prev" : "next"} className={cn(cell, "gap-stack-sm font-medium hover:bg-default")}>
         {body}
       </Link>
     )
@@ -77,7 +71,7 @@ export function Pagination({
         {pages.map((p, i) => (
           <li key={p} className="flex items-center gap-stack-xs">
             {i > 0 && p - pages[i - 1] > 1 && (
-              <span aria-hidden="true" className="px-1 text-muted">
+              <span aria-hidden="true" className="px-stack-xs text-muted">
                 ...
               </span>
             )}

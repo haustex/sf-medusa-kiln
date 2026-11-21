@@ -2,6 +2,7 @@ import { __iconData as chevronDown } from "lucide-react/icons/chevron-down"
 import { HttpTypes } from "@medusajs/types"
 
 import { Dictionary } from "@lib/i18n/dictionaries"
+import { optionTitle } from "@lib/i18n/option-title"
 import { Icon } from "@modules/ds/icons"
 
 type T = Dictionary["product"]
@@ -19,7 +20,7 @@ export const optionLabel = (o: Pick<HttpTypes.StoreProductOption, "title" | "met
   const m = (o.metadata ?? {}) as Record<string, unknown>
   const own = m[`title_${lang}`]
   if (typeof own === "string" && own.trim()) return own.trim()
-  return t.optionTitles[(o.title ?? "").trim().toLowerCase()] ?? o.title ?? ""
+  return optionTitle(o.title, t)
 }
 
 /** Options with more than one value, values in variant order; titles translated (optionLabel) */

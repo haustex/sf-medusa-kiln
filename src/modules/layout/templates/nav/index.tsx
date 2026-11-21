@@ -29,14 +29,14 @@ import { Icon } from "@modules/ds/icons"
  * account + cart right; category row below from md. Server-rendered static HTML; the counts (cart, wishlist) and the
  * two menus are the only JS.
  *
- * Frost surface (white alpha + blur, no hairline: the blocks are separated by spacing only; text Ink only). Sticky from md at a negative top, so its extra top
- * padding (--header-tuck) scrolls away: it gets a little smaller without moving the page (CLS 0). A paint-only
- * shadow follows the scroll (.site-header in globals.css).
+ * Two frost rows (white alpha + blur, no hairline; text Ink only) on a transparent, click-through <header>. The second
+ * row (search field on phones, category row from md) slides up behind the top row and fades while scrolling down and
+ * comes back when scrolling up or near the top (HeaderScroll toggles data-collapsed; transform + opacity only, so
+ * nothing moves: CLS 0; see .header-secondary in globals.css). The top row (logo, search, icons) always stays.
  *
- * Phones: fixed, with an in-flow spacer of the same constant height (108px; 116px from sm): a top row (menu button,
- * logo, search icon, wishlist, account, cart) and the search row, which slides up behind the top row while scrolling
- * down and comes back when scrolling up (HeaderScroll toggles data-collapsed; transform only, CLS 0). The categories
- * live in the phone menu drawer.
+ * From md the header is sticky at a negative top, so its extra top padding (--header-tuck) scrolls away: it gets a
+ * little smaller without moving the page. Phones: fixed, with an in-flow spacer of the same constant height (108px;
+ * 116px from sm); the categories live in the phone menu drawer.
  */
 export default async function Nav({ countryCode }: { countryCode: string }) {
   const t = getDictionary(countryCode)
@@ -61,9 +61,9 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
     <div aria-hidden="true" className="h-[108px] sm:h-[116px] md:hidden" />
     <header
       id="site-header"
-      className="site-header max-md:pointer-events-none max-md:fixed max-md:inset-x-0 max-md:top-0 max-md:z-40 md:sticky md:inset-x-0 md:top-[calc(-1*var(--header-tuck))] md:z-40 md:frost"
+      className="site-header pointer-events-none max-md:fixed max-md:inset-x-0 max-md:top-0 max-md:z-40 md:sticky md:inset-x-0 md:top-[calc(-1*var(--header-tuck))] md:z-40"
     >
-      <div className="header-top relative z-10 max-md:pointer-events-auto max-md:frost">
+      <div className="header-top frost pointer-events-auto relative z-10">
       <div className="content-container grid h-14 grid-cols-[1fr_auto] items-center gap-stack-md sm:h-16 md:h-[calc(4.5rem+var(--header-tuck))] md:pt-[var(--header-tuck)] md:grid-cols-[1fr_minmax(0,640px)_1fr] md:gap-stack-lg">
         <div className="flex items-center gap-1">
           <MobileMenu
@@ -112,7 +112,7 @@ export default async function Nav({ countryCode }: { countryCode: string }) {
       </div>
       </div>
 
-      <div data-header-secondary className="header-secondary max-md:pointer-events-auto max-md:frost">
+      <div data-header-secondary className="header-secondary frost pointer-events-auto">
         <div className="content-container h-[3.25rem] pb-stack-sm md:hidden">{search}</div>
         <div className="hidden md:block">
           <CategoryMenu label={t.nav.menu} items={menuItems} />

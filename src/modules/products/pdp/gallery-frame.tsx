@@ -51,7 +51,7 @@ export default function GalleryFrame({ thumbs, label, showPhoto, overlay, classN
       {count > 1 && (
         <>
           {/* dots: phones */}
-          <ol className="flex justify-center gap-1.5 sm:hidden" aria-hidden="true">
+          <ol className="flex justify-center gap-stack-sm sm:hidden" aria-hidden="true">
             {thumbs.map((_, i) => (
               <li key={i} className={cn("h-1.5 rounded-full bg-foreground transition-all", i === active ? "w-5" : "w-1.5 opacity-30")} />
             ))}

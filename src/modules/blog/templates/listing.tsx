@@ -7,7 +7,7 @@ import config from "@theme"
 import { breadcrumbList, JsonLd } from "@lib/seo/jsonld"
 import { marketPath } from "@lib/util/market"
 import { getSiteOrigin } from "@lib/util/site"
-import { ButtonLink, Page, Stack } from "@modules/ds"
+import { ButtonLink, Page, PageHeader, Stack } from "@modules/ds"
 
 import { CategoryChips, Pagination } from "../components/blog-nav"
 import FeaturedPost from "../components/featured-post"
@@ -53,18 +53,8 @@ export default async function BlogListing({ countryCode, category, page = 1 }: {
       )}
       <JsonLd data={blogItemList(origin, countryCode, [...(featured ? [featured] : []), ...posts])} />
 
-      {/* "Blog // Stories from the workshop…": title and intro on one line (the intro wraps under it on phones) */}
-      <div className="content-container flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h1 className="type-h1">{title}</h1>
-        {intro && (
-          <>
-            <span aria-hidden="true" className="type-h1 font-normal text-muted/50">
-              {"//"}
-            </span>
-            <p className="text-lg text-muted sm:text-xl">{intro}</p>
-          </>
-        )}
-      </div>
+      {/* Title block like the product listings: the blog's (or the category's) name and its description */}
+      <PageHeader title={title} description={intro} className="content-container" titleTestId="blog-title" />
 
       {empty && (
         <div className="content-container flex flex-col items-start gap-stack-md">

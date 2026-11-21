@@ -15,7 +15,7 @@ const icons = [packageOpen, leaf, truck, undo2]
  */
 export default function ValueProps({ t }: { t: Dictionary["home"] }) {
   return (
-    <section aria-labelledby="values-title" className="bg-foreground py-10 text-background md:py-16" data-testid="value-props">
+    <section aria-labelledby="values-title" className="bg-foreground py-section text-background" data-testid="value-props">
       <h2 id="values-title" className="sr-only">
         {t.valuesTitle}
       </h2>

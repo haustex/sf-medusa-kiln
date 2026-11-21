@@ -207,7 +207,7 @@ export default function Panel({ open, onClose, countryCode, currencyCode, region
             </svg>
             {t.cs}
           </a>
-          {config.hours && <p className="mt-1 text-center text-xs text-muted">{fill(t.csHours, { hours: config.hours })}</p>}
+          {config.hours && <p className="mt-stack-xs text-center text-xs text-muted">{fill(t.csHours, { hours: config.hours })}</p>}
         </div>
       )}
       {consent && !blocked && (
@@ -216,7 +216,7 @@ export default function Panel({ open, onClose, countryCode, currencyCode, region
             e.preventDefault()
             void send()
           }}
-          className="flex items-end gap-2"
+          className="flex items-end gap-stack-sm"
         >
           <textarea
             ref={inputRef}
@@ -244,18 +244,18 @@ export default function Panel({ open, onClose, countryCode, currencyCode, region
           {notice}
         </p>
       )}
-      <p className="text-[11px] leading-snug text-muted">{t.disclaimer}</p>
+      <p className="text-xs text-muted">{t.disclaimer}</p>
     </div>
   )
 
   return (
-    <Sheet open={open} onClose={onClose} side="right" label={config.name} title={<span className="inline-flex items-center gap-2">{config.name}<span className="rounded-full bg-foreground px-1.5 text-[10px] font-semibold leading-4 text-background">{t.badge}</span></span>} closeLabel={t.close} footer={footer} className="k-ai-chat">
+    <Sheet open={open} onClose={onClose} side="right" label={config.name} title={<span className="inline-flex items-center gap-stack-sm">{config.name}<span className="rounded-full bg-foreground px-1.5 text-xs font-semibold leading-[1.25rem] text-background">{t.badge}</span></span>} closeLabel={t.close} footer={footer} className="k-ai-chat">
       <div className="flex h-full flex-col gap-stack-sm" data-testid="ai-chat-messages">
         {!consent ? (
-          <div className="rounded-media border border-separator p-stack-md" data-testid="ai-chat-consent">
-            <h3 className="type-h3 mb-2">{t.consentTitle}</h3>
+          <div className="flex flex-col gap-stack-sm rounded-media border border-separator p-stack-md" data-testid="ai-chat-consent">
+            <h3 className="type-h3">{t.consentTitle}</h3>
             <p className="text-sm text-muted">{consentText}</p>
-            <button type="button" onClick={accept} className={cn(buttonVariants({ variant: "primary", size: "lg" }), "mt-4 h-11 px-6")} data-testid="ai-chat-start">
+            <button type="button" onClick={accept} className={cn(buttonVariants({ variant: "primary", size: "lg" }), "mt-stack-sm h-11 self-start px-6")} data-testid="ai-chat-start">
               {t.start}
             </button>
           </div>
@@ -267,16 +267,16 @@ export default function Panel({ open, onClose, countryCode, currencyCode, region
                 <Bubble role={m.role} text={m.text} pending={m.pending} error={m.error}>
                   {m.products?.length ? <Products items={m.products} countryCode={countryCode} label={t.products} soldOut={t.soldOut} /> : null}
                   {m.handoff && whatsappHref && (
-                    <div className="mt-2">
-                      <a href={m.handoff.url} target="_blank" rel="noopener noreferrer" className="glass inline-flex h-10 items-center gap-1.5 rounded-button px-4 text-sm font-medium" data-testid="ai-chat-handoff">
+                    <div className="mt-stack-sm">
+                      <a href={m.handoff.url} target="_blank" rel="noopener noreferrer" className="glass inline-flex h-10 items-center gap-stack-sm rounded-button px-4 text-sm font-medium" data-testid="ai-chat-handoff">
                         {t.handoff}
                       </a>
-                      <p className="mt-1 text-xs text-muted">{t.handoffNote}</p>
+                      <p className="mt-stack-xs text-xs text-muted">{t.handoffNote}</p>
                     </div>
                   )}
                 </Bubble>
                 {m.role === "assistant" && !m.pending && !m.error && m.text && !m.id.startsWith("a") && (
-                  <div className="-mt-1 flex items-center gap-1 pl-1" aria-live="polite">
+                  <div className="-mt-1 flex items-center gap-stack-xs pl-1" aria-live="polite">
                     <button type="button" onClick={() => feedback(m, 1)} aria-label={t.helpful} aria-pressed={m.feedback === 1} className={cn("inline-flex size-8 items-center justify-center rounded-full text-muted hover:bg-default/60", m.feedback === 1 && "text-foreground")}>
                       <ThumbsUp {...ICON} size={16} />
                     </button>
@@ -331,12 +331,12 @@ function Bubble({ role, text, pending, error, children }: { role: "user" | "assi
 
 function Products({ items, countryCode, label, soldOut }: { items: ProductCard[]; countryCode: string; label: string; soldOut: string }) {
   return (
-    <div className="mt-2" data-testid="ai-chat-products">
-      <p className="mb-1 text-xs text-muted">{label}</p>
-      <ul className="flex flex-col gap-1.5">
+    <div className="mt-stack-sm" data-testid="ai-chat-products">
+      <p className="mb-stack-xs text-xs text-muted">{label}</p>
+      <ul className="flex flex-col gap-stack-sm">
         {items.map((p) => (
           <li key={p.handle}>
-            <Link href={marketPath(countryCode, `/products/${p.handle}`)} prefetch={false} className="flex items-center gap-3 rounded-media border border-separator bg-background p-1.5 hover:bg-default/40">
+            <Link href={marketPath(countryCode, `/products/${p.handle}`)} prefetch={false} className="flex items-center gap-stack-md rounded-media border border-separator bg-background p-1.5 hover:bg-default/40">
               <ProductImage src={p.thumbnail} name={p.handle} alt="" sizes="56px" className="size-14 shrink-0 rounded-media" />
               <span className="min-w-0 flex-1">
                 <span className="line-clamp-2 text-sm font-medium">{p.title}</span>

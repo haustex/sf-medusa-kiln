@@ -302,6 +302,12 @@ const config = {
    * (listings, product, blog), independent of `visible`.
    */
   breadcrumb: { visible: false as boolean, schema: true as boolean },
+  /**
+   * Title block of the listing pages (store, categories, collections, blog index and categories, search): the h1
+   * in the page-title size and its one-line muted description (the category's, collection's or blog category's
+   * description) under it, centred like shop.com ("center") or left-aligned ("left"). ds/page-header.tsx.
+   */
+  pageHeader: { align: "center" as "center" | "left" },
   product: {
     /** The share button over the photo, under the wishlist heart: the system share sheet on phones, a menu (copy link, WhatsApp, Facebook, X, Pinterest, e-mail) elsewhere */
     share: true as boolean,

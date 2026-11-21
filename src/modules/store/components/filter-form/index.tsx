@@ -68,11 +68,12 @@ export default function FilterForm({
 
       <fieldset className="flex flex-col gap-stack-sm">
         <legend className={cn(legend, "mb-stack-xs")}>{t.price}</legend>
+        {/* "Rp | Min": the currency is its own adornment in the field's flow (never under the placeholder), the field takes the rest */}
         <div className="grid grid-cols-2 gap-stack-sm">
           {(["min", "max"] as const).map((k) => (
-            <label key={k} className="relative block">
+            <label key={k} className="flex h-11 items-center rounded-control border border-foreground bg-background focus-within:ring-2 focus-within:ring-focus">
               <span className="sr-only">{k === "min" ? t.priceMin : t.priceMax}</span>
-              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted">
+              <span aria-hidden="true" className="shrink-0 pl-3 pr-2 text-sm text-muted">
                 {currencySymbol}
               </span>
               <input
@@ -83,7 +84,7 @@ export default function FilterForm({
                 inputMode="decimal"
                 defaultValue={query[k] ?? ""}
                 placeholder={k === "min" ? t.min : t.max}
-                className="h-11 w-full rounded-control border border-foreground bg-background pl-8 pr-3 text-sm tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-focus"
+                className="h-full min-w-0 flex-1 bg-transparent pr-3 text-sm tabular-nums outline-none"
               />
             </label>
           ))}

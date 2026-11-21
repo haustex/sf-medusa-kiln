@@ -11,6 +11,7 @@ import { PRODUCT_CARD_FIELDS, toProductCard } from "@lib/util/product-card"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
 import { getSiteOrigin } from "@lib/util/site"
 import Link from "@modules/common/components/app-link"
+import ShareButton from "@modules/common/components/share-button"
 import { Page, type ProductCardData, Section, Stack } from "@modules/ds"
 
 import AuthorBox from "../components/author-box"
@@ -18,7 +19,6 @@ import FromTheShop from "../components/from-the-shop"
 import PostBody from "../components/post-body"
 import PostCard, { PostGrid } from "../components/post-card"
 import PostCover from "../components/post-cover"
-import ShareButtons from "../components/share"
 import Toc from "../components/toc"
 import { formatPostDate } from "../format"
 import { splitForShop } from "../split"
@@ -77,8 +77,9 @@ export default async function ArticleTemplate({
   const showUpdated = updated !== card.dateLabel && new Date(post.updated_at) > new Date(post.published_at)
   const updatedText = t.blog.updated.split("{date}")
   const publishedBy = t.blog.publishedBy.split("{name}")
-  // Pinterest pins the cover itself (the wide one when there is one); the share card otherwise
-  const share = { url, title: post.title, image: post.cover_wide || post.cover || blogShareImage(origin, countryCode, post).url, labels: t.blog.share }
+  // The share button (the product page's): Pinterest pins the cover itself (the wide one when there is one) with its
+  // alt text, the share card otherwise; every channel tags the URL with utm_source=share&utm_medium={channel}
+  const share = { url, title: post.title, image: post.cover_wide || post.cover || blogShareImage(origin, countryCode, post).url, imageAlt: post.cover_alt || null, labels: { ...t.product.share, button: fill(t.product.share.button, { title: post.title }) } }
 
   return (
     <Page>
@@ -132,7 +133,7 @@ export default async function ArticleTemplate({
                 {publishedBy[1]}
               </span>
             </div>
-            {post.excerpt && <p className="text-lg leading-relaxed text-muted sm:text-xl">{post.excerpt}</p>}
+            {post.excerpt && <p className="type-lead text-muted">{post.excerpt}</p>}
             {showUpdated && (
               <p className="text-sm text-muted">
                 {updatedText[0]}
@@ -163,7 +164,11 @@ export default async function ArticleTemplate({
           <FromTheShop className="blog-shop" title={t.blog.fromShop} products={shop} countryCode={countryCode} />
           {after.length > 0 && <PostBody blocks={after} slug={post.slug} raw={preview} products={cards} labels={bodyLabels} />}
           <footer className="flex flex-col gap-section-head">
-            <ShareButtons {...share} />
+            {/* "Share" + the round glass share button (share sheet on phones, menu elsewhere), as on the product page */}
+            <div className="flex items-center justify-between gap-stack-md border-t border-separator pt-stack-md" data-testid="share-row">
+              <p className="text-sm font-medium">{t.blog.share}</p>
+              <ShareButton {...share} surface="page" align="end" />
+            </div>
             <AuthorBox author={post.author} origin={origin} lang={lang} labels={t.blog} />
           </footer>
         </div>

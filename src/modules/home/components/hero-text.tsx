@@ -27,7 +27,7 @@ export default function HeroText({
               {t.heroTitle}
             </h1>
           </Stack>
-          <p className="max-w-md text-base leading-relaxed sm:text-lg">{t.heroBody}</p>
+          <p className="type-lead max-w-md">{t.heroBody}</p>
         </Stack>
         <Stack direction="row" gap="sm" className="flex-wrap">
           <Link href={shopHref} className={cn(buttonVariants({ variant: "primary", size: "lg" }), "h-12 px-6")}>
