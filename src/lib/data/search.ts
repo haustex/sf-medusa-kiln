@@ -88,19 +88,21 @@ const BACKEND = (process.env.MEDUSA_BACKEND_URL_INTERNAL || process.env.NEXT_PUB
 /**
  * Smart search (theme.config.ts `searchRewrite`): asks the backend endpoint for catalog keywords for a query. The
  * visitor's address goes along (Cloudflare header, as the AI chat proxy does) so the endpoint can rate-limit per
- * visitor. null when the feature is off, the answer is late or anything fails: the caller keeps the keyword results.
+ * visitor. `waitMs` is sent as `wait` and bounds the request (plus 500 ms for the round trip). null when the feature
+ * is off, the answer is late or anything fails: the caller keeps the keyword results.
  */
-export const rewriteSearch = async ({ countryCode, query }: { countryCode: string; query: string }): Promise<SearchRewrite | null> => {
+export const rewriteSearch = async ({ countryCode, query, waitMs }: { countryCode: string; query: string; waitMs: number }): Promise<SearchRewrite | null> => {
   const q = query.trim()
   if (!q || !(await feature("searchRewrite"))) return null
   const h = await headers()
   const ip = h.get("cf-connecting-ip") || h.get("x-real-ip") || h.get("x-forwarded-for")?.split(",")[0].trim() || ""
-  const params = new URLSearchParams({ q: q.slice(0, 80), lang: getMarket(countryCode).dictionary })
+  // `wait`: how long the endpoint may take; the request itself gets a little more for the round trip
+  const params = new URLSearchParams({ q: q.slice(0, 80), lang: getMarket(countryCode).dictionary, wait: String(waitMs) })
   try {
     const res = await fetch(`${BACKEND}${config.searchRewrite.path}?${params}`, {
       headers: { "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "", ...(ip ? { "cf-connecting-ip": ip } : {}) },
       cache: "no-store",
-      signal: AbortSignal.timeout(config.searchRewrite.timeoutMs),
+      signal: AbortSignal.timeout(waitMs + 500),
     })
     if (!res.ok) return null
     const body = (await res.json()) as Partial<SearchRewrite>

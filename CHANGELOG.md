@@ -3,6 +3,15 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.15.0] — 2026-11-21
+
+Smart search waits longer when there is nothing else to show.
+
+### Changed
+- `theme.config.ts` `searchRewrite.timeoutMs` is now `{ empty, withResults }` (3000 / 1500, was one number): with
+  no keyword results the page waits up to `empty` behind four card skeletons and "Looking for similar products…",
+  with keyword results already shown it waits `withResults`. The value is sent to the endpoint as `wait`.
+
 ## [0.14.0] — 2026-11-21
 
 Smart search.

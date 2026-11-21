@@ -244,18 +244,21 @@ The consent text and every label live in dictionary `aiChat`; the launcher stack
 
 `features.searchRewrite` adds a second pass to `/search` when the keyword search found less than a page. The page
 renders the keyword results first; then it asks the endpoint at `searchRewrite.path` (default
-`/store/search-rewrite`, any backend route you write) `GET ?q={query}&lang={id|en}` with the publishable key and
-the visitor's IP in `cf-connecting-ip`, and expects
+`/store/search-rewrite`, any backend route you write) `GET ?q={query}&lang={id|en}&wait={ms}` with the publishable
+key and the visitor's IP in `cf-connecting-ip`, and expects
 
 ```json
 { "terms": ["mangkuk salad", "salad bowl"], "corrected": "mangkuk", "no_match": false }
 ```
 
 Each term is searched like the query itself (Meilisearch when `features.search` is on); products not already shown
-stream in under "Showing results for: mangkuk salad, salad bowl" (dictionary `listing.searchRewritten`). An answer
-later than `searchRewrite.timeoutMs` (2000), an error, `no_match: true` or no terms leave the page as it was; when
-the keyword search found nothing, "Looking for similar products…" (`listing.searchRewriting`) stands where the empty
-state will be until the answer is in, so a visitor never sees "no results" flash before results. The endpoint
+stream in under "Showing results for: mangkuk salad, salad bowl" (dictionary `listing.searchRewritten`). How long the
+page waits depends on what it already shows (`searchRewrite.timeoutMs`): `empty` (3000) when the keyword search
+found nothing — four card skeletons under "Looking for similar products…" (`listing.searchRewriting`) stand where
+the empty state would be, so a visitor never sees "no results" flash before results — and `withResults` (1500) when
+keyword results are already on the page. The value goes to the endpoint as `wait` (an endpoint can finish a later
+answer in the background and cache it for the next search; Haus Kayu's does). A later answer, an error,
+`no_match: true` or no terms leave the page as it was. The endpoint
 decides how it finds the words: Haus Kayu's asks a small model with the category names and the synonym list, caches
 each query for a day and keeps its own budget and rate limit. It is called once per search page view and never
 while typing; the probe calls it without `q` and treats only a 404 as "not installed".

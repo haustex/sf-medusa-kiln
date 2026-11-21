@@ -274,9 +274,11 @@ const config = {
    * for catalog keywords, searches each of them the same way and streams the extra products in under "Showing
    * results for: …". Any failure or a slow answer leaves the keyword results alone. The endpoint decides how it
    * finds the words (a small model call in Haus Kayu's store); the probe asks it without `q`: a 404 switches the
-   * feature off. `timeoutMs` bounds the wait for that answer.
+   * feature off. `timeoutMs` bounds the wait for that answer and is sent along as `wait` (the endpoint may finish a
+   * late answer in the background for the next search): `empty` when the keyword search found nothing (the page shows
+   * a skeleton and "Looking for similar products…" meanwhile), `withResults` when keyword results are already shown.
    */
-  searchRewrite: { path: "/store/search-rewrite", timeoutMs: 2000 },
+  searchRewrite: { path: "/store/search-rewrite", timeoutMs: { empty: 3000, withResults: 1500 } },
 
   /**
    * Product listings (/store, categories, collections). Filters are computed from the products of the listing

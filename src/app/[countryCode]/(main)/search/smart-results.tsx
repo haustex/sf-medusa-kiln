@@ -1,5 +1,6 @@
 import { productAlts } from "@lib/data/image-alt"
 import { cardRating, getProductRatings } from "@lib/data/reviews"
+import config from "@theme"
 import { rewriteSearch, searchRewriteProducts } from "@lib/data/search"
 import { fill, getDictionary } from "@lib/i18n/dictionaries"
 import { marketPath } from "@lib/util/market"
@@ -27,12 +28,27 @@ export function SearchEmpty({ countryCode }: { countryCode: string }) {
   )
 }
 
-/** While the keywords are being looked up and the keyword search found nothing (no flash of the empty state) */
+/**
+ * While the keywords are being looked up and the keyword search found nothing (no flash of the empty state): the
+ * line "Looking for similar products…" over four card skeletons the size of the real cards (no layout shift when
+ * they arrive). The pulse respects prefers-reduced-motion.
+ */
 export function SearchRewriting({ countryCode }: { countryCode: string }) {
   return (
-    <p className="type-body text-muted" role="status" data-testid="search-rewriting">
-      {getDictionary(countryCode).listing.searchRewriting}
-    </p>
+    <Stack gap="md" role="status" data-testid="search-rewriting">
+      <p className="type-body text-muted">{getDictionary(countryCode).listing.searchRewriting}</p>
+      <div aria-hidden="true">
+        <ProductGrid>
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="motion-safe:animate-pulse">
+              <div className="aspect-square w-full rounded-media bg-default" />
+              <div className="mt-stack-sm h-4 w-3/4 rounded-full bg-default" />
+              <div className="mt-2 h-4 w-1/3 rounded-full bg-default" />
+            </div>
+          ))}
+        </ProductGrid>
+      </div>
+    </Stack>
   )
 }
 
@@ -45,7 +61,9 @@ type Props = { countryCode: string; query: string; shown: string[]; limit: numbe
  */
 export default async function SmartResults({ countryCode, query, shown, limit }: Props) {
   const t = getDictionary(countryCode).listing
-  const rewrite = await rewriteSearch({ countryCode, query })
+  // Nothing shown yet: wait longer (the visitor sees the skeleton); keyword results shown: a short extra pass
+  const waitMs = shown.length ? config.searchRewrite.timeoutMs.withResults : config.searchRewrite.timeoutMs.empty
+  const rewrite = await rewriteSearch({ countryCode, query, waitMs })
   const extra = rewrite && !rewrite.no_match && rewrite.terms.length ? await searchRewriteProducts({ countryCode, terms: rewrite.terms, exclude: new Set(shown), limit, fields: PRODUCT_CARD_FIELDS }) : null
   if (!extra?.products.length) return shown.length ? null : <SearchEmpty countryCode={countryCode} />
 
