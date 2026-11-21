@@ -6,7 +6,8 @@ import { LINKS_PATH } from "@lib/links-path"
 /**
  * Optional integrations (docs/rencana.md §5): reviews + wishlist (medusa-reviews-wishlist), blog (medusa-blog-seo),
  * Meilisearch (the `/store/meilisearch/products` route), tracking (medusa-fulfillment-zone-rate), links
- * (medusa-link-in-bio), banners (medusa-hero-banners), image alt texts (medusa-image-alt) and the AI assistant (medusa-ai-chat). Each one is probed once per server process: a 404
+ * (medusa-link-in-bio), banners (medusa-hero-banners), image alt texts (medusa-image-alt), the AI assistant (medusa-ai-chat)
+ * and smart search (your endpoint at theme.config.ts `searchRewrite.path`). Each one is probed once per server process: a 404
  * from the backend means the plugin is not installed and the feature switches off cleanly (no links, no sections,
  * the routes answer 404). Anything else, including a backend that is down for a moment, keeps it on — the data
  * functions already degrade on their own — and a failed probe is retried on the next call.
@@ -26,6 +27,8 @@ const PROBES: Record<Feature, string> = {
   banners: "/store/hero-banners",
   imageAlt: "/store/image-alt?product_id=prod_kiln_probe",
   aiChat: "/store/ai-chat/config",
+  // Without `q` the endpoint answers 400, never a paid model call
+  searchRewrite: config.searchRewrite.path,
 }
 
 const BACKEND = (process.env.MEDUSA_BACKEND_URL_INTERNAL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000").replace(/\/$/, "")

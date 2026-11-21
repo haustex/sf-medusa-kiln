@@ -202,7 +202,7 @@ headings get the display cut (`src/styles/fonts-files`, 40 KB). To use another f
 ## features
 
 ```ts
-features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto", links: "auto", banners: "auto", imageAlt: "auto", aiChat: "auto" },
+features: { reviews: "auto", wishlist: "auto", blog: "auto", search: "auto", tracking: "auto", links: "auto", banners: "auto", imageAlt: "auto", aiChat: "auto", searchRewrite: "auto" },
 ```
 
 `"auto"` probes one store route per integration when the server starts (`src/lib/features.ts`): a 404 switches
@@ -220,6 +220,7 @@ environment overrides the file: `KILN_FEATURE_BLOG=off`. What "off" means:
 | `banners` | medusa-hero-banners | The home hero shows `hero.slides` from theme.config.ts (or the text hero when that list is empty) instead of the Admin's banners |
 | `imageAlt` | medusa-image-alt | Product photos keep the built-in alt texts: the title on cards and in the share image, "{title} (photo n of m)" in the gallery, decorative (`alt=""`) in the cart and the checkout summary, plain URLs in the Product JSON-LD |
 | `aiChat` | medusa-ai-chat | No chat button; `/api/ai-chat/*` 404 |
+| `searchRewrite` | your endpoint at `searchRewrite.path` | `/search` shows the keyword results only |
 
 ### AI assistant
 
@@ -238,6 +239,26 @@ Point the plugin's `knowledge.pages` at the information pages as Markdown, e.g. 
 and `https://your-store.com/us/returns.md` (see "Information pages"), so the assistant quotes your own policies.
 The consent text and every label live in dictionary `aiChat`; the launcher stacks above any element with
 `data-k-dock` (market banner, sticky add-to-cart bar) that dispatches a `k:dock` event when it appears or leaves.
+
+### Smart search
+
+`features.searchRewrite` adds a second pass to `/search` when the keyword search found less than a page. The page
+renders the keyword results first; then it asks the endpoint at `searchRewrite.path` (default
+`/store/search-rewrite`, any backend route you write) `GET ?q={query}&lang={id|en}` with the publishable key and
+the visitor's IP in `cf-connecting-ip`, and expects
+
+```json
+{ "terms": ["mangkuk salad", "salad bowl"], "corrected": "mangkuk", "no_match": false }
+```
+
+Each term is searched like the query itself (Meilisearch when `features.search` is on); products not already shown
+stream in under "Showing results for: mangkuk salad, salad bowl" (dictionary `listing.searchRewritten`). An answer
+later than `searchRewrite.timeoutMs` (2000), an error, `no_match: true` or no terms leave the page as it was; when
+the keyword search found nothing, "Looking for similar products…" (`listing.searchRewriting`) stands where the empty
+state will be until the answer is in, so a visitor never sees "no results" flash before results. The endpoint
+decides how it finds the words: Haus Kayu's asks a small model with the category names and the synonym list, caches
+each query for a day and keeps its own budget and rate limit. It is called once per search page view and never
+while typing; the probe calls it without `q` and treats only a 404 as "not installed".
 
 ### Alt texts of product photos
 

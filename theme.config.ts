@@ -264,7 +264,19 @@ const config = {
     imageAlt: "auto" as "auto" | "on" | "off",
     /** medusa-ai-chat: the AI assistant (round button bottom right, chat panel, handover to WhatsApp) */
     aiChat: "auto" as "auto" | "on" | "off",
+    /** Smart search: a backend endpoint (searchRewrite.path) that turns a /search query into catalog keywords */
+    searchRewrite: "auto" as "auto" | "on" | "off",
   },
+
+  /**
+   * Smart search (features.searchRewrite). /search shows its keyword results at once; then it asks the backend
+   * endpoint at `path` (GET ?q=&lang=, answer `{ terms: string[], corrected: string | null, no_match: boolean }`)
+   * for catalog keywords, searches each of them the same way and streams the extra products in under "Showing
+   * results for: …". Any failure or a slow answer leaves the keyword results alone. The endpoint decides how it
+   * finds the words (a small model call in Haus Kayu's store); the probe asks it without `q`: a 404 switches the
+   * feature off. `timeoutMs` bounds the wait for that answer.
+   */
+  searchRewrite: { path: "/store/search-rewrite", timeoutMs: 2000 },
 
   /**
    * Product listings (/store, categories, collections). Filters are computed from the products of the listing

@@ -3,6 +3,18 @@
 All notable changes to Kiln. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions
 follow [Semantic Versioning](https://semver.org).
 
+## [0.14.0] — 2026-11-21
+
+Smart search.
+
+### Added
+- `theme.config.ts` features.searchRewrite (`"auto"`) and `searchRewrite { path, timeoutMs }`: when the keyword
+  search of `/search` found less than a page, the page asks a backend endpoint (`GET ?q=&lang=` →
+  `{ terms, corrected, no_match }`) for catalog keywords, searches each one and streams the extra products in under
+  "Showing results for: …" (`search/smart-results.tsx`, Suspense). The keyword results never wait; a slow or failed
+  answer, `no_match` or no terms change nothing. No client JavaScript. Dictionary `listing.searchRewritten`,
+  `listing.searchRewriting`. docs/customize.md "Smart search".
+
 ## [0.13.0] — 2026-11-21
 
 Header that tucks its second row away, shop.com-like page titles, one type scale.

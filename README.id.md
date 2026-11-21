@@ -38,7 +38,8 @@ Demo: [kiln.hauskayu.com](https://kiln.hauskayu.com) (Stripe mode test, data dir
   JavaScript klien minim. Lighthouse (mobile, build produksi lokal): lihat [docs/lighthouse.md](docs/lighthouse.md).
 - **Integrasi opsional nyala sendiri**: ulasan dan wishlist
   ([medusa-reviews-wishlist](https://www.npmjs.com/package/medusa-reviews-wishlist)), jurnal (medusa-blog-seo),
-  dan route Meilisearch dicek sekali saat start; backend tanpa semua itu mendapat storefront tanpa hati, bintang,
+  route Meilisearch, dan endpoint pencarian pintar (kueri → kata kunci katalog, hasilnya di-stream di bawah hasil
+  keyword) dicek sekali saat start; backend tanpa semua itu mendapat storefront tanpa hati, bintang,
   atau tautan jurnal, dan pencarian jatuh ke pencarian bawaan Medusa.
 - **Satu file konfigurasi**: `theme.config.ts` memuat brand, logo, profil sosial, market, warna, radius, permukaan
   blur, font, saklar fitur, filter daftar produk, catatan produk, slide hero, dan kontak. Tiap warna dan radius
