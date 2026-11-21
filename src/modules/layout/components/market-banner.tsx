@@ -3,7 +3,7 @@
 import { ArrowRight } from "@modules/ds/icons"
 import Link from "@modules/common/components/app-link"
 import { IconButton } from "@modules/common/components/ui"
-import { useEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useState } from "react"
 
 const STORAGE_KEY = "kiln_market_banner_dismissed"
 
@@ -11,29 +11,31 @@ const STORAGE_KEY = "kiln_market_banner_dismissed"
  * theme.config.ts markets.suggest: a small dismissible pill on one market pointing to another ("Shopping from the
  * US? → Go to the US store"). No geo-IP: every visitor of market `on` sees it until closed. Fixed position, shown
  * once the web fonts are in: a fixed element that changes height when the font swaps still counts as a layout
- * shift, an element that appears afterwards does not.
+ * shift, an element that appears afterwards does not. Once decided (shown, or dismissed earlier) it tells the chat
+ * launcher (`k:dock`, before paint), which waits for that to appear above it.
  */
 export default function MarketBanner({ href, text, cta, closeLabel, lang }: { href: string; text: string; cta: string; closeLabel: string; lang: string }) {
-  const [visible, setVisible] = useState(false)
+  const [state, setState] = useState<"pending" | "shown" | "hidden">("pending")
+  const visible = state === "shown"
 
   useEffect(() => {
     let show = true
     try {
       show = window.localStorage.getItem(STORAGE_KEY) !== "1"
     } catch {}
-    if (!show) return
     let alive = true
     const ready = document.fonts?.ready ?? Promise.resolve()
-    ready.then(() => alive && setVisible(true))
+    ready.then(() => alive && setState(show ? "shown" : "hidden"))
     return () => {
       alive = false
     }
   }, [])
 
-  useEffect(() => {
-    // The chat launcher (modules/ai-chat) stacks above whatever carries data-k-dock
-    window.dispatchEvent(new Event("k:dock"))
-  }, [visible])
+  useLayoutEffect(() => {
+    // The chat launcher (modules/ai-chat) stacks above whatever carries data-k-dock; before paint, so the launcher
+    // and the banner come in within the same frame
+    if (state !== "pending") window.dispatchEvent(new Event("k:dock"))
+  }, [state])
 
   if (!visible) return null
 
@@ -41,7 +43,7 @@ export default function MarketBanner({ href, text, cta, closeLabel, lang }: { hr
     try {
       window.localStorage.setItem(STORAGE_KEY, "1")
     } catch {}
-    setVisible(false)
+    setState("hidden")
   }
 
   return (

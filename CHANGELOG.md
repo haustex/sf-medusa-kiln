@@ -41,6 +41,11 @@ Header that tucks its second row away, shop.com-like page titles, one type scale
   are the listing's glass chips; `SectionHeader` descriptions and hero copy use `type-body` / `type-lead`;
   `Heading` (common/ui) maps h1/h2/h3 onto `type-h1`/`type-h2`/`type-h3`; the 404 pages use `type-h1`.
 
+### Fixed
+- The AI assistant's button no longer jumps up when the market banner comes in (a 0.004 layout shift on every page
+  of that market since 0.11.0): on a market with the banner it stays invisible until the banner has decided
+  (`k:dock` dispatched before paint) and appears once, in its place. Its "AI" badge is 13px.
+
 
 No visible breadcrumbs.
 

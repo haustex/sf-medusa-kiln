@@ -1,3 +1,4 @@
+import config from "@theme"
 import { getAiChatConfig } from "@lib/data/ai-chat"
 import { getRegion } from "@lib/data/regions"
 import { feature } from "@lib/features"
@@ -14,8 +15,9 @@ import Launcher from "./launcher"
  */
 export default async function AiChat({ countryCode }: { countryCode: string }) {
   if (!(await feature("aiChat"))) return null
-  const config = await getAiChatConfig(countryCode)
-  if (!config?.enabled) return null
+  const chat = await getAiChatConfig(countryCode)
+  if (!chat?.enabled) return null
+  const suggest = config.markets.suggest
   const market = getMarket(countryCode)
   const region = await getRegion(countryCode).catch(() => null)
   const t = getDictionary(countryCode).aiChat
@@ -25,9 +27,10 @@ export default async function AiChat({ countryCode }: { countryCode: string }) {
       currencyCode={market.currency}
       regionId={region?.id ?? null}
       pathPrefix={marketPath(countryCode, "")}
-      privacyHref={marketPath(countryCode, config.privacy_path) || config.privacy_path}
-      config={config}
+      privacyHref={marketPath(countryCode, chat.privacy_path) || chat.privacy_path}
+      config={chat}
       labels={t}
+      waitForDock={!!suggest && suggest.on.toLowerCase() === countryCode.toLowerCase()}
     />
   )
 }

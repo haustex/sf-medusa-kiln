@@ -13,6 +13,8 @@ export type AiChatProps = {
   privacyHref: string
   config: AiChatConfig
   labels: AiChatLabels
+  /** True when this market shows the market banner (theme.config.ts markets.suggest): the button waits for the banner's decision before it appears, so it never jumps (CLS 0) */
+  waitForDock: boolean
 }
 
 export type ProductCard = { handle: string; title: string; url: string; thumbnail: string | null; price: string | null; in_stock: boolean | null }
